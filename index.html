@@ -1,0 +1,1918 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kamyar Portfolio</title>
+<style>
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+html, body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+/* Layout: desktop-first canvas (1440 design width), 1280px content column on a 12-col grid, 24px gutters. Single matte dark theme. */
+:root {
+  color-scheme: dark;
+
+  /* Palette: near-neutral warm greys, minimal saturation, no gloss or gradients */
+  --ink-900: #141413;   /* page background */
+  --ink-800: #1A1A19;   /* surface / cards */
+  --ink-700: #222221;   /* raised surface, hover */
+  --ink-600: #2E2E2D;   /* borders, dividers */
+  --stone-400: #8C8B89; /* secondary text */
+  --stone-100: #E2E2E0; /* primary text, soft off-white */
+  --ash-300: #B8B7B4;   /* primary accent, pale ash */
+  --taupe-400: #92918D; /* secondary accent, grey taupe */
+
+  /* Semantic aliases used by components */
+  --bg: var(--ink-900);
+  --surface: var(--ink-800);
+  --surface-2: var(--ink-700);
+  --line: var(--ink-600);
+  --fg: var(--stone-100);
+  --muted: var(--stone-400);
+  --accent: var(--ash-300);
+  --accent-2: var(--taupe-400);
+
+  /* Type */
+  --font-display: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Geist", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --header-h: 88px;
+
+  /* Scale (1.25 ratio) */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.563rem;
+  --fs-2xl: 1.953rem;
+  --fs-3xl: 3.052rem;
+  --fs-4xl: 4.768rem;
+
+  /* Layout */
+  --container: 1280px;
+  --cols: 12;
+  --gutter: 24px;
+  --radius: 6px;
+  --space: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  position: relative;
+}
+
+/* ---------- Page regions ---------- */
+.site-main, .site-footer { display: grid; }
+.site-main { min-height: 60vh; }
+
+/* ---------- Top bar ---------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 40;
+  background: var(--bg);
+}
+.site-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 40;
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar {
+  min-height: var(--header-h);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--space) * 2) calc(var(--space) * 4);
+  padding-block: calc(var(--space) * 1.5);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+.brand__text {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  /* Optical centering: the large title carries most of the visual weight, so the
+     mathematically centered pair reads high. Nudge it down so its perceived center
+     sits on the bar's midline (measured: mass center ~7px above the box center). */
+  position: relative;
+  top: 3px;
+}
+
+/* Portrait: no frame or background; the bust stands on the top bar's bottom border.
+   The figure fills x 14%–75% of its square, so the anchor shifts left by 14% to align the hair with the grid edge. */
+.brand__spacer { flex: none; width: calc(var(--header-h) * 0.61 + 8px); height: 1px; }
+.portrait-anchor {
+  position: absolute;
+  left: calc(var(--header-h) * -0.14);
+  bottom: 0;
+  width: var(--header-h);
+  height: var(--header-h);
+  pointer-events: none;
+}
+.portrait-frame { display: none; background: none; }
+.portrait-anchor > .portrait-frame { display: block; position: absolute; inset: 0; }
+.portrait-frame pixel-portrait { display: block; width: 100%; }
+.portrait-frame.is-flying { display: block; position: fixed; z-index: 101; }
+
+/* ---------- Loading screen ---------- */
+.intro { display: none; }
+html.is-intro { overflow: hidden; }
+html.is-intro .intro {
+  display: grid;
+  place-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px));
+}
+.intro__inner { display: grid; gap: 0; max-width: 100%; }
+/* the portrait's bottom edge stands directly on the progress line */
+.intro__stage { width: 100%; aspect-ratio: 1; }
+.intro__bar { height: 1px; background: var(--line); overflow: hidden; }
+.intro__bar i { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: 0 50%; }
+/* Header content arrives once the portrait has landed */
+.nav__label { display: inline; }
+/* while the intro runs, the active-tab cursor waits until the menu has been written */
+html.is-writing .nav a::after { opacity: 0 !important; animation: none !important; }
+
+/* Writing animation for name and title (characters are split by script during the intro only) */
+.ch { opacity: 0; transition: opacity 120ms ease; }
+.ch.on { opacity: 1; }
+/* zero-size anchor so the caret never changes line height (no jump when it moves or leaves) */
+.type-caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  vertical-align: baseline;
+}
+.type-caret::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  bottom: -0.12em;
+  width: 1px;
+  height: 1em;
+  background: currentColor;
+}
+.type-caret.is-done { animation: caret-blink 1s steps(1, end) 2 forwards; }
+@keyframes caret-blink { 50% { opacity: 0; } 100% { opacity: 0; } }
+.brand__name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.375rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--fg);
+}
+.brand__role {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--muted);
+}
+.site-header nav { display: flex; align-items: center; position: relative; }
+.nav li { display: flex; align-items: center; position: relative; z-index: 1; }
+
+/* Active tab: a blinking underscore cursor right after the label */
+.nav__indicator { display: none; }
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space) * 2.5);
+  list-style: none;
+  margin: 0 -4px 0 0; /* the last label plus its cursor end exactly at the content edge */
+  padding: 0;
+}
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 10px 14px;
+  position: relative;
+  transition: color 240ms ease;
+}
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: calc(100% - 12px); /* 2px after the label (links have 14px side padding) */
+  bottom: 10px;
+  width: 8px;
+  height: 2px;
+  background: var(--fg);
+  opacity: 0;
+}
+.nav a[aria-current="true"]::after {
+  opacity: 1;
+  animation: bit-blink 1.06s steps(1, end) infinite;
+}
+@keyframes bit-blink { 50% { opacity: 0; } }
+
+.nav a:hover { color: var(--fg); }
+.nav a[aria-current="true"] { color: var(--fg); }
+
+/* ---------- Views ---------- */
+.view { padding-block: 72px 128px; }
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.prose { max-width: 62ch; font-size: 1.125rem; line-height: 1.65; font-weight: 300; color: var(--muted); }
+.prose p { margin: 0; }
+.prose > p + p { margin-top: 1em; }
+.prose strong, .muted-strong strong { color: var(--fg); font-weight: 500; }
+
+/* ---------- Work (home) ---------- */
+.work-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+.work-head h2 { font-family: var(--font-display); font-weight: 400; font-size: var(--fs-2xl); letter-spacing: -0.02em; margin: 0; }
+.case-card {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--gutter);
+  color: inherit;
+  text-decoration: none;
+}
+.case-card__media {
+  grid-column: 1 / span 8;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.case-card__media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 800ms cubic-bezier(.16, 1, .3, 1); }
+.case-card:hover .case-card__media img { transform: scale(1.025); }
+.case-card__body { grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.case-card__title { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-3xl); letter-spacing: -0.03em; line-height: 1; margin: 0; }
+.case-card__sum { margin: 0; color: var(--muted); font-size: 1.0625rem; line-height: 1.55; font-weight: 300; }
+.case-card__cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+.case-card__cta::after {
+  content: "";
+  width: 8px;
+  height: 2px;
+  margin-left: 2px;
+  background: currentColor;
+  opacity: 0;
+}
+.case-card:hover .case-card__cta::after,
+.case-card:focus-visible .case-card__cta::after { opacity: 1; animation: bit-blink 1.06s steps(1, end) infinite; }
+
+.facts { margin: 0; border-top: 1px solid var(--line); }
+.facts div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.facts dt { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); flex: none; }
+.facts dd { margin: 0; font-size: var(--fs-sm); text-align: right; min-width: 0; }
+
+/* ---------- Case study ---------- */
+.cs-back {
+  display: inline-flex;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+.cs-back:hover { color: var(--fg); }
+.cs-hero {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 32px var(--gutter);
+  align-items: end;
+  padding-block: 48px 48px;
+}
+.cs-hero__title { grid-column: 1 / span 7; min-width: 0; }
+.cs-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(3.25rem, 8vw, 6.5rem);
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  margin: 18px 0 0;
+}
+.cs-hero__sub { margin: 18px 0 0; font-size: var(--fs-xl); font-weight: 300; color: var(--muted); text-wrap: balance; }
+.cs-hero .facts { grid-column: 9 / span 4; }
+
+.frame { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #0a0a0a; }
+.frame img { display: block; width: 100%; height: auto; }
+.cs-figure { margin: 0; display: grid; gap: 12px; }
+.cs-figure figcaption { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+.cs-section {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 40px var(--gutter);
+  padding-top: 120px;
+}
+.cs-section__head { grid-column: 1 / span 4; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.cs-num { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em; color: var(--muted); }
+.cs-section__head h2 { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-2xl); letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance; }
+.cs-kicker { margin: 0; color: var(--muted); font-weight: 300; }
+.cs-section__body { grid-column: 5 / span 8; min-width: 0; }
+.cs-full { grid-column: 1 / -1; min-width: 0; }
+.cs-note { margin: 0; max-width: 36ch; font-size: 1.5rem; line-height: 1.4; font-weight: 300; color: var(--muted); text-wrap: balance; }
+.cs-note strong { color: var(--fg); font-weight: 400; }
+
+/* four principles */
+.pillars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
+.pillars > div { border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 8px; align-content: start; }
+.pillars h3, .attr h4, .blend h3 { margin: 0; font-size: 1rem; font-weight: 500; letter-spacing: -0.005em; }
+.pillars p, .attr p, .blend p { margin: 0; color: var(--muted); font-size: 0.9375rem; line-height: 1.55; font-weight: 300; }
+
+/* workflow */
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  counter-reset: step;
+}
+.steps > li { background: var(--bg); padding: 22px 22px 26px; display: grid; gap: 10px; align-content: start; min-height: 190px; min-width: 0; }
+.steps > li::before {
+  counter-increment: step;
+  content: counter(step, decimal-leading-zero) " ——";
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.steps > li:last-child::before { content: counter(step, decimal-leading-zero) " ↺"; }
+.steps h3 { margin: 0; font-size: 1rem; font-weight: 500; }
+.steps p, .steps ul { margin: 0; color: var(--muted); font-size: 0.9375rem; line-height: 1.55; font-weight: 300; }
+.steps ul { padding-left: 1.1em; }
+
+/* competitive table */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+.compare { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 0.9375rem; }
+.compare th, .compare td { padding: 18px 22px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.compare tr:last-child td, .compare tr:last-child th { border-bottom: 0; }
+.compare thead th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: var(--surface); }
+.compare tbody th { font-weight: 500; width: 28%; }
+.compare td { color: var(--muted); font-weight: 300; width: 24%; }
+.compare td.none { color: var(--line); }
+.compare td.none::before { content: "—"; color: var(--ink-600); }
+
+/* personas */
+.persona { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px var(--gutter); padding-block: 36px; border-top: 1px solid var(--line); }
+.persona + .persona { margin-top: 8px; }
+.persona__photo { grid-column: 1 / span 3; margin: 0; }
+.persona__photo .frame { aspect-ratio: 1; max-width: 100%; }
+.persona__photo img { height: 100%; object-fit: cover; }
+.persona__main { grid-column: 4 / span 9; display: grid; gap: 28px; min-width: 0; }
+.persona__id { display: grid; gap: 10px; }
+.persona__id h3 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: var(--fs-xl); letter-spacing: -0.02em; }
+.persona__id ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 0.9375rem; font-weight: 300; }
+.persona__id ul strong { color: var(--fg); font-weight: 500; }
+.attrs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px var(--gutter); }
+.attr { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.attr h4 { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.attr p strong, .attr li strong { color: var(--fg); font-weight: 500; }
+.attr ul { margin: 0; padding-left: 1.1em; color: var(--muted); font-size: 0.9375rem; line-height: 1.6; font-weight: 300; }
+
+/* smart blenders */
+.blends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gutter); }
+.blend { border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 8px; align-content: start; }
+.blend p strong { color: var(--fg); font-weight: 500; }
+
+/* video posters (link out: the viewer can't embed video players) */
+.video { position: relative; display: block; color: inherit; text-decoration: none; }
+.video__play {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px 10px 12px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 200ms ease;
+}
+.video__play::before { content: ""; width: 0; height: 0; border-style: solid; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent currentColor; }
+.video:hover .video__play { border-color: var(--taupe-400); }
+
+/* testimonials */
+.quotes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gutter); }
+.quote { margin: 0; display: grid; gap: 16px; align-content: start; min-width: 0; }
+.quote .frame { aspect-ratio: 356 / 400; max-width: 100%; }
+.quote .frame img { height: 100%; object-fit: cover; }
+.quote figcaption { font-weight: 500; }
+.quote blockquote { margin: 0; color: var(--muted); font-size: 0.9375rem; line-height: 1.6; font-weight: 300; }
+
+/* award */
+.award { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px var(--gutter); align-items: center; }
+.award .frame { grid-column: 1 / span 7; }
+.award__text { grid-column: 8 / span 5; display: grid; gap: 16px; min-width: 0; }
+.award__text h3 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: var(--fs-2xl); letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
+.award__text p { margin: 0; color: var(--muted); font-weight: 300; line-height: 1.6; }
+.tags { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; color: var(--muted); }
+
+/* closing */
+.cs-end { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px var(--gutter); margin-top: 120px; padding-top: 48px; border-top: 1px solid var(--line); }
+.cs-end h2 { grid-column: 1 / span 5; margin: 0; font-family: var(--font-display); font-weight: 500; font-size: var(--fs-3xl); letter-spacing: -0.03em; line-height: 1; }
+.cs-end__body { grid-column: 7 / span 6; display: grid; gap: 24px; min-width: 0; }
+.cs-end__body p { margin: 0; color: var(--muted); font-size: 1.125rem; line-height: 1.6; font-weight: 300; }
+.contact-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.email { font-family: var(--font-mono); font-size: 1rem; color: var(--fg); user-select: all; overflow-wrap: anywhere; }
+.btn-line {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 9px 13px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+.btn-line:hover { color: var(--fg); border-color: var(--taupe-400); }
+.cs-foot { margin-top: 72px; }
+
+/* ---------- About: experience map, with the intro and roles laid over it ---------- */
+/* clip sideways overflow at the window edge (not at the content gutter), so the full-bleed map reaches both edges */
+body { overflow-x: clip; }
+.xstage { position: relative; display: flow-root; }
+/* full-bleed: the map spans the whole window, outside the content column */
+.xmap { position: relative; width: 100vw; max-width: none; margin: 0 calc(50% - 50vw); overflow: hidden; overflow: clip; }
+
+.xmap canvas, .xmap svg { display: block; width: 100%; height: auto; }
+.xmap svg { position: absolute; inset: 0; height: 100%; overflow: visible; }
+.xmap__worked-tone { color: color-mix(in srgb, var(--ink-600) 76%, var(--stone-400)); display: none; }
+.xmap .arc { fill: var(--ash-300); opacity: 0.65; transition: opacity 240ms ease; }
+.xmap .core { fill: var(--fg); }
+.xmap .halo { fill: var(--ash-300); }
+.xmap .ring { fill: var(--stone-100); animation: bit-blink 1.06s steps(1, end) infinite; }
+.xmap .pkt { fill: var(--stone-100); }
+.xmap [data-city="berlin"] .ring { animation-delay: -0.27s; }
+.xmap [data-city="dubai"] .ring { animation-delay: -0.53s; }
+.xmap [data-city="la"] .ring { animation-delay: -0.8s; }
+.xmap [data-city="atlanta"] .ring { animation-delay: -0.4s; }
+.xmap [data-city="yerevan"] .ring { animation-delay: -0.66s; }
+.xmap .city { transition: opacity 240ms ease; }
+.xmap[data-focus] .city:not(.is-focus), .xmap[data-focus] .arc:not(.is-focus) { opacity: 0.25; }
+.xmap[data-focus] .arc.is-focus { opacity: 1; }
+.xmap__label {
+  position: absolute;
+  display: grid;
+  gap: 4px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  pointer-events: none;
+  padding: 4px 6px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  transition: opacity 240ms ease;
+}
+.xmap__label span { color: var(--muted); letter-spacing: 0.06em; }
+.xmap[data-focus] .xmap__label:not(.is-focus) { opacity: 0.3; }
+.xmap__label--ur { transform: translate(16px, calc(-100% - 8px)); }
+.xmap__label--dr { transform: translate(16px, 10px); }
+.xmap__label--ul { transform: translate(calc(-100% - 16px), calc(-100% - 8px)); text-align: right; }
+.xmap__label--dl { transform: translate(calc(-100% - 16px), 10px); text-align: right; }
+
+/* content layer: sits on the map inside the content column */
+.xstage__content {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* panels are placed by script: the intro ends just above the highest city, the roles start just below the lowest */
+.xstage__content .xpanel { position: absolute; left: 0; right: 0; }
+.xpanel {
+  pointer-events: auto;
+  background: color-mix(in srgb, var(--bg) 74%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  border-radius: var(--radius);
+}
+.xpanel--intro { padding: 24px 28px 28px; display: grid; gap: 20px; }
+.xpanel__head { margin: 0; padding-bottom: 16px; }
+.about__intro { margin: 0; font-size: 1.25rem; line-height: 1.6; font-weight: 300; color: var(--muted); text-wrap: pretty; }
+.about__intro strong { color: var(--fg); font-weight: 500; }
+.xpanel--roles { padding: 4px 28px; }
+.xp { margin: 0; }
+.xp__row {
+  display: grid;
+  grid-template-columns: 2fr 3fr 4fr 3fr 2fr;
+  gap: 16px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  font-size: var(--fs-base);
+  transition: color 200ms ease;
+}
+.xp__row:last-child { border-bottom: 0; }
+.xp__row > * { min-width: 0; }
+.xp__row:hover .xp__co { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.xp__years { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.06em; color: var(--muted); font-variant-numeric: tabular-nums; }
+.xp__co { font-weight: 500; }
+.xp__role { color: var(--muted); font-weight: 300; }
+.xp__place { color: var(--fg); }
+.xp__mode { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: right; }
+.xp__mode.is-remote { color: var(--fg); }
+
+/* ---------- About page: bio, numbers, expertise ---------- */
+.about-bio { display: grid; gap: 48px; }
+.about-bio .work-head { margin-bottom: 0; }
+/* two columns that start on the same line: the story on the left, a compact profile card on the right */
+/* same 4-column grid as the stat cards below, so the profile card lines up with the last card */
+.bio { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto 1fr; gap: 28px var(--gutter); align-items: start; }
+.bio__lead { grid-column: 1 / span 3; grid-row: 1; margin: 0; font-size: clamp(1.75rem, 2.9vw, 2.375rem); line-height: 1.25; letter-spacing: -0.02em; font-weight: 300; color: var(--muted); text-wrap: balance; }
+.bio__lead strong { color: var(--fg); font-weight: 400; }
+.bio__text { grid-column: 1 / span 3; grid-row: 2; max-width: 64ch; display: grid; gap: 1em; color: var(--muted); font-size: 1.125rem; line-height: 1.65; font-weight: 300; }
+.bio__text p { margin: 0; }
+.bio__text strong { color: var(--fg); font-weight: 500; }
+.bio__facts {
+  grid-column: 4;
+  grid-row: 1 / span 2;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 4px 22px;
+  /* the card runs the full height of the story beside it, rows spread evenly */
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+}
+.bio__facts div { padding: 14px 0; flex: 1; align-items: center; }
+.bio__facts div:last-child { border-bottom: 0; }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
+.stat {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  padding: 24px 24px 26px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.stat__num { margin-bottom: 16px; }
+.stat__num { font-family: var(--font-display); font-size: clamp(2.5rem, 4.4vw, 3.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+.stat__what { font-size: var(--fs-base); color: var(--fg); }
+.stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); }
+
+.expertise { padding-top: 140px; }
+.expertise__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 40px var(--gutter); }
+.expertise__text { grid-column: 1 / span 4; display: grid; gap: 1em; align-content: start; color: var(--muted); font-size: 1.0625rem; line-height: 1.65; font-weight: 300; min-width: 0; }
+.expertise__text p { margin: 0; }
+.expertise__text strong { color: var(--fg); font-weight: 500; }
+.expertise__lead { color: var(--fg) !important; font-size: var(--fs-xl); line-height: 1.3; font-weight: 400; letter-spacing: -0.01em; }
+.skills { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.skills li { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--fg); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 10px; }
+
+.vgraph { grid-column: 5 / span 8; margin: 0; display: grid; gap: 14px; min-width: 0; }
+.vgraph__rows { display: grid; gap: 4px; }
+.vg-row { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) 4.5rem; gap: 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
+.vg-row__label { display: grid; gap: 3px; min-width: 0; }
+.vg-row__domain { font-size: var(--fs-sm); color: var(--fg); }
+.vg-row__co { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.vg-row svg { display: block; width: 100%; height: auto; }
+.vg-row__dur { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.vg-off { fill: var(--ink-700); }
+.vg-on { fill: var(--ash-300); }
+.vg-now { fill: var(--stone-100); animation: bit-blink 1.06s steps(1, end) infinite; }
+.vgraph__rows:hover .vg-row:not(:hover) { opacity: 0.4; }
+.vgraph__axis { position: relative; height: 14px; margin-left: calc(13rem + 16px); margin-right: calc(4.5rem + 16px); }
+.vgraph__axis span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vgraph figcaption { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.04em; color: var(--muted); }
+
+/* experience map section now sits third on the page */
+.about { padding-top: 140px; }
+.xpanel__note { margin: 0; font-size: 1.125rem; line-height: 1.6; font-weight: 300; color: var(--muted); }
+.xpanel__note strong { color: var(--fg); font-weight: 500; }
+
+/* closing link */
+.about-cta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px 32px; margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--line); }
+.about-cta p { margin: 0; font-size: var(--fs-xl); font-weight: 300; color: var(--muted); }
+.about-cta a { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg); text-decoration: none; display: inline-flex; align-items: baseline; }
+.about-cta a::after { content: ""; width: 8px; height: 2px; margin-left: 4px; background: currentColor; animation: bit-blink 1.06s steps(1, end) infinite; }
+
+@media (max-width: 1100px) {
+  .expertise__text, .vgraph { grid-column: 1 / -1; }
+  .vgraph__axis { margin-left: calc(11rem + 16px); }
+  .vg-row { grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 4.5rem; }
+}
+@media (max-width: 900px) {
+  .bio__lead, .bio__text, .bio__facts { grid-column: 1 / -1; grid-row: auto; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
+  .expertise, .about { padding-top: 96px; }
+  .vg-row { grid-template-columns: minmax(0, 1fr) 3.5rem; }
+  .vg-row svg { grid-column: 1 / -1; grid-row: 2; }
+  .vgraph__axis { margin-left: 0; margin-right: 0; }
+}
+
+/* ---------- Contact ---------- */
+.contact { display: grid; gap: 40px; }
+.contact .work-head { margin-bottom: 0; }
+.contact__lead { margin: 0; max-width: 46ch; font-size: var(--fs-xl); line-height: 1.45; font-weight: 300; color: var(--muted); text-wrap: balance; }
+.contact__row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; }
+.contact__email { font-family: var(--font-display); font-size: clamp(1.75rem, 5vw, 3.5rem); font-weight: 400; letter-spacing: -0.03em; color: var(--fg); user-select: all; overflow-wrap: anywhere; }
+.contact__links { max-width: 640px; }
+.contact__links a { color: var(--fg); text-decoration: none; }
+.contact__links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 1100px) {
+  /* not enough room to overlay: the map comes first, then the content below it */
+  .xstage { display: flex; flex-direction: column; gap: 32px; }
+  .xstage__content { display: contents; }
+  .xpanel { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border: 0; padding: 0; border-radius: 0; }
+  .xpanel--intro { order: 0; max-width: 62ch; }
+  .xmap { order: 1; }
+  .xstage__content .xpanel { position: static; }
+  .xpanel--roles { order: 2; width: 100%; border-top: 1px solid var(--line); }
+}
+@media (max-width: 640px) {
+  /* narrow screens: the menu wraps to a second row on the right, the portrait stays on the first */
+  .site-header nav { margin-left: auto; }
+  .portrait-anchor { top: 0; bottom: auto; }
+  .xmap__label { display: none; }
+}
+@media (max-width: 900px) {
+  .about { padding-top: 96px; }
+  .xp__row { grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+  .xp__mode { text-align: left; }
+  .xmap__label span { display: none; }
+}
+
+@media (max-width: 900px) {
+  .case-card__media, .case-card__body,
+  .cs-hero__title, .cs-hero .facts,
+  .cs-section__head, .cs-section__body,
+  .persona__photo, .persona__main,
+  .award .frame, .award__text,
+  .cs-end h2, .cs-end__body { grid-column: 1 / -1; }
+  .persona__photo { max-width: 240px; }
+  .pillars, .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .attrs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quotes { grid-template-columns: 1fr; max-width: 420px; }
+  .cs-section { padding-top: 88px; }
+  .view { padding-block: 40px 96px; }
+}
+@media (max-width: 560px) {
+  .pillars, .steps, .attrs, .blends { grid-template-columns: 1fr; }
+  .video__play { left: 10px; bottom: 10px; }
+}
+
+@media (max-width: 900px) {
+  :root { --cols: 4; --gutter: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<script>
+  // Show the loading screen from the first paint (skipped for reduced motion).
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('is-intro');
+</script>
+<script src="portrait.js"></script>
+
+<header class="site-header">
+  <div class="container topbar">
+    <div class="portrait-anchor" id="portrait-anchor"></div>
+    <a class="brand" href="#top" aria-label="Kamyar Yazdanpanah, home">
+      <span class="brand__spacer" aria-hidden="true"></span>
+      <span class="brand__text">
+        <span class="brand__name">Kamyar Yazdanpanah</span>
+        <span class="brand__role">Senior Product Designer</span>
+      </span>
+    </a>
+    <nav aria-label="Main" id="main-nav">
+      <span class="nav__indicator" id="nav-indicator" aria-hidden="true"></span>
+      <ul class="nav">
+        <li><a href="#work" aria-current="true">Work</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <div class="container">
+    <!-- Home: work index -->
+    <div class="view" id="view-home">
+      <section id="work-section" aria-labelledby="work-title">
+        <div class="work-head" data-reveal>
+          <h2 id="work-title">Selected work</h2>
+          <span class="label">1 case study</span>
+        </div>
+
+        <a class="case-card" href="#djoid">
+          <div class="case-card__media" data-reveal>
+            <img src="work/djoid/card.webp" width="1600" height="900" alt="Djoid dashboard on a monitor: Friday Night Collection with filters, key wheel, track list and waveform player.">
+          </div>
+          <div class="case-card__body" data-reveal>
+            <span class="label">Case study · 2025</span>
+            <h3 class="case-card__title">Djoid</h3>
+            <p class="case-card__sum">An AI-powered music library that turns chaotic DJ collections into performance-ready journeys.</p>
+            <dl class="facts">
+              <div><dt>Role</dt><dd>Product designer</dd></div>
+              <div><dt>Product</dt><dd>Desktop music library</dd></div>
+              <div><dt>Award</dt><dd>GEMA × WISE Startup 2025</dd></div>
+            </dl>
+            <span class="case-card__cta">View case study</span>
+          </div>
+        </a>
+      </section>
+
+    </div>
+
+    <!-- About -->
+    <div class="view view--about" id="view-about" hidden>
+      <!-- 1 · Bio and numbers -->
+      <section class="about-bio" aria-label="About">
+        <div class="bio" data-reveal>
+          <p class="bio__lead">I’m Kamyar, an award-winning <strong>senior product designer</strong> with <strong>8+ years</strong> of building and scaling digital products for <strong>millions of users</strong>.</p>
+          <div class="bio__text">
+            <p>I work at <strong>Digikala</strong> in the q-commerce vertical, owning the shopping journey from discovery to post-purchase for 1.9M active users inside a 66M+ ecosystem. Before that I helped <strong>AbanTether</strong>, Iran’s second-largest crypto exchange, grow through a full platform revamp, designed Web3 products for <strong>Gala</strong>’s worldwide communities, and shaped <strong>Djoid</strong>, an AI music library that won the GEMA × WISE Startup Competition Award in 2025.</p>
+            <p>Alongside product work I publish UI kits, icons and 3D assets on UI8, and I build design systems from scratch: tokens, components, icon sets and interaction guidelines.</p>
+          </div>
+          <dl class="facts bio__facts">
+            <div><dt>Based in</dt><dd>Tehran, Iran</dd></div>
+            <div><dt>Works</dt><dd>On-site &amp; remote</dd></div>
+            <div><dt>Focus</dt><dd>Product · UX · Design systems</dd></div>
+            <div><dt>Recognition</dt><dd>GEMA × WISE 2025</dd></div>
+          </dl>
+        </div>
+        <div class="stats" data-reveal>
+          <div class="stat"><span class="stat__num">8+</span><span class="stat__what">years designing products</span><span class="stat__src">Since 2017 · 9 roles</span></div>
+          <div class="stat"><span class="stat__num">1.9M</span><span class="stat__what">active users served</span><span class="stat__src">Digikala q-commerce · 66M+ ecosystem</span></div>
+          <div class="stat"><span class="stat__num">+373%</span><span class="stat__what">average daily orders</span><span class="stat__src">Digikala · 4,433 → 20,991 after redesign</span></div>
+          <div class="stat"><span class="stat__num">2.5M</span><span class="stat__what">active users, up from 600k</span><span class="stat__src">AbanTether · 3 years after the revamp</span></div>
+        </div>
+      </section>
+
+      <!-- 2 · Expertise: variety of domains over time -->
+      <section class="expertise" aria-labelledby="expertise-title">
+        <div class="work-head">
+          <h2 id="expertise-title">Expertise</h2>
+          <span class="label">7 domains · 2017 — now</span>
+        </div>
+        <div class="expertise__grid">
+          <div class="expertise__text">
+            <p class="expertise__lead">Seven domains, often in parallel.</p>
+            <p>I’ve moved between very different products: an insurance CRM, SaaS and cloud tools, Web3 and DeFi, a crypto exchange, AI music software and q-commerce, while publishing design assets on UI8 throughout.</p>
+            <p>Each one sharpened something I now bring to every project: <strong>dense, data-heavy interfaces</strong> from trading and dashboards, <strong>trust and onboarding</strong> from insurance and fintech, <strong>fast, high-volume flows</strong> from q-commerce, and <strong>systems thinking</strong> from building design systems from scratch.</p>
+            <ul class="skills" aria-label="Skills">
+              <li>Product design</li><li>UX research &amp; testing</li><li>Interaction design</li><li>Design systems</li><li>3D &amp; illustration</li><li>Motion · Lottie, SVG</li>
+            </ul>
+          </div>
+          <figure class="vgraph" id="vgraph" aria-label="Timeline of domains worked in, one square per quarter, from late 2017 to now.">
+            <div class="vgraph__rows" id="vgraph-rows"></div>
+            <div class="vgraph__axis" id="vgraph-axis" aria-hidden="true"></div>
+            <figcaption>Each square is three months. Filled squares show time spent in that domain; a blinking square is ongoing work.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- 3 · Experience: map and roles -->
+      <section class="about" id="about-section" aria-labelledby="xp-title">
+        <div class="xstage">
+          <figure class="xmap" id="xmap" data-reveal aria-label="Pixel map of work locations: Tehran (on-site), and remote work with teams in Berlin, Yerevan, Dubai, Atlanta and Los Angeles.">
+            <canvas id="xmap-land" width="800" height="544" aria-hidden="true"></canvas>
+            <svg id="xmap-svg" viewBox="0 0 800 544" role="presentation"></svg>
+          </figure>
+
+          <div class="xstage__content">
+            <div class="xpanel xpanel--intro" data-reveal>
+              <div class="work-head xpanel__head">
+                <h2 id="xp-title">Experience</h2>
+                <span class="label">5 countries · since 2017</span>
+              </div>
+              <p class="xpanel__note"><strong>On-site in Tehran</strong>, and <strong>remote</strong> with teams in <strong>Berlin</strong>, <strong>Yerevan</strong>, <strong>Dubai</strong>, <strong>Atlanta</strong> and <strong>Los Angeles</strong>. Point at a role to see where it happened.</p>
+            </div>
+            <div class="xpanel xpanel--roles" data-reveal>
+              <div class="xp" role="list" aria-label="Experience">
+                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2024 — Now</span><span class="xp__co">Digikala</span><span class="xp__role">Senior Product Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
+                <div class="xp__row" role="listitem" data-city="dubai"><span class="xp__years">2020 — Now</span><span class="xp__co">UI8</span><span class="xp__role">Affiliate Product Designer</span><span class="xp__place">Dubai, UAE</span><span class="xp__mode is-remote">Remote</span></div>
+                <div class="xp__row" role="listitem" data-city="berlin"><span class="xp__years">2023 — 2024</span><span class="xp__co">Djoid</span><span class="xp__role">Product Designer</span><span class="xp__place">Berlin, Germany</span><span class="xp__mode is-remote">Remote</span></div>
+                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2023 — 2024</span><span class="xp__co">Abantether</span><span class="xp__role">Senior Product Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
+                <div class="xp__row" role="listitem" data-city="la"><span class="xp__years">2022 — 2023</span><span class="xp__co">Gala</span><span class="xp__role">Product Designer</span><span class="xp__place">Los Angeles, USA</span><span class="xp__mode is-remote">Remote</span></div>
+                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2020 — 2022</span><span class="xp__co">Imen Aria</span><span class="xp__role">UI/UX Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
+                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2017 — 2020</span><span class="xp__co">EasyBimeh</span><span class="xp__role">UI/UX Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
+                <div class="xp__row" role="listitem" data-city="atlanta"><span class="xp__years">Project</span><span class="xp__co">Trakdesk</span><span class="xp__role">Product Designer</span><span class="xp__place">Atlanta, USA</span><span class="xp__mode is-remote">Remote</span></div>
+                <div class="xp__row" role="listitem" data-city="yerevan"><span class="xp__years">Project</span><span class="xp__co">Fill Studio</span><span class="xp__role">Product Designer</span><span class="xp__place">Yerevan, Armenia</span><span class="xp__mode is-remote">Remote</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 · Next step -->
+      <div class="about-cta">
+        <p>Working on something in one of these spaces?</p>
+        <a href="#contact">Get in touch</a>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="view view--contact" id="view-contact" hidden>
+      <section class="contact" id="contact-section" aria-labelledby="contact-title">
+        <div class="work-head" data-reveal>
+          <h2 id="contact-title">Contact</h2>
+          <span class="label">Tehran · UTC+3:30</span>
+        </div>
+        <p class="contact__lead" data-reveal>Open to product design roles and collaborations, on-site or remote. The fastest way to reach me is email.</p>
+        <div class="contact__row" data-reveal>
+          <span class="contact__email" id="contact-email">kamyaryp@gmail.com</span>
+          <button class="btn-line" type="button" id="contact-copy">Copy email</button>
+        </div>
+        <dl class="facts contact__links" data-reveal>
+          <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/kamyaryp" target="_blank" rel="noopener">linkedin.com/in/kamyaryp ↗</a></dd></div>
+          <div><dt>Behance</dt><dd><a href="https://www.behance.net/gallery/233141421/Djoid-UIUX-Case-Study" target="_blank" rel="noopener">Djoid case study ↗</a></dd></div>
+        </dl>
+      </section>
+    </div>
+
+    <!-- Case study: Djoid -->
+    <article class="view" id="view-djoid" hidden aria-labelledby="djoid-title">
+      <a class="cs-back" href="#work" data-reveal>← All work</a>
+
+      <header class="cs-hero">
+        <div class="cs-hero__title" data-reveal>
+          <span class="label">UI/UX case study · 2025</span>
+          <h1 id="djoid-title">Djoid</h1>
+          <p class="cs-hero__sub">AI-powered music library for DJs</p>
+        </div>
+        <dl class="facts" data-reveal>
+          <div><dt>Role</dt><dd>Product designer</dd></div>
+          <div><dt>Users</dt><dd>Club, festival &amp; event DJs</dd></div>
+          <div><dt>Published</dt><dd>September 2025</dd></div>
+          <div><dt>Recognition</dt><dd>GEMA × WISE Startup Award 2025</dd></div>
+        </dl>
+      </header>
+
+      <figure class="cs-figure" data-reveal>
+        <div class="frame"><img src="work/djoid/cover.webp" width="1920" height="1234" alt="Djoid dashboard mockup on a monitor stand: Deep Techno collection with BPM, key and energy filters, track list and cue-marked waveform player."></div>
+      </figure>
+
+      <!-- 01 -->
+      <section class="cs-section" aria-labelledby="s1">
+        <div class="cs-section__head">
+          <span class="cs-num">01</span>
+          <h2 id="s1">Data to Rhythm</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>As digital music collections expanded, libraries became <strong>chaotic and unmanageable</strong>. <strong>Djoid</strong> emerged as an <strong>intelligent system</strong>, using <strong>AI</strong> to <strong>bring order</strong>, reveal hidden tracks, and shape collections into performance-ready journeys.</p>
+          <p>The challenge was clear: DJs faced <strong>fragmented libraries</strong>, unreliable tagging, and endless prep time. The problem wasn’t <strong>collecting music</strong>; it was transforming that <strong>chaos into a system</strong> that supports creativity and live performance.</p>
+        </div>
+        <a class="video cs-full" href="https://vimeo.com/1114525300" target="_blank" rel="noopener">
+          <div class="frame"><img src="work/djoid/video-dashboard.webp" width="1280" height="801" loading="lazy" alt="Dashboard walkthrough: track grid grouped into Fire and Chilling sets, Track Explorer panel and player."></div>
+          <span class="video__play">Watch dashboard walkthrough · 0:18</span>
+        </a>
+        <div class="pillars cs-full">
+          <div><h3>Scalable architecture</h3><p>Handling large-scale track libraries with efficient storage, indexing, and retrieval.</p></div>
+          <div><h3>Intelligent algorithms</h3><p>Applying AI models for detection, grouping, and recommendation across complex datasets.</p></div>
+          <div><h3>Instant controls</h3><p>Designing interfaces and flows optimized for speed, accuracy, and live performance use cases.</p></div>
+          <div><h3>System reliability</h3><p>Ensuring low-latency operations, stability under stress, and error-tolerant design.</p></div>
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section class="cs-section" aria-labelledby="s2">
+        <div class="cs-section__head">
+          <span class="cs-num">02</span>
+          <h2 id="s2">Workflow Perspective</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>A <strong>holistic look</strong> at our workflow, covering challenge definition, research, ideation, prototyping, testing, and refinement through to post-launch insights.</p>
+        </div>
+        <ol class="steps cs-full">
+          <li><h3>Challenge definition</h3><p>Framing the problem &amp; project goals.</p></li>
+          <li><h3>Research &amp; analysis</h3><ul><li>Competitive landscape</li><li>Cross-domain inspiration</li><li>Audience insights &amp; personas</li></ul></li>
+          <li><h3>Information architecture</h3><ul><li>Early structures</li><li>Content flows</li><li>System mapping</li></ul></li>
+          <li><h3>Ideation &amp; sketches</h3><p>Low-fidelity explorations of layout and interactions.</p></li>
+          <li><h3>Prototyping</h3><p>Progression from low → mid → high-fidelity UI.</p></li>
+          <li><h3>Testing &amp; iteration</h3><p>Ongoing validation with users &amp; internal feedback.</p></li>
+          <li><h3>Launch &amp; post-release insights</h3><p>Data-driven refinements after real-world usage.</p></li>
+          <li><h3>Continuous refinement</h3><p>Ultimately iterative, looping back when needed.</p></li>
+        </ol>
+      </section>
+
+      <!-- 03 -->
+      <section class="cs-section" aria-labelledby="s3">
+        <div class="cs-section__head">
+          <span class="cs-num">03</span>
+          <h2 id="s3">Competitive Analysis</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>With only an <strong>early understanding</strong> of the challenges, we turned to existing solutions for perspective. Studying <strong>competitor tools</strong> not only revealed limitations, but also offered <strong>valuable insights</strong> that helped outline <strong>DJs’ needs and personas</strong>.</p>
+        </div>
+        <div class="table-wrap cs-full">
+          <table class="compare">
+            <thead>
+              <tr><th scope="col">Feature</th><th scope="col">algoriddim</th><th scope="col">Mixo</th><th scope="col">Producer AI</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">AI-powered curation, analysis</th><td>Automix AI, Neural Mix™ for stems and transitions</td><td class="none"></td><td class="none"></td></tr>
+              <tr><th scope="row">Bulk upload, library management</th><td class="none"></td><td>Cloud syncs, metadata editing, duplicates cleanup</td><td class="none"></td></tr>
+              <tr><th scope="row">Auto grouping, matching, graph</th><td>Track Match based on harmonic/tempo compatibility</td><td class="none"></td><td class="none"></td></tr>
+              <tr><th scope="row">Genre, mood detection</th><td class="none"></td><td class="none"></td><td>Generative composition only</td></tr>
+              <tr><th scope="row">In-dashboard track purchasing</th><td class="none"></td><td class="none"></td><td class="none"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cs-section__body prose">
+          <p>Alongside competitors, I explored <strong>unrelated products</strong> for inspiration. Looking beyond similar tools is part of my usual method, especially when few direct references exist.</p>
+        </div>
+      </section>
+
+      <!-- 04 -->
+      <section class="cs-section" aria-labelledby="s4">
+        <div class="cs-section__head">
+          <span class="cs-num">04</span>
+          <h2 id="s4">Who We Designed For</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>We had <strong>long-standing ties with DJs</strong>, which we extended into online and in-person interviews. The following <strong>personas</strong> are <strong>fictionalized</strong> but reflect real insights.</p>
+        </div>
+        <div class="cs-full">
+          <div class="persona">
+            <figure class="persona__photo"><div class="frame"><img src="work/djoid/persona-1.webp" width="391" height="391" loading="lazy" alt="Persona I portrait, black and white."></div></figure>
+            <div class="persona__main">
+              <div class="persona__id">
+                <span class="label">Persona I</span>
+                <h3>The Veteran Club DJ</h3>
+                <ul><li><strong>+16 years</strong> experience</li><li>Club &amp; festival performer</li><li>Age <strong>28</strong></li><li>Berlin, Germany</li><li>Full-time DJ</li></ul>
+              </div>
+              <div class="attrs">
+                <div class="attr"><h4>Library &amp; context</h4><p><strong>+30,000 tracks</strong> across genres and eras. Residencies, festivals, late-night dance floors.</p></div>
+                <div class="attr"><h4>Workflow style</h4><p>Preps crates but relies on <strong>graph views</strong> to uncover track flow.</p></div>
+                <div class="attr"><h4>Primary goal</h4><p>Deliver <strong>high-energy</strong> sets with smooth flow while keeping the library manageable.</p></div>
+                <div class="attr"><h4>Creative needs</h4><p>Tools that reveal <strong>unexpected connections</strong> between tracks to push creativity mid-set.</p></div>
+                <div class="attr"><h4>Tool expectations</h4><ul><li>AI-powered suggestions</li><li>Reliability under pressure</li><li>Fast <strong>navigation</strong> in <strong>massive libraries</strong></li></ul></div>
+                <div class="attr"><h4>Pain points</h4><ul><li>Too much <strong>time wasted</strong> digging</li><li>Lost gems buried in the archive</li><li><strong>Stressful prep</strong> before big shows</li></ul></div>
+              </div>
+            </div>
+          </div>
+          <div class="persona">
+            <figure class="persona__photo"><div class="frame"><img src="work/djoid/persona-2.webp" width="391" height="391" loading="lazy" alt="Persona II portrait, black and white."></div></figure>
+            <div class="persona__main">
+              <div class="persona__id">
+                <span class="label">Persona II</span>
+                <h3>The Collector Curator</h3>
+                <ul><li><strong>+10 years</strong> experience</li><li>Events &amp; private gigs</li><li>Age <strong>36</strong></li><li>Oslo, Norway</li><li>Part-time DJ, radio host</li></ul>
+              </div>
+              <div class="attrs">
+                <div class="attr"><h4>Library &amp; context</h4><p><strong>10k–15k tracks</strong> spanning many decades and genres. Corporate events, private parties, crowd-pleasing focus.</p></div>
+                <div class="attr"><h4>Workflow style</h4><p>Prepares <strong>graph playlists</strong> to <strong>map energy progression</strong>; keeps backup crates for audience requests.</p></div>
+                <div class="attr"><h4>Primary goal</h4><p>Deliver long, adaptable sets while managing <strong>diverse audience expectations</strong>.</p></div>
+                <div class="attr"><h4>Creative needs</h4><p>Visualizing set <strong>progression</strong> to <strong>balance energy</strong>; surprise guests with smooth transitions.</p></div>
+                <div class="attr"><h4>Tool expectations</h4><ul><li>Bulk upload</li><li><strong>Smart grouping</strong> to reduce prep time</li><li><strong>Mood/genre detection</strong> to shift across styles</li></ul></div>
+                <div class="attr"><h4>Pain points</h4><ul><li>Pressure of requests on the spot</li><li>Difficulty <strong>maintaining flow</strong> across styles</li><li>Time-consuming prep</li></ul></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 -->
+      <section class="cs-section" aria-labelledby="s5">
+        <div class="cs-section__head">
+          <span class="cs-num">05</span>
+          <h2 id="s5">Core IA Sitemap</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>As a <strong>pioneer</strong> in this industry, we were <strong>less bound by Jakob’s Law</strong> than products in crowded markets. This freedom let us explore <strong>innovation</strong> while shaping the information architecture.</p>
+        </div>
+        <figure class="cs-figure cs-full">
+          <div class="frame"><img src="work/djoid/sitemap.webp" width="1800" height="1610" loading="lazy" alt="Sitemap: Djoid branches into Core (Library, Groups, Chapter Builder, Node-Playlist, Stats, Repository, Settings, Shop), Quick Access (Collections, Playlists), Core Features (Auto Group, Matching Tracks, Genre/Mood Detection), Global Utilities (Account, Import, Search), Advanced Filter (Info and Parameters) and Advanced Player (Fast Preview, Navigator, Waveform Indicator, Settings, Next-Track Suggester)."></div>
+        </figure>
+      </section>
+
+      <!-- 06 -->
+      <section class="cs-section" aria-labelledby="s6">
+        <div class="cs-section__head">
+          <span class="cs-num">06</span>
+          <h2 id="s6">The Node Zone</h2>
+          <p class="cs-kicker">Where tracks connect</p>
+        </div>
+        <div class="cs-section__body prose">
+          <p>The challenge was to show how tracks connect through <strong>BPM</strong>, <strong>key</strong>, <strong>energy</strong>, and <strong>vibe</strong>. Inspired by <strong>Blender’s Geometry Nodes</strong>, I created a “node zone” where DJs map tracks like a <strong>mind map</strong>, dragging, linking, and reshaping playlists with ease.</p>
+        </div>
+        <a class="video cs-full" href="https://vimeo.com/1117954079" target="_blank" rel="noopener">
+          <div class="frame"><img src="work/djoid/video-node-zone.webp" width="1280" height="801" loading="lazy" alt="Node Zone: tracks linked as nodes on a canvas, with suggested tracks clustered to the right."></div>
+          <span class="video__play">Watch Node Zone demo · 0:11</span>
+        </a>
+        <div class="cs-section__body">
+          <p class="cs-note">Early tests showed the magic: instead of just curating lists, DJs were <strong>designing journeys</strong>. Hidden transitions surfaced, <strong>unexpected harmonies</strong> emerged, and sets began to flow like living stories.</p>
+        </div>
+      </section>
+
+      <!-- 07 -->
+      <section class="cs-section" aria-labelledby="s7">
+        <div class="cs-section__head">
+          <span class="cs-num">07</span>
+          <h2 id="s7">Smart Blenders</h2>
+        </div>
+        <div class="cs-section__body blends">
+          <div class="blend"><h3>Auto Group</h3><p>The feature was designed to remove the burden of <strong>manual organization</strong>. By grouping tracks automatically, it keeps libraries structured and usable at scale.</p></div>
+          <div class="blend"><h3>Matching Tracks</h3><p>The matching engine was crafted to align tracks by <strong>energy</strong>, <strong>BPM</strong>, <strong>key</strong>, <strong>harmony</strong>, <strong>danceability</strong>, and even <strong>era</strong>, making set preparation more intuitive and consistent.</p></div>
+        </div>
+        <a class="video cs-full" href="https://vimeo.com/1118175129" target="_blank" rel="noopener">
+          <div class="frame"><img src="work/djoid/video-smart-blenders.webp" width="1280" height="393" loading="lazy" alt="Two screens: the Auto Group dialog over a track list, and a collection of matched tracks."></div>
+          <span class="video__play">Watch Smart Blenders demo · 0:16</span>
+        </a>
+      </section>
+
+      <!-- 08 -->
+      <section class="cs-section" aria-labelledby="s8">
+        <div class="cs-section__head">
+          <span class="cs-num">08</span>
+          <h2 id="s8">Global Filter</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>The advanced filter unifies <strong>technical</strong> and <strong>contextual</strong> controls, from harmonic keys to custom tags, enabling faster navigation, smarter prep, and flexible workflows.</p>
+        </div>
+        <figure class="cs-figure cs-full">
+          <div class="frame"><img src="work/djoid/global-filter.webp" width="1920" height="967" loading="lazy" alt="Filter panel with Parameters and Information tabs, a dual-ring key wheel, and BPM, energy and danceability ranges, annotated with four callouts."></div>
+        </figure>
+      </section>
+
+      <!-- 09 -->
+      <section class="cs-section" aria-labelledby="s9">
+        <div class="cs-section__head">
+          <span class="cs-num">09</span>
+          <h2 id="s9">Advanced Player</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>The advanced player <strong>integrates</strong> navigation, previews, <strong>waveform view</strong>, and sound settings, improving track selection, mix adjustments, and <strong>playlist management</strong>.</p>
+        </div>
+        <figure class="cs-figure cs-full">
+          <div class="frame"><img src="work/djoid/player.webp" width="1920" height="680" loading="lazy" alt="Player bar with navigation, fast preview toggle, cue-marked waveform with energy levels, and settings, annotated with callouts."></div>
+        </figure>
+      </section>
+
+      <!-- 10 -->
+      <section class="cs-section" aria-labelledby="s10">
+        <div class="cs-section__head">
+          <span class="cs-num">10</span>
+          <h2 id="s10">What DJs Say</h2>
+        </div>
+        <div class="cs-section__body prose">
+          <p>DJs shared their experiences with Djoid, highlighting how it helped them <strong>organize vast libraries</strong>, uncover insights, and focus more on creating unforgettable sets.</p>
+        </div>
+        <div class="quotes cs-full">
+          <figure class="quote">
+            <div class="frame"><img src="work/djoid/dj-1.webp" width="356" height="400" loading="lazy" alt="Capitano, wearing headphones."></div>
+            <figcaption>Capitano</figcaption>
+            <blockquote>Djoid allows me to get to the essentials when preparing for a gig. The team is highly dedicated, and the software is top-notch. It’s a must-have tool for every DJ.</blockquote>
+          </figure>
+          <figure class="quote">
+            <div class="frame"><img src="work/djoid/dj-2.webp" width="356" height="400" loading="lazy" alt="Eva Yaso, holding her headphones."></div>
+            <figcaption>Eva Yaso</figcaption>
+            <blockquote>The Graph completely changed how I prepare for my sets. Instead of scrolling through endless track lists, I can now visualize my music, find connections between tracks, and build cohesive playlists faster than ever.</blockquote>
+          </figure>
+          <figure class="quote">
+            <div class="frame"><img src="work/djoid/dj-3.webp" width="356" height="400" loading="lazy" alt="Plutomes, playing at an outdoor event."></div>
+            <figcaption>Plutomes</figcaption>
+            <blockquote>Thanks to Djoid, I’ve been able to create stunning sets with ease, while gaining a deeper understanding of my music library through its powerful analytics and statistics. It has truly elevated my DJ experience!</blockquote>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Award -->
+      <section class="cs-section" aria-labelledby="award-title">
+        <div class="award cs-full">
+          <div class="frame"><img src="work/djoid/award.webp" width="1104" height="720" loading="lazy" alt="The Djoid team on stage receiving the award at the GEMA AI Music Summit."></div>
+          <div class="award__text">
+            <span class="label">Recognition</span>
+            <h3 id="award-title">We won the GEMA × WISE Startup Competition Award 2025</h3>
+            <p>Honored to have contributed as product designer to a platform that puts music curation at the heart of DJing. Big thanks to the team, the DJs who supported us during the iterations, and the community who made this possible.</p>
+            <span class="tags">#Djoid #StartupAward #MusicCuration #DJTech #BerlinStartups #GEMA</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Closing -->
+      <footer class="cs-end">
+        <h2>Thanks for reading</h2>
+        <div class="cs-end__body">
+          <p>Please don’t hesitate to reach out if you’d like to connect, exchange ideas, or discuss design and technology.</p>
+          <div class="contact-row">
+            <span class="email" id="cs-email">kamyaryp@gmail.com</span>
+            <button class="btn-line" type="button" id="cs-copy">Copy email</button>
+            <a class="btn-line" href="https://www.behance.net/gallery/233141421/Djoid-UIUX-Case-Study" target="_blank" rel="noopener">View on Behance ↗</a>
+          </div>
+        </div>
+      </footer>
+      <div class="cs-foot"><a class="cs-back" href="#work">← All work</a></div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container"><!-- Footer goes here --></div>
+</footer>
+
+<div class="intro" id="intro" role="status" aria-label="Loading portfolio">
+  <div class="intro__inner" id="intro-inner">
+    <div class="intro__stage" id="intro-stage"></div>
+    <div class="intro__bar" aria-hidden="true"><i id="intro-bar"></i></div>
+  </div>
+</div>
+
+<div class="portrait-frame" id="portrait-frame">
+  <pixel-portrait id="portrait" no-intro aria-label="Pixel portrait of Kamyar Yazdanpanah"></pixel-portrait>
+</div>
+
+<script>
+/* Loading screen: portrait assembles full screen, then flies into the header avatar slot */
+(() => {
+  const root = document.documentElement;
+  const intro = document.getElementById('intro');
+  const inner = document.getElementById('intro-inner');
+  const stage = document.getElementById('intro-stage');
+  const bar = document.getElementById('intro-bar');
+  const frame = document.getElementById('portrait-frame');
+  const portrait = document.getElementById('portrait');
+  const anchor = document.getElementById('portrait-anchor');
+  const tok = (name) => getComputedStyle(root).getPropertyValue(name).trim();
+
+  // Ink palette from the page tokens; the darkest shade (same as the page) becomes transparent,
+  // so the portrait carries no background of its own.
+  const inkPalette = () => ['transparent', ...['--ink-800', '--ink-700', '--ink-600', '--stone-400', '--taupe-400', '--ash-300', '--stone-100'].map(tok)];
+  customElements.whenDefined('pixel-portrait').then(() => { try { portrait.setPalette(inkPalette()); } catch (e) {} });
+
+  // Writing animation: split name and title into characters, typed in step with the flight.
+  const split = (el) => {
+    const text = el.textContent;
+    el.textContent = '';
+    return [...text].map((c) => {
+      const s = document.createElement('span');
+      s.className = 'ch';
+      s.textContent = c;
+      el.append(s);
+      return s;
+    });
+  };
+  const caret = document.createElement('span');
+  caret.className = 'type-caret';
+  caret.setAttribute('aria-hidden', 'true');
+  // start/end in ms from the moment the portrait begins to move (flight lasts 1050ms)
+  // menu labels get an inner span so their letters don't become flex items of the link
+  const navLabel = (a) => {
+    const w = document.createElement('span');
+    w.className = 'nav__label';
+    w.textContent = a.textContent;
+    a.textContent = '';
+    a.append(w);
+    return split(w);
+  };
+  const navLinks = [...document.querySelectorAll('.nav a')];
+  const lines = root.classList.contains('is-intro') ? [
+    { spans: split(document.querySelector('.brand__name')), start: 1250, end: 1950 },
+    { spans: split(document.querySelector('.brand__role')), start: 1850, end: 2450 },
+    // the same cursor carries on into the menu, one label after another
+    ...navLinks.map((a, i) => ({ spans: navLabel(a), start: 2380 + i * 120, end: 2380 + i * 120 + 170 }))
+  ] : [];
+  const TYPE_END = lines.length ? Math.max(...lines.map(l => l.end)) : 0;
+  const BODY_AT = TYPE_END - 40; // body content follows the menu straight away
+  let typeStarted = false;
+  let typeFrame = 0;
+  if (lines.length) root.classList.add('is-writing');
+  const showAll = () => {
+    cancelAnimationFrame(typeFrame);
+    lines.forEach(l => l.spans.forEach(s => s.classList.add('on')));
+    caret.remove();
+    root.classList.remove('is-writing');
+  };
+  const type = () => {
+    typeStarted = true;
+    const t0 = performance.now();
+    const step = (now) => {
+      const t = now - t0;
+      let last = null;
+      for (const l of lines) {
+        const n = t < l.start ? 0 : Math.min(l.spans.length, Math.ceil(((t - l.start) / (l.end - l.start)) * l.spans.length));
+        l.spans.forEach((s, i) => s.classList.toggle('on', i < n));
+        if (n > 0) last = l.spans[n - 1];
+      }
+      if (last && caret.previousSibling !== last) last.after(caret);
+      if (t < TYPE_END) typeFrame = requestAnimationFrame(step);
+      else {
+        // the typing cursor hands over to the active-tab cursor under Work
+        caret.remove();
+        root.classList.remove('is-writing');
+      }
+    };
+    typeFrame = requestAnimationFrame(step);
+  };
+
+
+  // Move the portrait onto the top bar's border for good.
+  const dock = () => {
+    if (!typeStarted) showAll();
+    frame.classList.remove('is-flying');
+    anchor.append(frame);
+    frame.removeAttribute('style');
+    frame.getAnimations().forEach(a => a.cancel());
+    portrait.getAnimations().forEach(a => a.cancel());
+    intro.getAnimations().forEach(a => a.cancel());
+    root.classList.remove('is-intro');
+  };
+
+  if (!root.classList.contains('is-intro')) {
+    dock();
+    customElements.whenDefined('pixel-portrait').then(() => portrait.isConnected && portrait.finishLoading?.());
+    return;
+  }
+
+  // Native grid multiples keep pixels crisp: 810, 540 or 270 CSS px.
+  const fit = () => {
+    const max = Math.min(innerWidth - 32, (innerHeight - 140) * 0.9);
+    const s = [810, 540, 270].find(v => v <= max) || Math.max(160, Math.floor(max));
+    inner.style.width = s + 'px';
+    const r = stage.getBoundingClientRect();
+    Object.assign(frame.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+  };
+  frame.classList.add('is-flying');
+  fit();
+  addEventListener('resize', fit);
+
+  let flown = false;
+  const fly = async () => {
+    if (flown) return;
+    flown = true;
+    removeEventListener('resize', fit);
+    // Outro, all at once: the progress line collapses, the dark screen fades to reveal the page,
+    // and the portrait starts turning into dust in the same frame.
+    const line = bar.parentElement;
+    line.style.transformOrigin = '50% 50%';
+    const from = frame.getBoundingClientRect();
+    const to = anchor.getBoundingClientRect();
+    line.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }],
+      { duration: 480, easing: 'cubic-bezier(.65, 0, .35, 1)', fill: 'forwards' });
+    // the page shows through slowly: about 20% visible when the dust is halfway, fully visible as it lands
+    intro.animate([
+      { opacity: 1, offset: 0 },
+      { opacity: 0.8, offset: 0.5, easing: 'cubic-bezier(.45, 0, .55, 1)' },
+      { opacity: 0, offset: 1 }
+    ], { duration: DUST_T, fill: 'forwards' });
+    // Body content waits (hidden) until the menu is written, then rises into focus piece by piece.
+    const items = [...document.querySelectorAll('.view:not([hidden]) [data-reveal]')];
+    items.forEach((el, i) => {
+      const a = el.animate([
+        { opacity: 0, transform: 'translateY(16px)', filter: 'blur(10px)' },
+        { opacity: 1, transform: 'none', filter: 'blur(0px)' }
+      ], { duration: 900, delay: BODY_AT + i * 110, easing: 'cubic-bezier(.16, 1, .3, 1)', fill: 'both' });
+      a.finished.then(() => a.cancel(), () => {});
+    });
+    type();
+    const canvas = await dust(from, to);
+    dock();
+    if (canvas) {
+      // hand over to the real portrait: the settled dust fades as the SVG appears underneath
+      canvas.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-out', fill: 'forwards' })
+        .finished.then(() => canvas.remove(), () => canvas.remove());
+    }
+  };
+
+  const DUST_T = 2800; // ms, whole dust transition
+
+  // Dust transition: every pixel of the portrait lifts off as a particle, drifts on a loose curve
+  // like dust caught in air, and settles into its own place in the small portrait on the top bar.
+  const dust = (from, to) => new Promise((resolve) => {
+    const sr = portrait.shadowRoot;
+    if (!sr) { resolve(null); return; }
+    const SIZE = 270; // logical pixels per side in the portrait data
+    const colors = [];
+    const px = [];    // x, y, colour index triplets
+    sr.querySelectorAll('path').forEach((path) => {
+      if (path.closest('mask')) return;
+      const eye = path.closest('g[id^="eye-"]');
+      if (eye && eye.id !== 'eye-open') return;
+      const fill = path.getAttribute('fill');
+      if (!fill || fill === 'transparent' || fill === 'none') return;
+      let ci = colors.indexOf(fill);
+      if (ci < 0) { ci = colors.length; colors.push(fill); }
+      const re = /M(\d+) (\d+)h(\d+)/g;
+      const d = path.getAttribute('d') || '';
+      let m;
+      while ((m = re.exec(d))) {
+        const x = +m[1], y = +m[2], w = +m[3];
+        for (let i = 0; i < w; i++) px.push(x + i, y, ci);
+      }
+    });
+    const N = px.length / 3;
+    if (!N) { resolve(null); return; }
+
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('aria-hidden', 'true');
+    Object.assign(canvas.style, { position: 'fixed', inset: '0', width: '100vw', height: '100vh', zIndex: '103', pointerEvents: 'none' });
+    canvas.width = Math.round(innerWidth * dpr);
+    canvas.height = Math.round(innerHeight * dpr);
+    document.body.append(canvas);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const s0 = from.width / SIZE, s1 = to.width / SIZE;
+    // wind: from the big portrait toward the top bar
+    let wx = (to.left + to.width / 2) - (from.left + from.width / 2);
+    let wy = (to.top + to.height / 2) - (from.top + from.height / 2);
+    const wl = Math.hypot(wx, wy) || 1; wx /= wl; wy /= wl;
+
+    const P = new Float32Array(N * 11); // sx sy c1x c1y c2x c2y tx ty delay dur seed
+    let minP = Infinity, maxP = -Infinity;
+    const proj = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      const x = px[i * 3], y = px[i * 3 + 1];
+      const sx = from.left + (x + 0.5) * s0, sy = from.top + (y + 0.5) * s0;
+      proj[i] = sx * wx + sy * wy;
+      if (proj[i] < minP) minP = proj[i];
+      if (proj[i] > maxP) maxP = proj[i];
+    }
+    const span = (maxP - minP) || 1;
+    for (let i = 0; i < N; i++) {
+      const x = px[i * 3], y = px[i * 3 + 1];
+      const r1 = Math.random(), r2 = Math.random(), r3 = Math.random(), r4 = Math.random(), r5 = Math.random();
+      const sx = from.left + (x + 0.5) * s0, sy = from.top + (y + 0.5) * s0;
+      const tx = to.left + (x + 0.5) * s1, ty = to.top + (y + 0.5) * s1;
+      const lift = 50 + r3 * 140;
+      const o = i * 11;
+      P[o] = sx; P[o + 1] = sy;
+      // first control: scatter outward and upward, like dust kicked off a surface
+      P[o + 2] = sx + (r1 - 0.5) * 220 + wx * 40;
+      P[o + 3] = sy + (r2 - 0.5) * 180 - lift;
+      // second control: approach the target from upstream, with a loose sideways drift
+      P[o + 4] = tx - wx * (60 + r4 * 220) + (r5 - 0.5) * 140;
+      P[o + 5] = ty - wy * (60 + r4 * 220) + (r1 - 0.5) * 120;
+      P[o + 6] = tx; P[o + 7] = ty;
+      // pixels nearest the top bar leave first; noise keeps the front ragged
+      P[o + 8] = 0.36 * (1 - (proj[i] - minP) / span) + 0.14 * r2;
+      P[o + 9] = 0.42 + 0.08 * r3;
+      P[o + 10] = r4 * 6.283;
+    }
+    const byColor = colors.map(() => []);
+    for (let i = 0; i < N; i++) byColor[px[i * 3 + 2]].push(i);
+
+    const T = DUST_T;
+    const ease = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+    const t0 = performance.now();
+    const step = (now) => {
+      const t = Math.max(0, now - t0) / T;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      let moving = false;
+      for (let c = 0; c < colors.length; c++) {
+        ctx.fillStyle = colors[c];
+        const list = byColor[c];
+        for (let k = 0; k < list.length; k++) {
+          const o = list[k] * 11;
+          let u = (t - P[o + 8]) / P[o + 9];
+          if (u < 1) moving = true;
+          u = u < 0 ? 0 : u > 1 ? 1 : u;
+          const e = ease(u), m1 = 1 - e;
+          const a = m1 * m1 * m1, b = 3 * m1 * m1 * e, cc = 3 * m1 * e * e, d = e * e * e;
+          // air turbulence, strongest mid-flight
+          const wob = Math.sin(u * Math.PI) * 7;
+          const ph = P[o + 10] + t * 9;
+          const X = a * P[o] + b * P[o + 2] + cc * P[o + 4] + d * P[o + 6] + Math.sin(ph) * wob;
+          const Y = a * P[o + 1] + b * P[o + 3] + cc * P[o + 5] + d * P[o + 7] + Math.cos(ph * 1.3) * wob;
+          // grains shrink from the big pixel size to the top-bar size, staying visible in the air
+          let sz = s0 + (s1 - s0) * e;
+          if (u > 0 && u < 1) sz = Math.max(sz, 1.1);
+          ctx.fillRect(X - sz / 2, Y - sz / 2, sz, sz);
+        }
+      }
+      if (moving) requestAnimationFrame(step);
+      else resolve(canvas);
+    };
+    // Draw the first frame right away, then hide the SVG in the same paint, so there's no blank gap.
+    step(t0);
+    frame.style.visibility = 'hidden';
+  });
+
+  const finish = () => {
+    if (customElements.get('pixel-portrait') && portrait._loading) portrait.finishLoading();
+    else if (!customElements.get('pixel-portrait')) dock();
+  };
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && root.classList.contains('is-intro')) finish(); });
+
+  const ready = customElements.whenDefined('pixel-portrait').then(() => true);
+  const timeout = new Promise(r => setTimeout(() => r(false), 6000));
+  Promise.race([ready, timeout]).then((ok) => {
+    if (!ok) { dock(); return; }
+    portrait.addEventListener('portrait-progress', (e) => {
+      const p = e.detail.progress;
+      bar.style.transform = `scaleX(${p})`;
+    });
+    portrait.addEventListener('portrait-ready', () => {
+      bar.style.transform = 'scaleX(1)';
+      fly();
+    }, { once: true });
+    portrait.playIntro();
+  });
+})();
+
+/* Active tab: click, URL hash, and scroll position all move the same indicator */
+(() => {
+  const nav = document.getElementById('main-nav');
+  const pill = document.getElementById('nav-indicator');
+  const links = [...nav.querySelectorAll('a[href^="#"]')];
+  let current = links.find(a => a.getAttribute('aria-current') === 'true') || links[0];
+
+  const EASE = 'cubic-bezier(.16, 1, .3, 1)';
+  let lastX = null;
+
+  // A calm glide: both edges travel together, the trailing edge only a hair behind.
+  const place = (animate = true) => {
+    if (!current) return;
+    const n = nav.getBoundingClientRect();
+    const r = current.getBoundingClientRect();
+    // whole pixels only, so the dither grid stays crisp
+    const x = Math.round(r.left - n.left);
+    const right = Math.round(n.width) - (x + Math.round(r.width));
+
+    if (animate && lastX !== null && x !== lastX && pill.classList.contains('is-ready')) {
+      const goingRight = x > lastX;
+      const lead = goingRight ? 'right' : 'left';
+      const tail = goingRight ? 'left' : 'right';
+      pill.style.transition = `${lead} 380ms ${EASE}, ${tail} 400ms ${EASE} 15ms, top 380ms ${EASE}, height 380ms ${EASE}, opacity 200ms ease`;
+    } else {
+      pill.style.transition = 'opacity 200ms ease';
+    }
+
+    pill.style.left = x + 'px';
+    pill.style.right = right + 'px';
+    pill.style.top = Math.round(r.top - n.top) + 'px';
+    pill.style.height = Math.round(r.height) + 'px';
+    lastX = x;
+  };
+  const setActive = (a) => {
+    if (!a || a === current) return;
+    const prev = current;
+    prev?.removeAttribute('aria-current');
+    a.setAttribute('aria-current', 'true');
+    current = a;
+    place();
+    nav.dispatchEvent(new CustomEvent('tabchange', { detail: { prev, next: a } }));
+  };
+
+  const fromHash = links.find(a => a.getAttribute('href') === location.hash);
+  if (fromHash) setActive(fromHash);
+  place();
+  requestAnimationFrame(() => pill.classList.add('is-ready'));
+  (document.fonts?.ready || Promise.resolve()).then(() => place(false));
+  window.addEventListener('resize', () => place(false));
+
+  // the router owns the active tab: each tab is its own page
+  window.portfolioNav = { setActive: (id) => setActive(links.find(a => a.getAttribute('href') === '#' + id)) };
+})();
+
+
+/* Pages: Work is home; About, Contact and the Djoid case study are separate pages, one per hash */
+(() => {
+  const views = {
+    work: document.getElementById('view-home'),
+    about: document.getElementById('view-about'),
+    contact: document.getElementById('view-contact'),
+    djoid: document.getElementById('view-djoid')
+  };
+  const tabFor = { work: 'work', djoid: 'work', about: 'about', contact: 'contact' };
+  let shown = null;
+  const show = (id) => {
+    if (!views[id]) id = 'work';
+    if (id !== shown) {
+      for (const k in views) views[k].hidden = k !== id;
+      shown = id;
+      window.scrollTo(0, 0);
+      window.dispatchEvent(new CustomEvent('viewchange', { detail: { id } }));
+    }
+    window.portfolioNav?.setActive(tabFor[id]);
+  };
+  const route = () => show(location.hash.slice(1));
+  addEventListener('hashchange', route);
+  route();
+
+  // menu clicks: always land, even when the hash is already the same
+  document.querySelectorAll('.nav a[href^="#"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = a.getAttribute('href').slice(1);
+      if (location.hash.slice(1) !== id) history.pushState(null, '', '#' + id);
+      show(id);
+    });
+  });
+  addEventListener('popstate', route);
+
+  // Contact page: copy email
+  const cCopy = document.getElementById('contact-copy');
+  const cEmail = document.getElementById('contact-email');
+  cCopy?.addEventListener('click', () => {
+    const done = () => { cCopy.textContent = 'Copied'; setTimeout(() => { cCopy.textContent = 'Copy email'; }, 1600); };
+    const select = () => { const r = document.createRange(); r.selectNodeContents(cEmail); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); cCopy.textContent = 'Press ⌘/Ctrl + C'; };
+    try { navigator.clipboard.writeText(cEmail.textContent.trim()).then(done, select); } catch (e) { select(); }
+  });
+
+  const copy = document.getElementById('cs-copy');
+  const email = document.getElementById('cs-email');
+  copy.addEventListener('click', () => {
+    const done = () => { copy.textContent = 'Copied'; setTimeout(() => { copy.textContent = 'Copy email'; }, 1600); };
+    const select = () => { const r = document.createRange(); r.selectNodeContents(email); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); copy.textContent = 'Press ⌘/Ctrl + C'; };
+    try { navigator.clipboard.writeText(email.textContent.trim()).then(done, select); } catch (e) { select(); }
+  });
+})();
+
+/* About: pixel map (0.25° per pixel, equirectangular, 130°W–70°E, 80°N–56°S), full-bleed behind the About content.
+   Land is drawn on a canvas (≈160k pixels); routes, markers and the moving packets sit in an SVG on top. */
+(() => {
+  const fig = document.getElementById('xmap');
+  const canvas = document.getElementById('xmap-land');
+  const svg = document.getElementById('xmap-svg');
+  if (!fig || !canvas || !svg) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  const MAP = { cols: 800, rows: 544, top: 80, left: -130, step: 0.25, rle: '3c.5,3q.12,4u.h,5d.17,78.50,cc.6,fp.2,ft.1,fw.3,g8.7,gi.z,k1.4,l1.1|3s.13,4x.1e,6e.2,77.54,fn.b,g0.5,g7.9,gh.1,gn.q|2r.8,3u.16,51.13,65.1,76.55,fn.j,g8.b,gq.l|2q.b,34.1,41.y,52.14,6v.5h,fp.1,fs.y,h3.1|2t.1,2w.c,39.1,3j.3,40.s,4u.1b,6p.5k,fm.2,fq.13,hk.6|1z.b,2t.2,2x.g,3j.8,42.m,4p.1,4s.1e,6g.5o,fn.2,fr.b,g3.1,g5.r,he.1|1v.g,2s.l,3j.d,45.h,4q.1d,6d.5r,cb.1,fp.3,fu.8,g7.e,gp.8|21.8,37.9,3m.a,4a.4,4h.1,4k.1,4q.4,4v.4,50.12,6d.5q,cb.2,fz.1,g1.j,gr.a|1o.5,1v.e,32.5,39.7,3n.7,4o.6,4y.z,6g.5m,c3.5,cg.1,fz.j,gu.d|1v.d,2o.3,33.2,3r.c,4b.5,4o.9,4z.t,6m.5o,cg.1,g0.2,g3.e,gs.e|18.e,1x.8,2p.5,40.1,4b.6,4p.p,5f.c,6e.4,6t.5g,g0.f,gs.1,gy.5|15.f,2r.3,3s.2,4m.11,6j.5w,g2.b|12.i,1p.5,2b.2,3p.d,4e.2,4i.1a,6k.5v,g6.7,lt.a|z.c,1c.8,29.5,2u.3,36.8,3g.4,3q.n,4e.1e,6r.5b,cc.1,g9.3,lq.e|u.f,1c.4,1l.7,27.8,2u.7,34.3,39.c,3s.r,4n.3,4r.2,4w.7,55.4,5g.8,6q.5b,cc.2,la.1,li.k|t.d,17.1,1c.2,1i.h,2a.6,2m.1,2v.7,35.5,3b.b,45.d,5g.2,5n.1,6t.a,75.4,7l.4o,cc.2,l5.t|12.3,19.4,1h.l,29.h,2x.p,3x.2,47.c,54.1,59.4,5l.3,7s.4h,kz.t|17.5,1f.s,2c.e,31.l,3p.3,3u.5,47.c,4l.2,4o.1,4r.1,4x.m,7y.4c,kw.o|1e.1b,2t.4,39.c,3o.1,3r.a,46.1g,7y.4d,cd.3,ks.l|1e.c,1s.w,2t.4,3a.b,3q.c,47.1e,80.45,c9.1,cc.6,kn.l|1s.j,2e.1,2i.2,3r.b,48.1e,83.42,c6.3,ko.i|x.1,1r.e,3t.2,3w.5,4a.1,4d.6,4m.k,58.b,85.46,kn.g|m.h,1u.5,85.46,gk.1,kl.e|m.l,18.9,3i.3,3w.a,85.3u,c1.6,kj.f|n.w,38.6,3f.8,3v.k,4s.7,88.3y,kg.g|o.y,2l.9,37.h,3t.l,4n.d,55.a,5g.e,88.3j,bs.e,kg.e|m.10,1o.3,2g.2,2l.9,36.h,3t.j,4l.c,50.g,5h.g,89.3k,bv.8,kh.b|l.17,2f.e,33.1,3a.a,3o.1,3t.h,4j.c,4y.k,5j.f,89.3o,kd.d|k.t,1e.e,1u.7,25.5,2f.c,31.5,3a.d,3o.1,3t.g,4i.c,4x.l,5k.f,8a.2,8d.3c,bq.a,kb.e,m5.3|k.o,1b.s,25.8,2g.b,32.o,3u.8,4h.d,4x.l,5r.a,88.3,8c.3e,br.9,kb.c,m4.4|i.p,1a.14,2h.a,34.m,3v.7,4g.f,4z.i,5k.3,5p.f,89.3i,bt.7,ka.c,m3.5|h.m,19.15,2h.b,38.i,3v.5,4g.f,4x.k,5i.p,8a.3l,by.1,k7.f,m2.6|j.k,18.17,2i.b,3b.f,3u.4,4g.g,4x.1a,8a.3o,k6.g,m2.6|o.e,19.1l,3e.9,3t.9,4g.i,4z.16,66.3,6b.6,89.8,8i.3i,k6.h,m0.8|p.b,1b.1k,3f.4,3r.d,4h.j,51.1i,8b.5,8k.31,bn.e,k9.3,kd.b,lw.c|r.3,1b.1j,3q.f,4j.2,4p.b,51.1i,6k.1,8g.2,8k.31,bq.c,di.2,ha.2,hi.2,kb.2,kf.b,lv.d|1b.1l,3q.f,4j.22,6n.2,8f.2,8n.2p,bd.9,br.b,dg.2,h5.6,hd.2,hh.5,hn.2,ke.g,lv.d|1d.1m,39.2,3r.g,4k.2a,8e.a,8r.2k,bc.a,bs.a,gw.5,h2.8,hc.3,hg.5,hm.8,kj.7,kr.3,lx.b|8.3,1p.3,20.14,3q.i,4m.12,5p.15,8e.34,bl.4,bv.2,c0.1,gy.b,ha.m,ky.4,lx.b|0.2,7.5,l.1,1g.1s,3q.j,4r.3,4v.u,5t.10,6u.4,8d.7,8m.2s,bf.k,gk.1,gn.1,gq.1,gu.6,h1.t,ky.6,lx.b|1.3,5.8,j.3,s.5,1f.1u,3j.2,3r.g,4y.5,59.7,5k.4,5t.16,8c.c,8r.2,8u.33,gi.4,go.14,hz.3,l0.6,l7.3,lv.d|0.f,j.4,r.a,1g.1m,37.1,3i.6,3t.f,49.2,4y.c,5h.5,5p.3,5w.z,6w.1,8d.b,8r.32,gh.8,gq.1e,l3.1,l5.f,lv.d|0.17,1i.1m,37.1,3i.9,3s.2,3z.2,42.d,4y.d,5p.2,5v.2,5z.12,8g.7,8s.2z,gc.1u,i7.2,ju.6,l5.i,m0.8|0.1b,1t.r,2n.i,3b.1,3e.e,3z.e,4i.3,4z.f,5n.3,5v.1,61.10,8r.2x,g6.2,gc.26,jt.8,l6.m,m1.7|0.1p,1t.n,2l.4,2s.b,39.2,3e.h,3y.2,41.d,4h.7,50.f,5m.3,5x.5,64.t,8r.2u,g2.6,g9.1,ge.27,jt.6,kc.5,kw.5,l7.p,m3.5|0.1r,1u.h,2f.b,2s.1,33.2,3k.9,41.d,4g.8,4x.i,62.2,66.q,8k.5,8q.2s,g2.2m,ja.8,ka.6,km.f,l3.v,m3.5|0.1s,2d.9,2n.4,2t.1,3i.6,3z.q,4x.d,5y.4,63.2,68.t,8j.2s,g2.6,g9.2i,jc.8,k3.c,kk.1o|0.1o,2e.g,2x.2,3h.b,3v.s,4s.3,4w.g,5w.8,65.3,6b.s,8j.2c,ay.4,fx.3,g1.1,g6.2q,jd.9,k0.28|0.1p,24.5,2g.l,39.4,3i.2,3m.6,3u.t,4s.k,5v.9,65.6,6c.w,79.1,8i.2d,fv.1,g3.2v,jc.b,jv.2d|0.2c,2f.1c,3u.u,4u.k,5v.9,6e.y,8h.2b,g3.2x,jc.5,js.2g|0.2g,2h.1a,3v.v,4s.n,5v.8,6e.y,7d.2,8h.29,g2.2z,jb.5,jr.2h|0.2g,2i.2w,6d.13,7h.1,8h.29,g0.32,jc.7,jr.2h|0.5c,6c.19,8i.27,fz.24,i4.x,jd.2v|0.5a,6a.1d,8i.25,fx.28,i8.s,jd.2s,m6.2|0.4u,4z.8,68.r,71.l,8h.24,bw.3,cm.3,cs.1,fw.2b,id.l,j3.7,jd.2v|0.4w,52.2,66.t,73.h,8i.1q,a9.8,bt.3,bx.5,c7.1,cb.3,cf.2,cj.a,fw.2e,im.8,j1.37|0.4v,4x.4,53.2,68.o,6x.2,76.c,8j.1w,bt.a,c6.3,ca.j,fu.2h,iy.3a|0.4i,4k.9,4w.6,55.2,69.p,77.a,8j.1o,a8.2,ab.1,br.c,c4.s,fr.1,ft.14,h7.14,iv.3d|0.4m,4n.4,4v.5,51.2,5u.5,61.1,64.v,78.7,8m.1f,bs.1,bz.y,fs.13,h9.11,iv.3d|0.4s,4v.b,5t.17,79.1,7b.4,8n.1d,by.10,fr.13,h7.1,h9.12,ie.1,ij.3,iw.3c|0.4r,4v.e,5r.1c,74.1,8n.1b,bs.15,fn.16,h7.15,ii.8,ix.3b|0.4q,4u.i,5r.e,66.11,8n.1c,bz.v,fo.16,h5.17,ij.3p|0.4p,4u.j,5s.9,6a.y,8o.1b,c0.u,fm.18,h4.1b,il.3n|0.4n,4u.j,5e.1,5g.1,6c.v,8p.19,c0.p,fk.18,h2.1f,io.3k|0.4g,4s.d,5a.9,6e.w,8q.18,bx.p,fj.5,fp.12,h0.58|0.4f,4r.d,5b.7,5v.2,6h.c,6v.f,8q.17,c6.b,fd.3,fh.18,gy.5a|0.4d,4x.5,5q.4,5w.1,6h.e,6y.a,79.1,8r.15,cb.4,fc.19,gx.5b|0.4d,4y.2,5s.1,6i.f,71.8,8s.13,fa.19,gu.5e|0.4c,56.6,6k.f,75.4,8u.z,f7.1b,gt.5f|0.48,55.7,5u.1,67.1,6l.2,6q.c,79.1,8v.x,f5.1b,gs.5g|0.46,54.6,5k.3,5s.9,62.1,67.4,6s.b,79.1,8v.w,f2.1c,gt.5f|0.44,55.1,5j.4,5r.m,6w.8,8x.u,do.2,f0.1e,gt.5f|0.43,5j.3,5s.n,72.1,77.1,8z.t,f0.1e,gt.5f|0.42,5k.2,5t.o,76.3,8z.s,f0.1d,gu.5e|0.40,5t.o,78.1,90.q,f0.1d,gu.5e|0.40,5s.v,92.o,f0.1d,gu.5e|0.3z,5q.1,5s.y,93.m,f0.1d,gt.5f|0.3y,5t.x,9c.d,eb.1,f0.1g,gt.5f|0.3y,5t.w,6v.2,78.2,9e.9,ea.2,f0.1i,gn.1,gw.g,he.1,hm.4m|0.3x,5u.v,78.3,9f.9,ea.2,f1.1i,gm.3,gu.1,gx.b,ho.4k|0.3x,5u.w,77.5,9j.4,f0.2,f3.1h,h0.1,hm.4m|0.3x,5t.x,76.7,f1.1i,ha.4,hk.4o|0.3x,5t.x,76.8,f0.m,fn.v,h4.54|0.3x,5r.10,75.a,e3.1,f1.1,f3.i,fo.u,gy.1,h2.56|0.3y,5q.14,74.c,e2.3,f2.g,fp.q,gx.3,h2.56|0.44,5q.15,72.e,dw.1,dz.5,f2.f,fp.n,gy.3,h2.56|0.44,5s.15,6z.j,dp.2,dw.8,f4.b,fp.m,gv.6,h3.55|0.45,5u.1o,do.3,du.8,f6.7,fq.l,gw.1,h6.52|0.45,5w.1o,do.1,dt.7,fr.k,gi.3,h5.53|0.46,5x.1o,dm.2,dq.1,dt.g,fk.2,fr.k,gh.3,gv.4,h5.53|0.46,5x.1o,dm.1,dp.3,dt.g,fi.4,fs.j,gg.3,gu.7,h5.53|0.46,48.8,5x.1p,dm.1,dr.h,fe.8,ft.h,gb.1,gh.1,gt.8,h4.54|0.4l,5y.1p,dt.e,fd.3,fh.4,fu.h,gs.5g|0.4n,5y.1o,dr.f,fd.1,ff.6,fv.g,gs.5g|0.4p,5k.1,5m.3,5y.1o,dr.2,du.b,fc.c,fv.f,gs.5g|0.4q,5l.3,5x.1r,dt.c,fc.9,fs.g,gs.5g|0.4u,5k.2,5w.1t,dq.2,du.1,dw.c,fc.9,fm.1,fq.4,fv.6,gs.5g|0.4x,5v.1w,dr.1,dt.3,dx.c,fd.6,fk.2,fo.7,fw.5,gs.5g|0.4z,5t.1y,dt.1,dx.d,fe.9,fo.6,fw.5,gt.5f|0.5a,5r.25,dj.9,dw.e,fe.4,fk.3,fq.3,g3.2,gt.5f|0.5b,5n.2b,7z.1,di.b,dv.g,fd.7,fo.5,gf.3,go.5k|0.5b,5l.2h,dh.d,e2.b,ff.5,fp.2,fx.1,ga.8,gn.5l|0.5b,5m.2f,dd.1,di.c,dy.1,e2.c,ff.a,ft.6,g9.5z|0.5b,5n.2g,dc.h,dx.1,e3.d,ff.9,fr.9,g4.64|0.5c,5o.2f,dc.f,e4.c,fe.6u|0.5c,5o.24,7u.d,dc.f,e4.c,f8.70|0.5c,5o.2l,dc.g,dy.1,e1.g,f2.76|0.1,2.59,5c.4,5o.2l,df.d,dy.j,f1.77|3.59,5d.4,5p.2k,de.e,dy.o,ez.79|3.1,5.58,5p.2k,dd.e,e0.n,ey.7a|5.1,7.57,5q.2j,dd.e,dz.o,ey.7a|7.58,5p.2k,db.d,dx.q,ex.7b|7.1,9.58,5o.2k,db.a,dv.q,ew.7c|7.5b,5m.1,5o.2i,dc.6,dw.1,dz.l,eu.7e|9.5a,5l.2g,85.5,e2.1,e4.i,et.7f|9.7p,84.5,dz.m,ep.7j|7.2,b.2,e.7i,84.5,dy.m,em.7m|7.5,e.7h,83.4,dw.8,e5.3,ea.2,em.7m|8.7l,82.5,dv.7,em.7m|9.6t,7l.3,81.5,du.2,el.7n|b.9,l.6f,7a.5,81.4,86.4,ei.7q|d.8,m.1,o.6b,7c.6,80.8,8f.1,e9.2,eg.7s|e.9,p.1,r.68,7e.6,7z.c,8d.4,e9.7z|h.8,r.64,71.9,7g.5,7z.j,e7.1,e9.7z|j.7,t.60,6x.e,7y.j,e2.2,e9.7z|k.7,u.5y,6v.g,7v.m,8j.1,dx.8b|l.1,o.3,t.5y,6t.h,7x.n,dx.8b|l.64,6r.h,7w.m,dy.8a|l.64,6q.f,77.1,7u.n,8i.2,dy.8a|m.6n,7l.1,7v.3,7z.8,88.7,8g.6,e3.85|n.5z,6n.l,7k.1,8b.2,8g.5,e6.82|n.5y,6m.m,89.3,8g.5,e7.4j,ir.1,it.3f|o.6l,7b.1,7p.2,88.3,8f.5,e8.4d,iq.1d,k7.2,kb.1x|o.6l,7b.1,7o.3,e8.3r,i0.h,in.1d,kc.1w|n.6n,7d.7,7n.3,ea.3l,hz.f,io.19,kc.1w|o.6o,7e.1,7g.2,7m.7,eb.3j,hz.1,i1.b,ip.17,kc.1w|o.6q,7m.2,7p.3,eb.3i,i6.6,in.18,kc.1w|o.73,eb.1l,fz.1s,i3.a,im.16,kb.1x|o.6i,78.g,eb.1i,fy.1t,i2.g,ij.1,il.15,k6.22|o.6f,78.e,eb.1j,fy.3,g2.1p,i5.d,ij.16,k5.23|o.6c,76.d,eb.1j,fz.1,g1.1,g3.1n,i6.7,il.14,k4.24|n.6c,74.b,eb.1i,g4.1k,i6.4,im.11,k1.3,k5.23|n.68,73.8,eb.1j,g4.1j,i7.1,ip.z,k1.27|n.65,73.7,ea.13,fi.c,g5.1i,is.x,k3.25|n.62,73.6,ea.12,fl.b,g6.1h,it.x,k4.24|n.60,75.2,dj.c,ea.z,fl.d,g7.1g,iu.w,k4.24|n.5z,dh.1e,ey.9,fl.e,ga.1c,iw.u,k5.23|m.60,df.1e,f2.4,fm.d,ga.1a,iy.s,k6.22|m.5z,df.1e,fh.1,fn.d,gb.1,gd.17,j0.r,k7.21|m.5z,dg.1d,ff.3,fo.d,gg.13,j2.q,ka.1y|m.5y,dh.1c,fe.4,fp.d,gi.11,j2.r,ka.1y|m.60,dg.1d,fe.4,fr.c,gk.10,j3.q,ka.1y|n.5z,dg.1d,ff.3,fs.h,gl.z,i2.b,j3.r,ka.2,kg.1s|n.61,dg.1b,ff.3,ft.f,gm.z,i0.g,j2.u,ka.2,kg.1s|n.5v,6l.1,6n.1,dh.18,fg.1,fv.e,gm.11,hy.j,j1.v,kb.1,kh.1r|n.5o,dh.15,fg.2,fz.d,gm.21,is.2,iy.z,ki.1q|n.5s,dh.13,fd.6,g0.e,gm.m,h9.9,hp.29,kb.2,ki.1q|n.5p,dh.12,fd.6,g2.e,gl.i,h6.1,hc.5,hn.2d,kb.1x|m.5m,dg.12,fe.5,g4.8,gd.5,gl.k,hd.2o,kb.1x|n.5l,dg.11,fe.5,g4.7,gg.2,gm.d,h1.1,h3.1,hb.1,hd.2l,kb.1x|o.5k,dg.10,er.2,ew.1,fe.5,g7.3,gg.2,gn.c,h8.2,hc.2m,kb.1,kd.1v|p.5i,df.10,eq.4,fd.6,g7.4,gn.d,hc.2m,ke.1u|p.5h,df.10,er.2,fd.6,g8.4,gp.c,hc.2,hf.2i,kc.1w|p.59,5z.4,64.1,de.11,fd.3,fh.1,g8.5,gq.a,hc.2,hf.2i,kf.1t|p.59,5z.4,de.12,el.1,g8.4,gr.b,hf.2h,kf.1t|q.58,5z.5,b9.1,df.11,g8.3,gq.1,gs.9,h2.3,hf.2h,kf.1t|r.5d,ba.1,dh.y,g7.3,gq.1,gs.d,hc.2k,kf.1t|s.57,60.3,dg.y,fu.4,g2.7,gq.1,gt.6,h0.4,h5.1,he.2i,kf.1t|t.56,61.2,bl.2,dg.x,fu.c,g7.1,gt.8,h3.1,h7.1,hh.2f,kf.1t|u.55,60.2,dg.x,fu.b,gt.8,h5.1,h8.1,hc.1,hf.2i,kf.1t|u.55,60.1,dg.u,fi.1,fx.8,gu.5,h0.2,hh.2k,kf.1t|u.55,dg.t,f9.1,fg.5,fz.6,gu.6,h8.2,hh.2l,kg.1s|w.54,dq.i,eu.6,f3.i,fm.3,g2.3,gv.1,gx.3,hg.1,hj.2l,kc.1w|w.54,dq.8,en.11,gx.1,gz.2,hi.1,hn.8,hz.b,ic.3,ig.3s|w.55,dr.4,ej.14,hk.1,hp.5,i0.9,if.3t|x.52,ds.3,eh.15,hj.2,hq.1,i2.5,if.3t|y.53,dt.2,ee.19,g1.1,if.3t|z.52,ds.3,ec.1c,hg.1,if.3t|10.50,dr.5,ea.1e,h2.9,i4.5,if.3t|11.4x,dr.1x,h5.8,i2.6,if.3t|11.4y,dr.1x,h7.1,i1.6,if.3t|11.4w,dq.1x,i2.3,ig.3s|14.4q,dp.1w,if.3t|17.4m,dp.1v,ie.3u|1a.4i,dn.1y,fn.1,ie.3u|1c.4d,dl.23,id.3v|1d.4b,di.27,id.3v|1e.49,dh.2a,ic.3w|1f.47,cj.1,dg.2j,gu.4,ic.3w|1f.45,ck.1,df.2n,gr.9,ic.3w|1g.42,df.2q,gp.c,ib.3x|1g.41,de.2s,go.g,ib.3x|1h.3z,de.2s,go.k,ia.3y|1h.8,1q.3p,dd.2t,go.l,ha.3,hw.1,ia.3y|1i.7,1t.3m,dc.2w,go.t,ht.7,i9.3z|1i.7,1v.3j,dc.32,go.y,hr.4h|1j.6,1v.3j,dc.34,go.5k|1k.6,1w.3i,dd.35,gn.5l|1k.6,1w.2x,4v.k,dd.36,gm.5m|1k.6,1x.2i,4g.2,4x.i,dd.6j,jx.2b|1l.6,1x.2m,4y.4,55.a,dd.6h,k1.27|1m.6,1y.1y,3x.3,45.d,56.9,dc.4q,i3.1q,k1.27|1n.8,1y.1y,4b.8,57.9,db.4r,i3.1p,k2.26|1p.6,1y.1y,4c.1,4f.1,4i.2,58.8,cx.1,da.4t,i4.1p,k3.25|1q.5,1y.1,20.1v,59.8,cg.1,d9.4u,i4.1p,k3.25|1r.5,21.1s,59.9,cg.1,cw.1,d7.4x,i5.5,ib.1j,k4.24|1r.6,22.1o,59.8,cl.2,cv.2,d6.54,ib.1j,k4.24|1r.6,23.1m,59.9,cj.1,cl.1,cp.1,d3.52,i7.1o,k5.23|1o.1,1r.6,24.1k,58.a,cp.1,d0.56,i8.1,id.1i,k6.22|1o.a,25.1i,5a.9,cz.58,ie.1i,k9.1z|1q.9,26.1h,59.a,cz.58,ie.1j,ka.1y|1r.9,27.1f,5a.a,cy.5a,if.1k,kc.1w|1t.8,28.1f,5b.9,cy.5a,ig.1k,ke.8,kn.2,ks.1g|1w.6,29.1e,5b.9,5p.3,5u.1,cx.5b,ih.1j,kh.3,km.1,ks.1g|1x.5,2b.1c,5c.8,5v.1,cv.5e,ih.1k,ks.1g|1z.4,2a.1d,5d.7,5v.1,cu.5f,ii.1j,k2.1,k4.1,ko.2,ks.1g|1z.4,2a.1e,5e.6,cu.5g,ij.1i,k4.2,ko.2,kt.1f|1z.5,2b.1c,5f.4,ct.5i,ij.1i,k3.3,km.4,kv.1d|1z.5,2d.1a,5f.4,5x.1,ct.5i,ik.1i,k3.3,kl.5,l0.1,l2.q,lu.e|1z.6,2f.17,5g.1,5r.1,5u.1,cs.5k,il.1h,k3.4,kk.6,l8.4,ld.1,lv.d|1z.7,2f.17,5r.2,cs.5k,il.1l,kj.7,lv.d|20.5,2g.16,5r.2,cs.5l,il.1l,ki.8,lx.b|22.4,2i.14,5r.2,cr.5n,im.1k,ki.9,lx.b|23.5,2j.12,5s.2,cq.5o,io.1j,ka.i,lx.b|25.4,2k.11,5t.1,cp.5q,ip.25,ly.a|26.4,2l.10,co.5q,iq.29,m1.7|27.4,2m.z,co.5q,iq.2a,m2.6|27.3,2m.z,5a.7,63.1,cn.5s,ir.29,m3.5|28.1,2n.y,55.g,cn.5s,ir.2a,m4.4|2p.w,53.j,67.2,cm.5v,is.2b|2p.w,52.6,5c.e,5r.1,cm.5w,is.2c,m4.4|2p.w,52.4,5d.g,cl.5y,is.2b,m4.4|2p.x,51.3,58.1,5j.b,ck.60,is.2b,m5.3|2l.1,2q.x,4m.3,58.2,5l.b,ck.60,is.2a,m6.2|2r.v,4h.c,5q.7,ck.60,is.29,m7.1|2r.w,4f.e,5q.b,69.3,ck.61,it.27|2q.x,4e.f,5r.a,cl.60,it.26|2r.x,4e.e,5t.c,cm.5z,iu.25|2p.10,4e.d,4s.1,5v.c,cn.5y,iv.21,kx.1,kz.1|2q.10,4e.c,5u.d,cn.5y,ix.1z|2q.10,4d.d,5t.5,61.3,6b.3,6h.4,cn.5y,iy.1x|2r.10,4d.d,6b.d,cm.5z,iz.1w|2s.z,4d.d,6d.e,cm.5z,j0.1v|2t.z,4c.e,6d.e,cn.5z,j0.1v|2w.x,4a.g,6b.j,cn.5z,j1.1t|2x.z,45.3,4b.e,66.3,6e.h,cn.61,j1.1q|2y.z,41.m,4o.1,5r.6,66.o,6z.7,cn.62,j2.1p|30.1o,5r.8,68.1,6c.1,6g.4,6z.6,co.62,j2.1o|34.1j,5t.6,6h.2,co.63,j3.1m|36.1h,cn.64,j4.1h|37.1g,cn.65,j5.1g|39.1e,bn.1,cn.65,j5.1g|3c.1b,cm.67,j3.1,j6.1a|3e.19,cm.67,j4.1,j7.16|3h.15,7m.1,cm.67,j7.13|3k.c,3z.m,7l.1,bw.1,cm.67,j7.12|3m.8,41.l,4o.3,4t.1,4v.8,cm.68,j7.12|3p.2,42.12,7m.1,cl.69,iw.1,j7.12|43.12,7m.1,cl.6b,j7.10|44.13,bt.1,ck.6d,j7.y|45.12,7n.1,bq.1,cj.6g,j7.u|46.11,7n.2,cj.6i,j8.q|48.z,ck.6i,j8.o|49.y,ck.6i,j8.n|4b.v,7o.1,cl.6j,j9.i|4g.q,cl.6k,j9.h|4j.n,cl.6l,j9.e|4n.1,4q.g,7t.1,cl.6m,j9.9|4p.h,cl.6n,ja.7|4q.g,cl.6o,jb.2,kd.5|4s.e,6g.3,cl.6p,ke.3|4t.c,6f.5,6n.2,6s.1,7l.1,cn.6n|4t.c,6e.5,6n.2,cn.6m,k2.3|4u.b,6c.6,6n.2,cq.6i,k1.4|4w.9,6b.6,6m.7,cq.6k,ju.1,jx.8|4x.8,67.a,6k.b,7c.1,cr.6k,jp.g|4x.9,63.e,6i.d,7b.1,7n.1,cs.6j,jj.1,jn.i|4x.9,62.t,6z.4,7b.8,7m.2,ct.6k,jh.o|4x.a,62.f,6i.m,7a.7,7m.2,cu.7a|4x.b,61.g,6j.z,7l.3,cv.79|4y.a,61.f,6j.13,cx.77|4z.1,51.9,5m.1,61.f,6j.15,cx.77|53.8,5k.7,60.h,6j.16,cy.75|55.6,5i.b,5z.1q,cz.74|55.9,5g.6,5o.6,5y.1q,cz.73|55.g,5q.5,5w.1r,7p.3,cz.73|56.e,5o.1,5r.5,5x.1w,cz.72|58.1,5c.6,5r.5,5x.1y,d0.70|5d.6,5q.26,d0.70|5e.1,5g.4,5r.26,d1.6y|5d.1,5g.3,5s.26,d2.6x|5s.26,d4.6u|5t.27,d6.6r|5u.27,d7.6q|5u.28,d9.1k,eu.53|5u.29,da.1c,ez.4x|5v.2k,db.19,f0.4w|5u.2p,dd.13,f0.4v|5u.2r,de.10,f1.4t|5u.2s,df.k,e1.b,f1.4t|5u.2t,dg.b,e6.3,f2.4r|5v.2u,di.7,f2.b,fe.4e|5u.2v,dl.2,f3.5,ff.4d|5u.2x,fg.4b|5v.2x,fi.48|5v.2x,fe.2,fi.47|5u.2y,fe.1,fj.45|5u.2y,fj.44|5t.30,fj.43|5s.31,fj.42|5q.33,fj.41|5p.36,fj.3z|5p.36,fj.3x|5o.38,fi.3x|5o.39,fi.3w|5m.3a,fi.3v|5k.3b,fi.3t|5j.3b,8v.1,fh.3t|5k.3b,f6.1,fi.3r|4a.1,5k.3e,f6.1,fh.3r|4a.2,5j.38,8s.1,8u.6,fh.3q|49.3,5i.39,8t.a,fh.3p|4b.2,4e.1,5i.39,8t.9,ff.3q|4a.3,4i.1,5h.3a,8t.9,93.6,ff.3q|5g.3l,92.a,fg.3o|5g.3l,92.c,fg.3n|5g.3i,90.h,fh.3m|5h.3d,8v.n,fh.3l|5g.42,fi.3i|5h.41,9n.1,fi.3h|5i.2,5l.45,fj.3f|5j.4i,fk.3d|5k.4i,fl.3c|5i.4m,fm.3a|5h.4p,fn.39|5g.4r,fo.37|5f.4t,fp.36|5f.4u,fq.34|5e.4w,fr.33|5f.4x,fr.32|5f.53,fs.31,iu.2|5g.53,fs.30|5g.53,fs.30|5f.55,ft.2z,it.1|5f.55,ft.31|5h.53,ft.2z,it.1|5j.51,fu.2z|5k.51,fv.2z|5l.50,fv.2z|5l.50,fv.2z|5m.4z,fw.2x|5m.4z,fw.2z|5n.4y,fx.2x|5o.4w,fx.2x|5p.4v,fx.2x|5p.4v,fw.2y|5p.4u,fw.2z|5q.4s,fw.2z|5q.4s,fx.2y|5r.4q,fx.2y|5r.4p,fx.2z|5s.4n,fy.30|5s.4m,fz.2z|5t.4j,fz.2z|5t.4j,fz.2z|5u.4h,fz.2z|5v.4f,fz.2z,j9.1|5v.4f,fz.2z,j9.1|5v.4e,fz.2z,jd.1,jw.1|5w.4d,fy.30,jw.2|5x.4b,fx.32,jv.4|5y.47,a6.1,fw.32,jg.1,jv.4|5y.47,fv.34,jv.5|5z.45,fu.35,ju.6|5z.45,fu.35,js.9|5z.45,fu.35,js.9|5z.45,ft.36,jr.a|5z.45,ft.36,jr.a|60.44,ft.37,jr.a|61.43,ft.36,jp.c|62.42,fs.37,jo.e|63.41,fs.37,jm.g|65.40,fs.36,jl.e,k0.2|67.3y,fr.36,ji.h,k0.1|68.3w,fr.35,je.l|6b.3t,fr.34,jd.n|6d.3r,fr.34,jd.m|6f.3p,fr.32,jd.m|6g.3o,fr.30,jc.m|6i.3l,fr.2x,jc.m|6i.3m,fr.2v,jc.m|6j.3k,fr.2u,jc.m|6l.3h,fr.2t,jc.m|6m.3g,fs.2r,jc.m|6m.3f,fs.2q,jd.k|6m.3f,ft.2o,jd.k|6n.3e,fu.2l,jd.j|6n.3e,fv.2j,jd.j|6n.3e,fv.2i,jd.j|6n.3d,fw.2f,jd.j|6n.3d,fw.2f,jd.i,ku.1|6n.3c,fx.2e,jd.i,kt.2|6n.3b,fx.2f,jc.i|6n.3a,fy.2e,jc.i,kl.2|6n.3a,fy.2f,jb.j,kl.2|6n.39,fz.2e,ja.k,km.1|6n.39,fz.2e,ja.j|6n.39,g0.2d,j9.k|6n.38,g1.2d,j9.j|6n.36,g2.2c,j9.j|6n.35,g2.2c,j9.j|6m.36,g2.2c,j9.j|6m.2w,9l.1,g1.2d,ja.h|6m.2v,g2.2c,ja.h|6m.2t,g2.2c,jb.g|6m.2q,9e.1,g2.2c,ja.g|6m.2o,g2.2c,ja.g|6m.2m,g2.2b,jb.f|6l.2m,g3.29,jb.e|6m.2j,g3.27,jc.d|6m.2i,g3.24,jd.a|6m.2i,g3.22,jf.5|6l.2h,g3.21,jh.1|6l.2h,g3.20|6l.2h,g3.20|6l.2h,g4.20|6l.2h,g4.20|6l.2h,g4.20|6k.2i,g5.1z|6k.2i,g5.1y|6k.2i,g6.1x|6j.2j,g6.1x|6j.2j,g7.1v|6j.2i,g8.1u|6j.2i,g9.1s|6i.2h,ga.1q|6i.2g,gb.1o|6i.2f,gc.1m|6i.2f,gc.1l|6i.2e,gc.1k|6i.2e,gd.1j|6h.2a,8s.3,gd.1i|6h.2a,8t.1,ge.1g|6h.2a,8s.2,ge.1g|6h.29,8r.2,gf.1e|6h.27,8r.1,gf.1d|6h.27,8q.1,gg.1b|6i.27,gh.18|6i.26,gh.17|6i.25,gh.16|6i.25,gh.15|6i.24,gf.16|6h.25,gg.13|6h.24,gg.12|6h.22,gh.z|6g.22,gh.u|6g.22,gh.g,h0.1,h5.3|6g.1i,80.h,gk.b|6f.1k,84.c,gl.4|6f.1m,86.3,8a.4|6f.1o|6e.1p|6d.1q|6d.1q|6c.1r|6c.1t|6c.1u|6b.1u|6b.1u|69.1v|69.1u|6a.1s|6a.1s|6a.1q|6a.1n|6a.1j|6b.18|6b.19|6a.1a|6a.19|69.1a|69.1a|68.1b|68.10,79.a|68.10,7c.5|68.10|69.3,6d.v|68.2,6d.v|67.3,6e.v,7c.1|67.3,6d.11|67.2,6d.w,7b.3|67.3,6d.x,7b.2|66.4,6c.y|67.2,6c.w|6c.v|68.1,6b.w|6b.w|66.3,6b.w|66.10|66.3,6b.v|67.2,6a.s|66.1,68.1,6a.q|65.u|64.u|64.u|63.v|61.y|61.1,65.1,67.u|67.y|66.z|65.10|63.2,66.z|62.12|62.10|61.2,64.1,67.t|62.x,m3.2|62.w,m3.3|62.w,m3.5|62.4,67.q,m3.5|63.3,67.q|62.3,66.q|65.o|62.1,64.o|64.n|65.n|63.3,68.k,7r.4,7w.2,7z.1|67.l,7q.4,7v.6|64.3,69.k,7p.4,7u.5|64.2,67.1,69.l,7o.3,7t.3|67.j,6t.1|68.5,6f.9,6p.5|66.1,6a.8,6j.2,6n.8|67.1,69.2,6c.3,6i.3,6m.8|69.2,6c.8,6m.a|69.b,6o.9|6b.4,6g.4,6l.1,6n.b|6d.1,6f.5,6l.1,6o.c,a9.5|6i.k,ac.4|6g.r,ae.2|6j.1,6l.1,6o.j,79.3,af.1|6k.3,6o.c|6q.1,6s.3|6v.1,6y.1|', worked: '||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||fd.1,ff.1|ff.5,fx.1|ff.9,fu.5|fg.8,fr.8|fe.n|f9.3,fe.n|f8.u|f9.t|f8.t|f7.v|f8.u|f7.w|f6.x|f4.z|f4.10|f4.10|f4.x,g2.1|f4.u|f5.p|f4.p|f5.p|f6.o|f6.p|3v.2,f8.1,fa.n|t.34,fc.n|u.37,42.2,fb.o|t.3d,fb.n|l.8,u.3g,4b.2,4k.5,fa.l|m.45,fa.m|m.48,fa.4,fh.c,fv.1|n.49,6r.1,fk.2|n.4c,6q.7|o.4d,6p.8|o.4d,6o.9|o.4g,6n.a|o.4g,6n.a|o.4i,6m.b|o.4k,6m.c|o.4m,6l.d|o.4m,6i.i|o.4m,63.x|o.4n,61.x|o.4n,60.v|n.4o,5y.u|n.4o,5x.s|n.4o,5p.y|n.4o,5n.z|m.4p,5o.x|m.4o,5o.x|m.4o,5m.z|m.4n,5j.11|n.4l,5e.17|n.4l,5c.1a|n.60|o.5u|n.5o,jb.6|n.5r,ja.8|n.5n,jb.7|n.5l,ja.9|n.5l,jb.9|o.5k,je.5|p.5i,je.2,jh.4,jr.1|p.5h,jc.4,jj.3,jp.4|p.59,5z.4,64.1,jc.5,jk.2,jn.6|p.59,5z.4,jd.f|q.58,5z.5,jd.g|s.56,5z.5,jd.i|s.56,60.3,jd.j,kp.4|t.56,61.1,jd.j,kk.c|u.55,60.2,je.j,kj.h|u.55,60.1,jf.m,kh.l|v.54,jf.n,kg.n|w.54,jf.p,kd.2,kg.p|w.54,jg.r,k8.11|w.54,jh.1s|x.52,jh.1s|y.53,jj.1q|z.52,jk.1p|10.50,jk.1p|11.4x,jk.1p|11.4y,jj.1p|11.4u,ji.1q|16.4o,ji.1p|17.4m,ji.1o|1a.4g,ji.1o|1c.4c,jj.1n|1e.4a,jk.1n|1e.49,jk.1m|1f.46,jm.1l|1f.6,1p.3v,jn.1k|1q.3s,jp.1i|1t.3o,jq.1h|1w.3k,jr.1g|20.f,2n.2s,jr.1g|23.c,2o.2r,jr.1k|2p.2p,jr.1k|2q.2o,js.1j|2s.2m,js.1i|2t.1r,4l.2,4p.2,4s.1,4v.j,jt.1g|2t.1m,4g.2,4x.i,ju.2,jx.2,k0.18|2t.1q,4y.4,55.a,k1.17|2u.7,37.p,3x.2,45.2,48.1,4a.7,56.9,k2.16|2w.5,38.o,4b.5,4h.2,57.9,k2.17|2y.2,39.n,4i.2,58.8,k3.17|3a.l,59.8,k3.17|3a.j,59.9,k4.17|3b.f,59.8,k5.19|3c.d,59.9,k5.1a|3c.b,59.9,k6.19|3d.a,5a.9,k9.16|3e.9,59.a,kb.14|3e.8,5a.9,kc.d,kr.q|3f.7,5b.9,ke.8,kn.2,ks.p|3f.7,5c.8,kh.3,km.1,ks.n|3g.7,5c.8,ks.l|3j.4,5d.7,kt.i|3m.1,5e.6,ko.1,kt.i|5f.4,kn.2,kw.f|5f.4,km.3,l3.8|kl.4,l9.1|kj.6|ki.5|ki.5|k6.1,ka.3,ke.a|k7.f|k8.e|k9.d|ka.b|kc.9|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||' };
+  const U = 1 / MAP.step;      // map pixels per degree
+  const M = U / 2;             // one marker pixel = half a degree
+  const el = (tag, attrs) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+  const cell = (lon, lat) => [(lon - MAP.left) / MAP.step, (MAP.top - lat) / MAP.step];
+  const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  svg.setAttribute('viewBox', `0 0 ${MAP.cols} ${MAP.rows}`);
+
+  const decode = (rle) => {
+    const rows = [];
+    rle.split('|').forEach((row, r) => {
+      if (!row) return;
+      row.split(',').forEach((run) => {
+        const [a, b] = run.split('.').map((v) => parseInt(v, 36));
+        rows.push(r, a, b);
+      });
+    });
+    return rows;
+  };
+  const landRuns = decode(MAP.rle);
+  const workedRuns = decode(MAP.worked);
+
+  // ---- land on canvas, redrawn crisply for the current size ----
+  const paint = () => {
+    const w = fig.clientWidth;
+    if (!w) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = Math.round(w * dpr), H = Math.round(W * MAP.rows / MAP.cols);
+    canvas.width = W; canvas.height = H;
+    const g = canvas.getContext('2d');
+    const cs = W / MAP.cols;
+    const size = Math.max(1, Math.round(cs * 0.7));
+    const off = Math.max(0, Math.floor((cs - size) / 2));
+    // top and bottom edges fade out in pixels: an 8×8 ordered dither thins the dots row by row
+    const B8 = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21];
+    const smooth = (t) => t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
+    const fade = new Float32Array(MAP.rows);
+    for (let r = 0; r < MAP.rows; r++) {
+      const y = r / (MAP.rows - 1);
+      fade[r] = Math.min(smooth(y / 0.16), smooth((1 - y) / 0.3));
+    }
+    const keep = (c, r) => fade[r] >= 1 || (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < fade[r];
+    // sea: a faint grid, one dot per degree
+    g.fillStyle = tok('--ink-700');
+    const seaStep = Math.round(U);
+    for (let r = 2; r < MAP.rows; r += seaStep) for (let c = 2; c < MAP.cols; c += seaStep) if (keep(c, r)) g.fillRect(Math.round(c * cs), Math.round(r * cs), size, size);
+    const runs = (list, color) => {
+      g.fillStyle = color;
+      for (let i = 0; i < list.length; i += 3) {
+        const r = list[i];
+        if (!fade[r]) continue;
+        const y = Math.round(r * cs) + off;
+        for (let c = list[i + 1], e = c + list[i + 2]; c < e; c++) if (keep(c, r)) g.fillRect(Math.round(c * cs) + off, y, size, size);
+      }
+    };
+    runs(landRuns, tok('--ink-600'));
+    // countries worked with sit a little lighter
+    const probe = document.createElement('span');
+    probe.className = 'xmap__worked-tone';
+    fig.append(probe);
+    runs(workedRuns, getComputedStyle(probe).color);
+    probe.remove();
+  };
+  paint();
+  let rt;
+  const later = () => { clearTimeout(rt); rt = setTimeout(paint, 80); };
+  addEventListener('resize', later);
+  addEventListener('viewchange', (e) => { if (e.detail.id === 'about') paint(); });
+  if ('ResizeObserver' in window) new ResizeObserver(later).observe(fig);
+  (document.fonts?.ready || Promise.resolve()).then(paint);
+
+  // ---- cities ----
+  const cities = {
+    tehran: { ll: [51.39, 35.69], home: true, name: 'Tehran', note: '4 roles', pos: 'dl' },
+    yerevan: { ll: [44.51, 40.18], name: 'Yerevan', note: 'Fill Studio', pos: 'ul' },
+    dubai: { ll: [55.27, 25.2], name: 'Dubai', note: 'UI8', pos: 'dl' },
+    berlin: { ll: [13.4, 52.52], name: 'Berlin', note: 'Djoid', pos: 'ul' },
+    atlanta: { ll: [-84.39, 33.75], name: 'Atlanta', note: 'Trakdesk', pos: 'dr' },
+    la: { ll: [-118.24, 34.05], name: 'Los Angeles', note: 'Gala', pos: 'dr' }
+  };
+  for (const k in cities) {
+    const c = cities[k];
+    c.c = cell(...c.ll);
+    const lab = document.createElement('div');
+    lab.className = `xmap__label xmap__label--${c.pos}`;
+    lab.dataset.city = k;
+    lab.style.left = (c.c[0] / MAP.cols) * 100 + '%';
+    lab.style.top = (c.c[1] / MAP.rows) * 100 + '%';
+    lab.innerHTML = `${c.name}<span>${c.note}</span>`;
+    fig.append(lab);
+  }
+
+  // ---- routes: pixel arcs from Tehran to each remote team, one dot per half degree ----
+  const [hx, hy] = cities.tehran.c;
+  const arcs = {};
+  const arcLayer = el('g', {});
+  svg.append(arcLayer);
+  const snap = (v) => Math.round(v / M) * M;
+  for (const k of Object.keys(cities).filter((k) => !cities[k].home)) {
+    const [tx, ty] = cities[k].c;
+    const dist = Math.hypot(tx - hx, ty - hy);
+    const cx = (hx + tx) / 2, cy = Math.max(2 * U, Math.min(hy, ty) - Math.min(dist * 0.3, 26 * U));
+    const pts = [];
+    let last = '';
+    for (let i = 0; i <= 1600; i++) {
+      const t = i / 1600, m = 1 - t;
+      const x = snap(m * m * hx + 2 * m * t * cx + t * t * tx);
+      const y = snap(m * m * hy + 2 * m * t * cy + t * t * ty);
+      const key = x + ',' + y;
+      if (key === last) continue;
+      last = key;
+      if (Math.max(Math.abs(x - hx), Math.abs(y - hy)) < 3.5 * U || Math.max(Math.abs(x - tx), Math.abs(y - ty)) < 2.5 * U) continue;
+      pts.push([x, y]);
+    }
+    let d = '';
+    pts.forEach(([x, y], i) => { if (i % 2 === 0) d += `M${x - 0.3 * M} ${y - 0.3 * M}h${0.6 * M}v${0.6 * M}h${-0.6 * M}z`; });
+    const path = el('path', { class: 'arc', d, 'data-city': k });
+    arcLayer.append(path);
+    arcs[k] = { pts };
+  }
+
+  // ---- markers, drawn on a half-degree pixel grid ----
+  const px = (x, y, s = 0.86) => `M${x - (s / 2) * M} ${y - (s / 2) * M}h${s * M}v${s * M}h${-s * M}z`;
+  for (const k in cities) {
+    const [x, y] = cities[k].c;
+    const g = el('g', { class: 'city', 'data-city': k });
+    let core = '', edge = '', ring = '';
+    if (cities[k].home) {
+      // home base: a 5×5 pixel block with clipped corners, bright centre
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+        if (Math.abs(dx) === 2 && Math.abs(dy) === 2) continue;
+        const p = px(x + dx * M, y + dy * M);
+        if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) core += p; else edge += p;
+      }
+    } else {
+      // remote team: a pixel diamond
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+        const m = Math.abs(dx) + Math.abs(dy);
+        if (m > 2) continue;
+        const p = px(x + dx * M, y + dy * M);
+        if (m <= 1) core += p; else edge += p;
+      }
+    }
+    // a pixel circle around each city that blinks like the tab cursor
+    const R = cities[k].home ? 5 : 4;
+    const seen = new Set();
+    for (let a = 0; a < 360; a += 2) {
+      const dx = Math.round(Math.cos(a * Math.PI / 180) * R), dy = Math.round(Math.sin(a * Math.PI / 180) * R);
+      const key = dx + ',' + dy;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if ((dx + dy) % 2) continue;
+      ring += px(x + dx * M, y + dy * M, 0.6);
+    }
+    g.append(el('path', { class: 'ring', d: ring }), el('path', { class: 'halo', d: edge }), el('path', { class: 'core', d: core }));
+    svg.append(g);
+  }
+
+  // ---- packets: a bright pixel with a short fading tail runs each route ----
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const packets = Object.values(arcs).map((a, i) => {
+      const parts = [1, 0.55, 0.25].map((o) => { const r = el('rect', { class: 'pkt', width: 0.9 * M, height: 0.9 * M, opacity: 0 }); r.dataset.o = o; svg.append(r); return r; });
+      return { a, parts, offset: i * 700, speed: 13 };
+    });
+    const t0 = performance.now();
+    const tick = (now) => {
+      for (const q of packets) {
+        const n = q.a.pts.length;
+        const travel = n * q.speed, cycle = travel + 1400;
+        const t = (Math.max(0, now - t0) + q.offset) % cycle;
+        const head = Math.floor(t / q.speed);
+        q.parts.forEach((r, j) => {
+          const i = head - j * 2;
+          if (t < travel && i >= 0 && i < n) {
+            const [x, y] = q.a.pts[i];
+            r.setAttribute('x', x - 0.45 * M);
+            r.setAttribute('y', y - 0.45 * M);
+            r.setAttribute('opacity', r.dataset.o);
+          } else r.setAttribute('opacity', 0);
+        });
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // ---- pointing at a row or a marker brings that city and its route forward ----
+  const stage = fig.closest('.xstage') || fig;
+  const focus = (k) => {
+    if (k) fig.dataset.focus = k; else delete fig.dataset.focus;
+    fig.querySelectorAll('[data-city]').forEach((n) => n.classList.toggle('is-focus', n.dataset.city === k));
+  };
+  stage.querySelectorAll('.xp__row').forEach((row) => {
+    row.addEventListener('mouseenter', () => focus(row.dataset.city));
+    row.addEventListener('mouseleave', () => focus(null));
+  });
+  svg.querySelectorAll('.city').forEach((g) => {
+    g.addEventListener('mouseenter', () => focus(g.dataset.city));
+    g.addEventListener('mouseleave', () => focus(null));
+  });
+
+  // ---- place the panels into the empty map: intro above the cities, roles below them ----
+  const introP = stage.querySelector('.xpanel--intro');
+  const rolesP = stage.querySelector('.xpanel--roles');
+  const GAP = 28;
+  const layout = () => {
+    if (!introP || !rolesP || !fig.clientWidth) return;
+    if (matchMedia('(max-width: 1100px)').matches) {
+      stage.style.paddingTop = stage.style.minHeight = introP.style.top = rolesP.style.top = '';
+      return;
+    }
+    const fr = fig.getBoundingClientRect();
+    const marks = [...fig.querySelectorAll('.xmap__label, .xmap .city')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
+    if (!marks.length) return;
+    const top = Math.min(...marks.map((r) => r.top)) - fr.top;        // highest city or label, in map coordinates
+    const bottom = Math.max(...marks.map((r) => r.bottom)) - fr.top;  // lowest one
+    const ih = introP.offsetHeight, rh = rolesP.offsetHeight;
+    const pad = Math.max(24, ih + GAP + 24 - top);                    // only push the map down as far as the intro needs
+    stage.style.paddingTop = pad + 'px';
+    introP.style.top = (pad + top - GAP - ih) + 'px';
+    const rolesTop = pad + bottom + 8; // the table tucks in close under the lowest label
+    rolesP.style.top = rolesTop + 'px';
+    stage.style.minHeight = (rolesTop + rh + 24) + 'px';
+  };
+  layout();
+  addEventListener('resize', layout);
+  addEventListener('viewchange', (e) => { if (e.detail.id === 'about') requestAnimationFrame(layout); });
+  (document.fonts?.ready || Promise.resolve()).then(layout);
+  if ('ResizeObserver' in window) new ResizeObserver(() => layout()).observe(introP);
+})();
+
+
+/* Expertise: one row per domain, one pixel per quarter from Q4 2017 to now */
+(() => {
+  const rowsEl = document.getElementById('vgraph-rows');
+  const axis = document.getElementById('vgraph-axis');
+  if (!rowsEl) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  const START = [2017, 10];
+  const now = new Date();
+  const idx = (y, m) => (y - START[0]) * 12 + (m - START[1]);
+  const M = idx(now.getFullYear(), now.getMonth() + 1) + 1; // months covered
+  const N = Math.ceil(M / 3);                                 // quarters (one pixel each)
+  const parse = (s) => s ? s.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
+  const domains = [
+    { d: 'Q-commerce & e-commerce', co: 'Digikala', s: '2024-03', e: null },
+    { d: 'Design assets · 3D, icons, UI kits', co: 'UI8', s: '2020-09', e: null },
+    { d: 'AI & music tech', co: 'Djoid', s: '2023-04', e: '2024-06' },
+    { d: 'Fintech · crypto exchange', co: 'AbanTether', s: '2023-02', e: '2024-05' },
+    { d: 'Web3, DeFi & blockchain', co: 'Gala', s: '2022-02', e: '2023-02' },
+    { d: 'SaaS, cloud & networks', co: 'Imen Aria', s: '2020-01', e: '2022-02' },
+    { d: 'Insurance · insurtech CRM', co: 'EasyBimeh', s: '2017-10', e: '2020-01' }
+  ];
+  const dur = (m) => { const y = Math.floor(m / 12), r = m % 12; return (y ? y + 'y' : '') + (y && r ? ' ' : '') + (r ? r + 'm' : ''); };
+  const sq = (i, s = 0.72) => `M${i + (1 - s) / 2} ${(1 - s) / 2}h${s}v${s}h${-s}z`;
+  for (const x of domains) {
+    const a = idx(...parse(x.s)), b = idx(...parse(x.e));
+    const qa = Math.floor(a / 3), qb = Math.floor(b / 3);
+    let off = '', on = '', live = '';
+    for (let i = 0; i < N; i++) {
+      if (i >= qa && i <= qb) { if (!x.e && i === N - 1) live += sq(i, 0.8); else on += sq(i, 0.8); }
+      else off += sq(i, 0.3);
+    }
+    const row = document.createElement('div');
+    row.className = 'vg-row';
+    row.innerHTML = `<span class="vg-row__label"><span class="vg-row__domain">${x.d}</span><span class="vg-row__co">${x.co}</span></span>`;
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${N} 1`);
+    svg.setAttribute('aria-hidden', 'true');
+    for (const [cls, d] of [['vg-off', off], ['vg-on', on], ['vg-now', live]]) {
+      if (!d) continue;
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('class', cls);
+      p.setAttribute('d', d);
+      svg.append(p);
+    }
+    row.append(svg);
+    const t = document.createElement('span');
+    t.className = 'vg-row__dur';
+    t.textContent = dur(b - a + 1);
+    row.append(t);
+    rowsEl.append(row);
+  }
+  for (let y = START[0] + 1; y <= now.getFullYear(); y++) {
+    const s = document.createElement('span');
+    s.style.left = ((Math.floor(idx(y, 1) / 3) + 0.5) / N) * 100 + '%';
+    s.textContent = "'" + String(y).slice(2);
+    axis.append(s);
+  }
+})();
+</script>
+</body>
+</html>
