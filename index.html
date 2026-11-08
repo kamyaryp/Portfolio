@@ -587,29 +587,9 @@ body { overflow-x: clip; }
 .xpanel__head { margin: 0; padding-bottom: 16px; }
 .about__intro { margin: 0; font-size: 1.25rem; line-height: 1.6; font-weight: 300; color: var(--muted); text-wrap: pretty; }
 .about__intro strong { color: var(--fg); font-weight: 500; }
-.xpanel--roles { padding: 4px 28px; }
-.xp { margin: 0; }
-.xp__row {
-  display: grid;
-  grid-template-columns: 2fr 3fr 4fr 3fr 2fr;
-  gap: 16px;
-  align-items: baseline;
-  padding: 14px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
-  font-size: var(--fs-base);
-  transition: color 200ms ease;
-}
-.xp__row:last-child { border-bottom: 0; }
-.xp__row > * { min-width: 0; }
-.xp__row:hover .xp__co { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-.xp__years { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.06em; color: var(--muted); font-variant-numeric: tabular-nums; }
-.xp__co { font-weight: 500; }
-.xp__role { color: var(--muted); font-weight: 300; }
-.xp__place { color: var(--fg); }
-.xp__mode { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: right; }
-.xp__mode.is-remote { color: var(--fg); }
+.xpanel--roles { padding: 12px 28px 22px; }
 
-/* ---------- About page: bio, numbers, expertise ---------- */
+/* ---------- About page: bio and numbers ---------- */
 .about-bio { display: grid; gap: 48px; }
 .about-bio .work-head { margin-bottom: 0; }
 /* two columns that start on the same line: the story on the left, a compact profile card on the right */
@@ -651,18 +631,10 @@ body { overflow-x: clip; }
 .stat__what { font-size: var(--fs-base); color: var(--fg); }
 .stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); }
 
-.expertise { padding-top: 140px; }
-.expertise__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 40px var(--gutter); }
-.expertise__text { grid-column: 1 / span 4; display: grid; gap: 1em; align-content: start; color: var(--muted); font-size: 1.0625rem; line-height: 1.65; font-weight: 300; min-width: 0; }
-.expertise__text p { margin: 0; }
-.expertise__text strong { color: var(--fg); font-weight: 500; }
-.expertise__lead { color: var(--fg) !important; font-size: var(--fs-xl); line-height: 1.3; font-weight: 400; letter-spacing: -0.01em; }
-.skills { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.skills li { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--fg); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 10px; }
 
-.vgraph { grid-column: 5 / span 8; margin: 0; display: grid; gap: 14px; min-width: 0; }
+.vgraph { margin: 0; display: grid; gap: 14px; min-width: 0; }
 .vgraph__rows { display: grid; gap: 4px; }
-.vg-row { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr) 4.5rem; gap: 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
+.vg-row { display: grid; grid-template-columns: minmax(0, 23rem) minmax(0, 1fr) 4.5rem; gap: 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
 .vg-row__label { display: grid; gap: 3px; min-width: 0; }
 .vg-row__domain { font-size: var(--fs-sm); color: var(--fg); }
 .vg-row__co { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.5; }
@@ -674,7 +646,7 @@ body { overflow-x: clip; }
 .vg-on { fill: var(--ash-300); }
 .vg-now { fill: var(--stone-100); animation: bit-blink 1.06s steps(1, end) infinite; }
 .vgraph__rows:hover .vg-row:not(:hover) { opacity: 0.4; }
-.vgraph__axis { position: relative; height: 14px; margin-left: calc(17rem + 16px); margin-right: calc(4.5rem + 16px); }
+.vgraph__axis { position: relative; height: 14px; margin-left: calc(23rem + 16px); margin-right: calc(4.5rem + 16px); }
 .vgraph__axis span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .vgraph figcaption { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.04em; color: var(--muted); }
 
@@ -690,14 +662,13 @@ body { overflow-x: clip; }
 .about-cta a::after { content: ""; width: 8px; height: 2px; margin-left: 4px; background: currentColor; animation: bit-blink 1.06s steps(1, end) infinite; }
 
 @media (max-width: 1100px) {
-  .expertise__text, .vgraph { grid-column: 1 / -1; }
   .vgraph__axis { margin-left: calc(15rem + 16px); }
   .vg-row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 4.5rem; }
 }
 @media (max-width: 900px) {
   .bio__lead, .bio__text, .bio__facts { grid-column: 1 / -1; grid-row: auto; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
-  .expertise, .about { padding-top: 96px; }
+  .about { padding-top: 96px; }
   .vg-row { grid-template-columns: minmax(0, 1fr) 3.5rem; }
   .vg-row svg { grid-column: 1 / -1; grid-row: 2; }
   .vgraph__axis { margin-left: 0; margin-right: 0; }
@@ -731,8 +702,6 @@ body { overflow-x: clip; }
 }
 @media (max-width: 900px) {
   .about { padding-top: 96px; }
-  .xp__row { grid-template-columns: 1fr 1fr; gap: 6px 16px; }
-  .xp__mode { text-align: left; }
   .xmap__label span { display: none; }
 }
 
@@ -846,30 +815,7 @@ body { overflow-x: clip; }
         </div>
       </section>
 
-      <!-- 2 · Expertise: every role over time -->
-      <section class="expertise" aria-labelledby="expertise-title">
-        <div class="work-head">
-          <h2 id="expertise-title">Expertise</h2>
-          <span class="label">10 roles · 2017 — now</span>
-        </div>
-        <div class="expertise__grid">
-          <div class="expertise__text">
-            <p class="expertise__lead">Ten roles, often in parallel.</p>
-            <p>I’ve moved between very different products: an insurance CRM, SaaS and cloud tools, Web3 and DeFi, a crypto exchange, AI music software and q-commerce, while publishing design assets on UI8 throughout.</p>
-            <p>Each one sharpened something I now bring to every project: <strong>dense, data-heavy interfaces</strong> from trading and dashboards, <strong>trust and onboarding</strong> from insurance and fintech, <strong>fast, high-volume flows</strong> from q-commerce, and <strong>systems thinking</strong> from building design systems from scratch.</p>
-            <ul class="skills" aria-label="Skills">
-              <li>Product design</li><li>UX research &amp; testing</li><li>Interaction design</li><li>Design systems</li><li>3D &amp; illustration</li><li>Motion · Lottie, SVG</li>
-            </ul>
-          </div>
-          <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
-            <div class="vgraph__rows" id="vgraph-rows"></div>
-            <div class="vgraph__axis" id="vgraph-axis" aria-hidden="true"></div>
-            <figcaption>Each square is three months. Filled squares show time in that role; a blinking square is ongoing work.</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <!-- 3 · Experience: map and roles -->
+      <!-- 2 · Experience: map, with every role on a timeline -->
       <section class="about" id="about-section" aria-labelledby="xp-title">
         <div class="xstage">
           <figure class="xmap" id="xmap" data-reveal aria-label="Pixel map of work locations: Tehran (on-site), and remote work with teams in Berlin, Lisbon, Yerevan, Dubai, Atlanta and Los Angeles.">
@@ -886,24 +832,17 @@ body { overflow-x: clip; }
               <p class="xpanel__note"><strong>On-site in Tehran</strong>, and <strong>remote</strong> with teams in <strong>Berlin</strong>, <strong>Lisbon</strong>, <strong>Yerevan</strong>, <strong>Dubai</strong>, <strong>Atlanta</strong> and <strong>Los Angeles</strong>. Point at a role to see where it happened.</p>
             </div>
             <div class="xpanel xpanel--roles" data-reveal>
-              <div class="xp" role="list" aria-label="Experience">
-                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2024 — Now</span><span class="xp__co">Digikala</span><span class="xp__role">Senior Product Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
-                <div class="xp__row" role="listitem" data-city="dubai"><span class="xp__years">2020 — Now</span><span class="xp__co">UI8</span><span class="xp__role">Affiliate Product Designer</span><span class="xp__place">Dubai, UAE</span><span class="xp__mode is-remote">Remote</span></div>
-                <div class="xp__row" role="listitem" data-city="berlin"><span class="xp__years">2023 — 2024</span><span class="xp__co">Djoid</span><span class="xp__role">Product Designer</span><span class="xp__place">Berlin, Germany</span><span class="xp__mode is-remote">Remote</span></div>
-                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2023 — 2024</span><span class="xp__co">Abantether</span><span class="xp__role">Senior Product Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
-                <div class="xp__row" role="listitem" data-city="la"><span class="xp__years">2022 — 2023</span><span class="xp__co">Gala</span><span class="xp__role">Product Designer</span><span class="xp__place">Los Angeles, USA</span><span class="xp__mode is-remote">Remote</span></div>
-                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2020 — 2022</span><span class="xp__co">Imen Aria</span><span class="xp__role">UI/UX Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
-                <div class="xp__row" role="listitem" data-city="lisbon"><span class="xp__years">Project</span><span class="xp__co">Kidcare</span><span class="xp__role">Product Designer</span><span class="xp__place">Lisbon, Portugal</span><span class="xp__mode is-remote">Remote</span></div>
-                <div class="xp__row" role="listitem" data-city="tehran"><span class="xp__years">2017 — 2020</span><span class="xp__co">EasyBimeh</span><span class="xp__role">UI/UX Designer</span><span class="xp__place">Tehran, Iran</span><span class="xp__mode">On-site</span></div>
-                <div class="xp__row" role="listitem" data-city="atlanta"><span class="xp__years">Project</span><span class="xp__co">Trakdesk</span><span class="xp__role">Product Designer</span><span class="xp__place">Atlanta, USA</span><span class="xp__mode is-remote">Remote</span></div>
-                <div class="xp__row" role="listitem" data-city="yerevan"><span class="xp__years">Project</span><span class="xp__co">Fill Studio</span><span class="xp__role">Product Designer</span><span class="xp__place">Yerevan, Armenia</span><span class="xp__mode is-remote">Remote</span></div>
-              </div>
+              <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
+                <div class="vgraph__rows" id="vgraph-rows"></div>
+                <div class="vgraph__axis" id="vgraph-axis" aria-hidden="true"></div>
+                <figcaption>Each square is three months. Filled squares show time in that role; a blinking square is ongoing work.</figcaption>
+              </figure>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 4 · Next step -->
+      <!-- 3 · Next step -->
       <div class="about-cta">
         <p>Working on something in one of these spaces?</p>
         <a href="#contact">Get in touch</a>
@@ -1821,10 +1760,9 @@ body { overflow-x: clip; }
     if (k) fig.dataset.focus = k; else delete fig.dataset.focus;
     fig.querySelectorAll('[data-city]').forEach((n) => n.classList.toggle('is-focus', n.dataset.city === k));
   };
-  stage.querySelectorAll('.xp__row').forEach((row) => {
-    row.addEventListener('mouseenter', () => focus(row.dataset.city));
-    row.addEventListener('mouseleave', () => focus(null));
-  });
+  const rowsBox = stage.querySelector('.xpanel--roles');
+  rowsBox?.addEventListener('mouseover', (e) => { const r = e.target.closest('.vg-row'); if (r) focus(r.dataset.city); });
+  rowsBox?.addEventListener('mouseleave', () => focus(null));
   svg.querySelectorAll('.city').forEach((g) => {
     g.addEventListener('mouseenter', () => focus(g.dataset.city));
     g.addEventListener('mouseleave', () => focus(null));
@@ -1857,7 +1795,7 @@ body { overflow-x: clip; }
   addEventListener('resize', layout);
   addEventListener('viewchange', (e) => { if (e.detail.id === 'about') requestAnimationFrame(layout); });
   (document.fonts?.ready || Promise.resolve()).then(layout);
-  if ('ResizeObserver' in window) new ResizeObserver(() => layout()).observe(introP);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(() => layout()); ro.observe(introP); ro.observe(rolesP); }
 })();
 
 
@@ -1875,16 +1813,16 @@ body { overflow-x: clip; }
   const parse = (s) => s ? s.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
   // undated projects (s: undefined) show an empty track and "Project"
   const roles = [
-    { co: 'Digikala', role: 'Senior Product Designer', d: 'Q-commerce & e-commerce', s: '2024-03', e: null },
-    { co: 'UI8', role: 'Affiliate Product Designer', d: 'Design assets', s: '2020-09', e: null },
-    { co: 'Djoid', role: 'Product Designer', d: 'AI & music tech', s: '2023-04', e: '2024-06' },
-    { co: 'AbanTether', role: 'Senior Product Designer', d: 'Fintech & crypto', s: '2023-02', e: '2024-05' },
-    { co: 'Gala', role: 'Product Designer', d: 'Web3 & DeFi', s: '2022-02', e: '2023-02' },
-    { co: 'Imen Aria', role: 'UI/UX Designer', d: 'SaaS, cloud & networks', s: '2020-01', e: '2022-02' },
-    { co: 'Kidcare', role: 'Product Designer' },
-    { co: 'EasyBimeh', role: 'UI/UX Designer', d: 'Insurtech CRM', s: '2017-10', e: '2020-01' },
-    { co: 'Trakdesk', role: 'Product Designer' },
-    { co: 'Fill Studio', role: 'Product Designer' }
+    { co: 'Digikala', city: 'tehran', role: 'Senior Product Designer', d: 'Q-commerce & e-commerce', s: '2024-03', e: null },
+    { co: 'UI8', city: 'dubai', role: 'Affiliate Product Designer', d: 'Design assets', s: '2020-09', e: null },
+    { co: 'Djoid', city: 'berlin', role: 'Product Designer', d: 'AI & music tech', s: '2023-04', e: '2024-06' },
+    { co: 'AbanTether', city: 'tehran', role: 'Senior Product Designer', d: 'Fintech & crypto', s: '2023-02', e: '2024-05' },
+    { co: 'Gala', city: 'la', role: 'Product Designer', d: 'Web3 & DeFi', s: '2022-02', e: '2023-02' },
+    { co: 'Imen Aria', city: 'tehran', role: 'UI/UX Designer', d: 'SaaS, cloud & networks', s: '2020-01', e: '2022-02' },
+    { co: 'Kidcare', city: 'lisbon', role: 'Product Designer' },
+    { co: 'EasyBimeh', city: 'tehran', role: 'UI/UX Designer', d: 'Insurtech CRM', s: '2017-10', e: '2020-01' },
+    { co: 'Trakdesk', city: 'atlanta', role: 'Product Designer' },
+    { co: 'Fill Studio', city: 'yerevan', role: 'Product Designer' }
   ];
   const dur = (m) => { const y = Math.floor(m / 12), r = m % 12; return (y ? y + 'y' : '') + (y && r ? ' ' : '') + (r ? r + 'm' : ''); };
   const sq = (i, s = 0.72) => `M${i + (1 - s) / 2} ${(1 - s) / 2}h${s}v${s}h${-s}z`;
@@ -1899,6 +1837,7 @@ body { overflow-x: clip; }
     }
     const row = document.createElement('div');
     row.className = 'vg-row';
+    row.dataset.city = x.city;
     row.innerHTML = `<span class="vg-row__label"><span class="vg-row__domain">${x.co}</span><span class="vg-row__co"><span>${x.role}</span>${x.d ? `<i aria-hidden="true">·</i><wbr><span>${x.d}</span>` : ''}</span></span>`;
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${N} 1`);
