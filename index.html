@@ -580,7 +580,7 @@ body { overflow-x: clip; }
   border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
   border-radius: var(--radius);
 }
-.xpanel--intro { padding: 24px 28px 28px; display: grid; gap: 20px; }
+.xpanel--intro { padding: 24px 28px 28px; display: grid; gap: 24px; }
 .xpanel__head { margin: 0; padding-bottom: 16px; }
 .about__intro { margin: 0; font-size: 1.25rem; line-height: 1.6; font-weight: 300; color: var(--muted); text-wrap: pretty; }
 .about__intro strong { color: var(--fg); font-weight: 500; }
@@ -612,8 +612,8 @@ body { overflow-x: clip; }
 .bio__facts div:last-child { border-bottom: 0; }
 
 /* key numbers: one ruled row inside the Experience card, columns split by hairlines */
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); margin-top: 4px; }
-.stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 0; border-left: 1px solid var(--line); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 4px 24px 0; border-left: 1px solid var(--line); }
 .stat:first-child { padding-left: 0; border-left: 0; }
 .stat__num { margin-bottom: 10px; font-family: var(--font-display); font-size: clamp(2.25rem, 3.4vw, 3rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
 .stat__what { font-size: var(--fs-base); color: var(--fg); }
@@ -822,14 +822,13 @@ body { overflow-x: clip; }
             <div class="xpanel xpanel--intro" data-reveal>
               <div class="work-head xpanel__head">
                 <h2 id="xp-title">Experience</h2>
-                <span class="label">6 countries · since 2017</span>
               </div>
-              <p class="xpanel__note"><strong>On-site in Tehran</strong>, and <strong>remote</strong> with teams in <strong>Berlin</strong>, <strong>Lisbon</strong>, <strong>Yerevan</strong>, <strong>Dubai</strong>, <strong>Atlanta</strong> and <strong>Los Angeles</strong>.</p>
+              <!-- users: sum of the published figures only (Digikala, AbanTether, Gala); other products add to the "+" -->
               <div class="stats">
-                <div class="stat"><span class="stat__num">8+</span><span class="stat__what">years designing products</span><span class="stat__src">Since 2017 · 10 roles</span></div>
-                <div class="stat"><span class="stat__num">1.9M</span><span class="stat__what">active users served</span><span class="stat__src">Digikala q-commerce · 66M+ ecosystem</span></div>
-                <div class="stat"><span class="stat__num">+373%</span><span class="stat__what">average daily orders</span><span class="stat__src">Digikala · 4,433 → 20,991 after redesign</span></div>
-                <div class="stat"><span class="stat__num">2.5M</span><span class="stat__what">active users, up from 600k</span><span class="stat__src">AbanTether · 3 years after the revamp</span></div>
+                <div class="stat"><span class="stat__num">5.7M+</span><span class="stat__what">users reached</span><span class="stat__src">Digikala 1.9M · AbanTether 2.5M · Gala 1.3M</span></div>
+                <div class="stat"><span class="stat__num">10</span><span class="stat__what">projects</span><span class="stat__src">7 roles · 3 short projects</span></div>
+                <div class="stat"><span class="stat__num">7+</span><span class="stat__what">product domains</span><span class="stat__src">Q-commerce · fintech · Web3 · AI · SaaS · insurtech</span></div>
+                <div class="stat"><span class="stat__num">6</span><span class="stat__what">countries</span><span class="stat__src">Iran · UAE · Germany · Portugal · USA · Armenia</span></div>
               </div>
             </div>
             <div class="xpanel xpanel--roles" data-reveal>
