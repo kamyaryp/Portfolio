@@ -562,6 +562,7 @@ body { overflow-x: clip; }
 .xmap__label--dr { transform: translate(16px, 10px); }
 .xmap__label--ul { transform: translate(calc(-100% - 16px), calc(-100% - 8px)); text-align: right; }
 .xmap__label--dl { transform: translate(calc(-100% - 16px), 10px); text-align: right; }
+.xmap__label--r { transform: translate(16px, -50%); }
 
 /* content layer: sits on the map inside the content column */
 .xstage__content {
@@ -589,7 +590,6 @@ body { overflow-x: clip; }
 .about-bio { display: grid; gap: 48px; }
 .about-bio .work-head { margin-bottom: 0; }
 /* two columns that start on the same line: the story on the left, a compact profile card on the right */
-/* same 4-column grid as the stat cards below, so the profile card lines up with the last card */
 .bio { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto 1fr; gap: 28px var(--gutter); align-items: start; }
 .bio__lead { grid-column: 1 / span 3; grid-row: 1; margin: 0; font-size: clamp(1.75rem, 2.9vw, 2.375rem); line-height: 1.25; letter-spacing: -0.02em; font-weight: 300; color: var(--muted); text-wrap: balance; }
 .bio__lead strong { color: var(--fg); font-weight: 400; }
@@ -611,21 +611,13 @@ body { overflow-x: clip; }
 .bio__facts div { padding: 14px 0; flex: 1; align-items: center; }
 .bio__facts div:last-child { border-bottom: 0; }
 
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
-.stat {
-  display: grid;
-  gap: 8px;
-  align-content: start;
-  min-width: 0;
-  padding: 24px 24px 26px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-}
-.stat__num { margin-bottom: 16px; }
-.stat__num { font-family: var(--font-display); font-size: clamp(2.5rem, 4.4vw, 3.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+/* key numbers: one ruled row inside the Experience card, columns split by hairlines */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); margin-top: 4px; }
+.stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 0; border-left: 1px solid var(--line); }
+.stat:first-child { padding-left: 0; border-left: 0; }
+.stat__num { margin-bottom: 10px; font-family: var(--font-display); font-size: clamp(2.25rem, 3.4vw, 3rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
 .stat__what { font-size: var(--fs-base); color: var(--fg); }
-.stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); }
+.stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; line-height: 1.5; color: var(--muted); }
 
 
 /* Experience timeline: a table of roles. Type sets the scale: a square is as tall as the company name's capitals,
@@ -669,7 +661,9 @@ body { overflow-x: clip; }
 }
 @media (max-width: 900px) {
   .bio__lead, .bio__text, .bio__facts { grid-column: 1 / -1; grid-row: auto; }
-  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .stat:nth-child(n + 3) { margin-top: 24px; }
   .about { padding-top: 96px; }
   .vg-row { grid-template-columns: minmax(0, 1fr) 4.5rem; row-gap: 14px; }
   .vg-row svg { grid-column: 1 / -1; grid-row: 2; }
@@ -706,6 +700,10 @@ body { overflow-x: clip; }
 @media (max-width: 900px) {
   .about { padding-top: 96px; }
   .xmap__label span { display: none; }
+}
+@media (max-width: 1100px) {
+  /* no overlay here, so Dubai's label goes back under its marker and away from the right edge */
+  .xmap__label--r { transform: translate(calc(-100% - 16px), 10px); text-align: right; }
 }
 
 @media (max-width: 900px) {
@@ -795,7 +793,7 @@ body { overflow-x: clip; }
 
     <!-- About -->
     <div class="view view--about" id="view-about" hidden>
-      <!-- 1 · Bio and numbers -->
+      <!-- 1 · Bio -->
       <section class="about-bio" aria-label="About">
         <div class="bio" data-reveal>
           <p class="bio__lead">I’m Kamyar, an award-winning <strong>senior product designer</strong> with <strong>8+ years</strong> of building and scaling digital products for <strong>millions of users</strong>.</p>
@@ -810,15 +808,9 @@ body { overflow-x: clip; }
             <div><dt>Recognition</dt><dd>GEMA × WISE 2025</dd></div>
           </dl>
         </div>
-        <div class="stats" data-reveal>
-          <div class="stat"><span class="stat__num">8+</span><span class="stat__what">years designing products</span><span class="stat__src">Since 2017 · 10 roles</span></div>
-          <div class="stat"><span class="stat__num">1.9M</span><span class="stat__what">active users served</span><span class="stat__src">Digikala q-commerce · 66M+ ecosystem</span></div>
-          <div class="stat"><span class="stat__num">+373%</span><span class="stat__what">average daily orders</span><span class="stat__src">Digikala · 4,433 → 20,991 after redesign</span></div>
-          <div class="stat"><span class="stat__num">2.5M</span><span class="stat__what">active users, up from 600k</span><span class="stat__src">AbanTether · 3 years after the revamp</span></div>
-        </div>
       </section>
 
-      <!-- 2 · Experience: map, with every role on a timeline -->
+      <!-- 2 · Experience: numbers, map, and every role on a timeline -->
       <section class="about" id="about-section" aria-labelledby="xp-title">
         <div class="xstage">
           <figure class="xmap" id="xmap" data-reveal aria-label="Pixel map of work locations: Tehran (on-site), and remote work with teams in Berlin, Lisbon, Yerevan, Dubai, Atlanta and Los Angeles.">
@@ -833,6 +825,12 @@ body { overflow-x: clip; }
                 <span class="label">6 countries · since 2017</span>
               </div>
               <p class="xpanel__note"><strong>On-site in Tehran</strong>, and <strong>remote</strong> with teams in <strong>Berlin</strong>, <strong>Lisbon</strong>, <strong>Yerevan</strong>, <strong>Dubai</strong>, <strong>Atlanta</strong> and <strong>Los Angeles</strong>.</p>
+              <div class="stats">
+                <div class="stat"><span class="stat__num">8+</span><span class="stat__what">years designing products</span><span class="stat__src">Since 2017 · 10 roles</span></div>
+                <div class="stat"><span class="stat__num">1.9M</span><span class="stat__what">active users served</span><span class="stat__src">Digikala q-commerce · 66M+ ecosystem</span></div>
+                <div class="stat"><span class="stat__num">+373%</span><span class="stat__what">average daily orders</span><span class="stat__src">Digikala · 4,433 → 20,991 after redesign</span></div>
+                <div class="stat"><span class="stat__num">2.5M</span><span class="stat__what">active users, up from 600k</span><span class="stat__src">AbanTether · 3 years after the revamp</span></div>
+              </div>
             </div>
             <div class="xpanel xpanel--roles" data-reveal>
               <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
@@ -1648,7 +1646,7 @@ body { overflow-x: clip; }
   const cities = {
     tehran: { ll: [51.39, 35.69], home: true, name: 'Tehran', note: '4 roles', pos: 'dl' },
     yerevan: { ll: [44.51, 40.18], name: 'Yerevan', note: 'Fill Studio', pos: 'ul' },
-    dubai: { ll: [55.27, 25.2], name: 'Dubai', note: 'UI8', pos: 'dl' },
+    dubai: { ll: [55.27, 25.2], name: 'Dubai', note: 'UI8', pos: 'r' },
     berlin: { ll: [13.4, 52.52], name: 'Berlin', note: 'Djoid', pos: 'ul' },
     lisbon: { ll: [-9.14, 38.72], name: 'Lisbon', note: 'Kidcare', pos: 'dl' },
     atlanta: { ll: [-84.39, 33.75], name: 'Atlanta', note: 'Trakdesk', pos: 'dr' },
@@ -1781,7 +1779,7 @@ body { overflow-x: clip; }
     const pad = Math.max(24, ih + GAP + 24 - top);                    // only push the map down as far as the intro needs
     stage.style.paddingTop = pad + 'px';
     introP.style.top = (pad + top - GAP - ih) + 'px';
-    const rolesTop = pad + bottom + 8; // the table tucks in close under the lowest label
+    const rolesTop = pad + bottom + 4; // the table tucks in close under the lowest label
     rolesP.style.top = rolesTop + 'px';
     stage.style.minHeight = (rolesTop + rh + 24) + 'px';
   };
