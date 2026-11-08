@@ -662,17 +662,19 @@ body { overflow-x: clip; }
 
 .vgraph { grid-column: 5 / span 8; margin: 0; display: grid; gap: 14px; min-width: 0; }
 .vgraph__rows { display: grid; gap: 4px; }
-.vg-row { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) 4.5rem; gap: 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
+.vg-row { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr) 4.5rem; gap: 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
 .vg-row__label { display: grid; gap: 3px; min-width: 0; }
 .vg-row__domain { font-size: var(--fs-sm); color: var(--fg); }
-.vg-row__co { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.vg-row__co { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.5; }
+.vg-row__co i { font-style: normal; margin: 0 0.6em; color: var(--taupe-400); opacity: 0.5; }
+.vg-row__co span { white-space: nowrap; } /* wrap only at the divider */
 .vg-row svg { display: block; width: 100%; height: auto; }
 .vg-row__dur { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
 .vg-off { fill: var(--ink-700); }
 .vg-on { fill: var(--ash-300); }
 .vg-now { fill: var(--stone-100); animation: bit-blink 1.06s steps(1, end) infinite; }
 .vgraph__rows:hover .vg-row:not(:hover) { opacity: 0.4; }
-.vgraph__axis { position: relative; height: 14px; margin-left: calc(13rem + 16px); margin-right: calc(4.5rem + 16px); }
+.vgraph__axis { position: relative; height: 14px; margin-left: calc(17rem + 16px); margin-right: calc(4.5rem + 16px); }
 .vgraph__axis span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .vgraph figcaption { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.04em; color: var(--muted); }
 
@@ -689,8 +691,8 @@ body { overflow-x: clip; }
 
 @media (max-width: 1100px) {
   .expertise__text, .vgraph { grid-column: 1 / -1; }
-  .vgraph__axis { margin-left: calc(11rem + 16px); }
-  .vg-row { grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 4.5rem; }
+  .vgraph__axis { margin-left: calc(15rem + 16px); }
+  .vg-row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 4.5rem; }
 }
 @media (max-width: 900px) {
   .bio__lead, .bio__text, .bio__facts { grid-column: 1 / -1; grid-row: auto; }
@@ -844,25 +846,25 @@ body { overflow-x: clip; }
         </div>
       </section>
 
-      <!-- 2 · Expertise: variety of domains over time -->
+      <!-- 2 · Expertise: every role over time -->
       <section class="expertise" aria-labelledby="expertise-title">
         <div class="work-head">
           <h2 id="expertise-title">Expertise</h2>
-          <span class="label">7 domains · 2017 — now</span>
+          <span class="label">10 roles · 2017 — now</span>
         </div>
         <div class="expertise__grid">
           <div class="expertise__text">
-            <p class="expertise__lead">Seven domains, often in parallel.</p>
+            <p class="expertise__lead">Ten roles, often in parallel.</p>
             <p>I’ve moved between very different products: an insurance CRM, SaaS and cloud tools, Web3 and DeFi, a crypto exchange, AI music software and q-commerce, while publishing design assets on UI8 throughout.</p>
             <p>Each one sharpened something I now bring to every project: <strong>dense, data-heavy interfaces</strong> from trading and dashboards, <strong>trust and onboarding</strong> from insurance and fintech, <strong>fast, high-volume flows</strong> from q-commerce, and <strong>systems thinking</strong> from building design systems from scratch.</p>
             <ul class="skills" aria-label="Skills">
               <li>Product design</li><li>UX research &amp; testing</li><li>Interaction design</li><li>Design systems</li><li>3D &amp; illustration</li><li>Motion · Lottie, SVG</li>
             </ul>
           </div>
-          <figure class="vgraph" id="vgraph" aria-label="Timeline of domains worked in, one square per quarter, from late 2017 to now.">
+          <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
             <div class="vgraph__rows" id="vgraph-rows"></div>
             <div class="vgraph__axis" id="vgraph-axis" aria-hidden="true"></div>
-            <figcaption>Each square is three months. Filled squares show time spent in that domain; a blinking square is ongoing work.</figcaption>
+            <figcaption>Each square is three months. Filled squares show time in that role; a blinking square is ongoing work.</figcaption>
           </figure>
         </div>
       </section>
@@ -1859,7 +1861,7 @@ body { overflow-x: clip; }
 })();
 
 
-/* Expertise: one row per domain, one pixel per quarter from Q4 2017 to now */
+/* Expertise: one row per role (company, then role · focus), one pixel per quarter from Q4 2017 to now */
 (() => {
   const rowsEl = document.getElementById('vgraph-rows');
   const axis = document.getElementById('vgraph-axis');
@@ -1871,20 +1873,25 @@ body { overflow-x: clip; }
   const M = idx(now.getFullYear(), now.getMonth() + 1) + 1; // months covered
   const N = Math.ceil(M / 3);                                 // quarters (one pixel each)
   const parse = (s) => s ? s.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
-  const domains = [
-    { d: 'Q-commerce & e-commerce', co: 'Digikala', s: '2024-03', e: null },
-    { d: 'Design assets · 3D, icons, UI kits', co: 'UI8', s: '2020-09', e: null },
-    { d: 'AI & music tech', co: 'Djoid', s: '2023-04', e: '2024-06' },
-    { d: 'Fintech · crypto exchange', co: 'AbanTether', s: '2023-02', e: '2024-05' },
-    { d: 'Web3, DeFi & blockchain', co: 'Gala', s: '2022-02', e: '2023-02' },
-    { d: 'SaaS, cloud & networks', co: 'Imen Aria', s: '2020-01', e: '2022-02' },
-    { d: 'Insurance · insurtech CRM', co: 'EasyBimeh', s: '2017-10', e: '2020-01' }
+  // undated projects (s: undefined) show an empty track and "Project"
+  const roles = [
+    { co: 'Digikala', role: 'Senior Product Designer', d: 'Q-commerce & e-commerce', s: '2024-03', e: null },
+    { co: 'UI8', role: 'Affiliate Product Designer', d: 'Design assets', s: '2020-09', e: null },
+    { co: 'Djoid', role: 'Product Designer', d: 'AI & music tech', s: '2023-04', e: '2024-06' },
+    { co: 'AbanTether', role: 'Senior Product Designer', d: 'Fintech & crypto', s: '2023-02', e: '2024-05' },
+    { co: 'Gala', role: 'Product Designer', d: 'Web3 & DeFi', s: '2022-02', e: '2023-02' },
+    { co: 'Imen Aria', role: 'UI/UX Designer', d: 'SaaS, cloud & networks', s: '2020-01', e: '2022-02' },
+    { co: 'Kidcare', role: 'Product Designer' },
+    { co: 'EasyBimeh', role: 'UI/UX Designer', d: 'Insurtech CRM', s: '2017-10', e: '2020-01' },
+    { co: 'Trakdesk', role: 'Product Designer' },
+    { co: 'Fill Studio', role: 'Product Designer' }
   ];
   const dur = (m) => { const y = Math.floor(m / 12), r = m % 12; return (y ? y + 'y' : '') + (y && r ? ' ' : '') + (r ? r + 'm' : ''); };
   const sq = (i, s = 0.72) => `M${i + (1 - s) / 2} ${(1 - s) / 2}h${s}v${s}h${-s}z`;
-  for (const x of domains) {
-    const a = idx(...parse(x.s)), b = idx(...parse(x.e));
-    const qa = Math.floor(a / 3), qb = Math.floor(b / 3);
+  for (const x of roles) {
+    const dated = !!x.s;
+    const a = dated ? idx(...parse(x.s)) : 0, b = dated ? idx(...parse(x.e)) : 0;
+    const qa = dated ? Math.floor(a / 3) : Infinity, qb = dated ? Math.floor(b / 3) : -1;
     let off = '', on = '', live = '';
     for (let i = 0; i < N; i++) {
       if (i >= qa && i <= qb) { if (!x.e && i === N - 1) live += sq(i, 0.8); else on += sq(i, 0.8); }
@@ -1892,7 +1899,7 @@ body { overflow-x: clip; }
     }
     const row = document.createElement('div');
     row.className = 'vg-row';
-    row.innerHTML = `<span class="vg-row__label"><span class="vg-row__domain">${x.d}</span><span class="vg-row__co">${x.co}</span></span>`;
+    row.innerHTML = `<span class="vg-row__label"><span class="vg-row__domain">${x.co}</span><span class="vg-row__co"><span>${x.role}</span>${x.d ? `<i aria-hidden="true">·</i><wbr><span>${x.d}</span>` : ''}</span></span>`;
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${N} 1`);
     svg.setAttribute('aria-hidden', 'true');
@@ -1906,7 +1913,7 @@ body { overflow-x: clip; }
     row.append(svg);
     const t = document.createElement('span');
     t.className = 'vg-row__dur';
-    t.textContent = dur(b - a + 1);
+    t.textContent = dated ? dur(b - a + 1) : 'Project';
     row.append(t);
     rowsEl.append(row);
   }
