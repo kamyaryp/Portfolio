@@ -542,9 +542,6 @@ body { overflow-x: clip; }
 .xmap [data-city="atlanta"] .ring { animation-delay: -0.4s; }
 .xmap [data-city="yerevan"] .ring { animation-delay: -0.66s; }
 .xmap [data-city="lisbon"] .ring { animation-delay: -0.15s; }
-.xmap .city { transition: opacity 240ms ease; }
-.xmap[data-focus] .city:not(.is-focus), .xmap[data-focus] .arc:not(.is-focus) { opacity: 0.25; }
-.xmap[data-focus] .arc.is-focus { opacity: 1; }
 .xmap__label {
   position: absolute;
   display: grid;
@@ -561,7 +558,6 @@ body { overflow-x: clip; }
   transition: opacity 240ms ease;
 }
 .xmap__label span { color: var(--muted); letter-spacing: 0.06em; }
-.xmap[data-focus] .xmap__label:not(.is-focus) { opacity: 0.3; }
 .xmap__label--ur { transform: translate(16px, calc(-100% - 8px)); }
 .xmap__label--dr { transform: translate(16px, 10px); }
 .xmap__label--ul { transform: translate(calc(-100% - 16px), calc(-100% - 8px)); text-align: right; }
@@ -642,7 +638,7 @@ body { overflow-x: clip; }
 .vgraph__axis { position: relative; height: 1em; font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1; }
 .vgraph__axis span { position: absolute; top: 0; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
 .vgraph__axis span.is-now { color: var(--fg); }
-.vg-row { padding: 20px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
+.vg-row { padding: 20px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
 .vg-row:last-child { border-bottom: 0; }
 .vg-row__label { display: grid; gap: 8px; min-width: 0; }
 .vg-row__domain { font-family: var(--font-display); font-size: 1.25rem; font-weight: 500; letter-spacing: -0.015em; line-height: 1.1; color: var(--fg); }
@@ -656,8 +652,6 @@ body { overflow-x: clip; }
 .vg-yr { fill: var(--taupe-400); opacity: 0.45; }
 .vg-on { fill: var(--ash-300); }
 .vg-now { fill: var(--stone-100); animation: bit-blink 1.06s steps(1, end) infinite; }
-.vgraph__rows:hover .vg-row:not(:hover) { opacity: 0.35; }
-.vg-row:hover .vg-row__domain { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 
 /* experience map section now sits third on the page */
 .about { padding-top: 140px; }
@@ -838,7 +832,7 @@ body { overflow-x: clip; }
                 <h2 id="xp-title">Experience</h2>
                 <span class="label">6 countries · since 2017</span>
               </div>
-              <p class="xpanel__note"><strong>On-site in Tehran</strong>, and <strong>remote</strong> with teams in <strong>Berlin</strong>, <strong>Lisbon</strong>, <strong>Yerevan</strong>, <strong>Dubai</strong>, <strong>Atlanta</strong> and <strong>Los Angeles</strong>. Point at a role to see where it happened.</p>
+              <p class="xpanel__note"><strong>On-site in Tehran</strong>, and <strong>remote</strong> with teams in <strong>Berlin</strong>, <strong>Lisbon</strong>, <strong>Yerevan</strong>, <strong>Dubai</strong>, <strong>Atlanta</strong> and <strong>Los Angeles</strong>.</p>
             </div>
             <div class="xpanel xpanel--roles" data-reveal>
               <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
@@ -1766,19 +1760,7 @@ body { overflow-x: clip; }
     requestAnimationFrame(tick);
   }
 
-  // ---- pointing at a row or a marker brings that city and its route forward ----
   const stage = fig.closest('.xstage') || fig;
-  const focus = (k) => {
-    if (k) fig.dataset.focus = k; else delete fig.dataset.focus;
-    fig.querySelectorAll('[data-city]').forEach((n) => n.classList.toggle('is-focus', n.dataset.city === k));
-  };
-  const rowsBox = stage.querySelector('.xpanel--roles');
-  rowsBox?.addEventListener('mouseover', (e) => { const r = e.target.closest('.vg-row'); if (r) focus(r.dataset.city); });
-  rowsBox?.addEventListener('mouseleave', () => focus(null));
-  svg.querySelectorAll('.city').forEach((g) => {
-    g.addEventListener('mouseenter', () => focus(g.dataset.city));
-    g.addEventListener('mouseleave', () => focus(null));
-  });
 
   // ---- place the panels into the empty map: intro above the cities, roles below them ----
   const introP = stage.querySelector('.xpanel--intro');
@@ -1825,16 +1807,16 @@ body { overflow-x: clip; }
   const parse = (s) => s ? s.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
   // undated projects (s: undefined) show an empty track and "Project"
   const roles = [
-    { co: 'Digikala', city: 'tehran', role: 'Senior Product Designer', d: 'Q-commerce & e-commerce', s: '2024-03', e: null },
-    { co: 'UI8', city: 'dubai', role: 'Affiliate Product Designer', d: 'Design assets', s: '2020-09', e: null },
-    { co: 'Djoid', city: 'berlin', role: 'Product Designer', d: 'AI & music tech', s: '2023-04', e: '2024-06' },
-    { co: 'AbanTether', city: 'tehran', role: 'Senior Product Designer', d: 'Fintech & crypto', s: '2023-02', e: '2024-05' },
-    { co: 'Gala', city: 'la', role: 'Product Designer', d: 'Web3 & DeFi', s: '2022-02', e: '2023-02' },
-    { co: 'Imen Aria', city: 'tehran', role: 'UI/UX Designer', d: 'SaaS, cloud & networks', s: '2020-01', e: '2022-02' },
-    { co: 'Kidcare', city: 'lisbon', role: 'Product Designer' },
-    { co: 'EasyBimeh', city: 'tehran', role: 'UI/UX Designer', d: 'Insurtech CRM', s: '2017-10', e: '2020-01' },
-    { co: 'Trakdesk', city: 'atlanta', role: 'Product Designer' },
-    { co: 'Fill Studio', city: 'yerevan', role: 'Product Designer' }
+    { co: 'Digikala', role: 'Senior Product Designer', d: 'Q-commerce & e-commerce', s: '2024-03', e: null },
+    { co: 'UI8', role: 'Affiliate Product Designer', d: 'Design assets', s: '2020-09', e: null },
+    { co: 'Djoid', role: 'Product Designer', d: 'AI & music tech', s: '2023-04', e: '2024-06' },
+    { co: 'AbanTether', role: 'Senior Product Designer', d: 'Fintech & crypto', s: '2023-02', e: '2024-05' },
+    { co: 'Gala', role: 'Product Designer', d: 'Web3 & DeFi', s: '2022-02', e: '2023-02' },
+    { co: 'Imen Aria', role: 'UI/UX Designer', d: 'SaaS, cloud & networks', s: '2020-01', e: '2022-02' },
+    { co: 'Kidcare', role: 'Product Designer', s: '2020-01', e: '2020-06' },        // 6 months, early in Imen Aria
+    { co: 'EasyBimeh', role: 'UI/UX Designer', d: 'Insurtech CRM', s: '2017-10', e: '2020-01' },
+    { co: 'Trakdesk', role: 'Product Designer', s: '2021-03', e: '2022-02' },       // 1 year, Imen Aria's last year
+    { co: 'Fill Studio', role: 'Product Designer', s: '2026-05', e: '2026-08' }    // 4 months, alongside Digikala
   ];
   const dur = (m) => { const y = Math.floor(m / 12), r = m % 12; return (y ? y + 'y' : '') + (y && r ? ' ' : '') + (r ? r + 'm' : ''); };
   const SQ = 0.66; // filled square, as a share of one quarter's width
@@ -1853,7 +1835,6 @@ body { overflow-x: clip; }
     }
     const row = document.createElement('div');
     row.className = 'vg-row';
-    row.dataset.city = x.city;
     row.innerHTML = `<span class="vg-row__label"><span class="vg-row__domain">${x.co}</span><span class="vg-row__co"><span>${x.role}</span>${x.d ? `<i aria-hidden="true">·</i><wbr><span>${x.d}</span>` : ''}</span></span>`;
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${N} 1`);
