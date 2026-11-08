@@ -587,7 +587,7 @@ body { overflow-x: clip; }
 .xpanel__head { margin: 0; padding-bottom: 16px; }
 .about__intro { margin: 0; font-size: 1.25rem; line-height: 1.6; font-weight: 300; color: var(--muted); text-wrap: pretty; }
 .about__intro strong { color: var(--fg); font-weight: 500; }
-.xpanel--roles { padding: 12px 28px 22px; }
+.xpanel--roles { padding: 6px 32px 8px; }
 
 /* ---------- About page: bio and numbers ---------- */
 .about-bio { display: grid; gap: 48px; }
@@ -632,23 +632,32 @@ body { overflow-x: clip; }
 .stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); }
 
 
-.vgraph { margin: 0; display: grid; gap: 14px; min-width: 0; }
-.vgraph__rows { display: grid; gap: 4px; }
-.vg-row { display: grid; grid-template-columns: minmax(0, 23rem) minmax(0, 1fr) 4.5rem; gap: 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
-.vg-row__label { display: grid; gap: 3px; min-width: 0; }
-.vg-row__domain { font-size: var(--fs-sm); color: var(--fg); }
-.vg-row__co { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.5; }
-.vg-row__co i { font-style: normal; margin: 0 0.6em; color: var(--taupe-400); opacity: 0.5; }
+/* Experience timeline: a table of roles. Type sets the scale: a square is as tall as the company name's capitals,
+   and every row shares one rhythm (company, role line, track, duration on a common centre line). */
+.vgraph { margin: 0; min-width: 0; --vg-label: 27rem; --vg-dur: 5rem; --vg-gap: 32px; }
+.vg-head, .vg-row { display: grid; grid-template-columns: minmax(0, var(--vg-label)) minmax(0, 1fr) var(--vg-dur); column-gap: var(--vg-gap); align-items: center; }
+.vg-head { padding: 18px 0 14px; border-bottom: 1px solid var(--line); }
+.vg-head .label { font-size: 0.6875rem; }
+.vg-head .label:last-child { text-align: right; }
+.vgraph__axis { position: relative; height: 1em; font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1; }
+.vgraph__axis span { position: absolute; top: 0; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+.vgraph__axis span.is-now { color: var(--fg); }
+.vg-row { padding: 20px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); transition: opacity 200ms ease; }
+.vg-row:last-child { border-bottom: 0; }
+.vg-row__label { display: grid; gap: 8px; min-width: 0; }
+.vg-row__domain { font-family: var(--font-display); font-size: 1.25rem; font-weight: 500; letter-spacing: -0.015em; line-height: 1.1; color: var(--fg); }
+.vg-row__co { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
+.vg-row__co i { font-style: normal; margin: 0 0.7em; color: var(--taupe-400); opacity: 0.5; }
 .vg-row__co span { white-space: nowrap; } /* wrap only at the divider */
-.vg-row svg { display: block; width: 100%; height: auto; }
-.vg-row__dur { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
-.vg-off { fill: var(--ink-700); }
+.vg-row svg { display: block; width: 100%; height: auto; overflow: visible; }
+.vg-row__dur { font-family: var(--font-mono); font-size: 0.875rem; color: var(--fg); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vg-row__dur.is-project { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.vg-off { fill: var(--ink-600); }
+.vg-yr { fill: var(--taupe-400); opacity: 0.45; }
 .vg-on { fill: var(--ash-300); }
 .vg-now { fill: var(--stone-100); animation: bit-blink 1.06s steps(1, end) infinite; }
-.vgraph__rows:hover .vg-row:not(:hover) { opacity: 0.4; }
-.vgraph__axis { position: relative; height: 14px; margin-left: calc(23rem + 16px); margin-right: calc(4.5rem + 16px); }
-.vgraph__axis span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.vgraph figcaption { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.04em; color: var(--muted); }
+.vgraph__rows:hover .vg-row:not(:hover) { opacity: 0.35; }
+.vg-row:hover .vg-row__domain { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 
 /* experience map section now sits third on the page */
 .about { padding-top: 140px; }
@@ -662,16 +671,16 @@ body { overflow-x: clip; }
 .about-cta a::after { content: ""; width: 8px; height: 2px; margin-left: 4px; background: currentColor; animation: bit-blink 1.06s steps(1, end) infinite; }
 
 @media (max-width: 1100px) {
-  .vgraph__axis { margin-left: calc(15rem + 16px); }
-  .vg-row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 4.5rem; }
+  .vgraph { --vg-label: 19rem; --vg-gap: 24px; }
 }
 @media (max-width: 900px) {
   .bio__lead, .bio__text, .bio__facts { grid-column: 1 / -1; grid-row: auto; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 32px; }
   .about { padding-top: 96px; }
-  .vg-row { grid-template-columns: minmax(0, 1fr) 3.5rem; }
+  .vg-row { grid-template-columns: minmax(0, 1fr) 4.5rem; row-gap: 14px; }
   .vg-row svg { grid-column: 1 / -1; grid-row: 2; }
-  .vgraph__axis { margin-left: 0; margin-right: 0; }
+  .vg-head { grid-template-columns: minmax(0, 1fr); }
+  .vg-head .label { display: none; }
 }
 
 /* ---------- Contact ---------- */
@@ -833,9 +842,12 @@ body { overflow-x: clip; }
             </div>
             <div class="xpanel xpanel--roles" data-reveal>
               <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
+                <div class="vg-head" aria-hidden="true">
+                  <span class="label">Role</span>
+                  <div class="vgraph__axis" id="vgraph-axis"></div>
+                  <span class="label">Time</span>
+                </div>
                 <div class="vgraph__rows" id="vgraph-rows"></div>
-                <div class="vgraph__axis" id="vgraph-axis" aria-hidden="true"></div>
-                <figcaption>Each square is three months. Filled squares show time in that role; a blinking square is ongoing work.</figcaption>
               </figure>
             </div>
           </div>
@@ -1799,7 +1811,7 @@ body { overflow-x: clip; }
 })();
 
 
-/* Expertise: one row per role (company, then role · focus), one pixel per quarter from Q4 2017 to now */
+/* Experience timeline: one row per role (company, then role · focus), one pixel per quarter from Q4 2017 to now */
 (() => {
   const rowsEl = document.getElementById('vgraph-rows');
   const axis = document.getElementById('vgraph-axis');
@@ -1825,15 +1837,19 @@ body { overflow-x: clip; }
     { co: 'Fill Studio', city: 'yerevan', role: 'Product Designer' }
   ];
   const dur = (m) => { const y = Math.floor(m / 12), r = m % 12; return (y ? y + 'y' : '') + (y && r ? ' ' : '') + (r ? r + 'm' : ''); };
+  const SQ = 0.66; // filled square, as a share of one quarter's width
+  const yearStart = new Set();
+  for (let y = START[0] + 1; y <= now.getFullYear(); y++) yearStart.add(Math.floor(idx(y, 1) / 3));
   const sq = (i, s = 0.72) => `M${i + (1 - s) / 2} ${(1 - s) / 2}h${s}v${s}h${-s}z`;
   for (const x of roles) {
     const dated = !!x.s;
     const a = dated ? idx(...parse(x.s)) : 0, b = dated ? idx(...parse(x.e)) : 0;
     const qa = dated ? Math.floor(a / 3) : Infinity, qb = dated ? Math.floor(b / 3) : -1;
-    let off = '', on = '', live = '';
+    let off = '', yr = '', on = '', live = '';
     for (let i = 0; i < N; i++) {
-      if (i >= qa && i <= qb) { if (!x.e && i === N - 1) live += sq(i, 0.8); else on += sq(i, 0.8); }
-      else off += sq(i, 0.3);
+      if (i >= qa && i <= qb) { if (!x.e && i === N - 1) live += sq(i, SQ); else on += sq(i, SQ); }
+      else if (yearStart.has(i)) yr += sq(i, 0.2); // the first quarter of each year is a touch brighter, a quiet column guide
+      else off += sq(i, 0.16);
     }
     const row = document.createElement('div');
     row.className = 'vg-row';
@@ -1842,7 +1858,7 @@ body { overflow-x: clip; }
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${N} 1`);
     svg.setAttribute('aria-hidden', 'true');
-    for (const [cls, d] of [['vg-off', off], ['vg-on', on], ['vg-now', live]]) {
+    for (const [cls, d] of [['vg-off', off], ['vg-yr', yr], ['vg-on', on], ['vg-now', live]]) {
       if (!d) continue;
       const p = document.createElementNS(NS, 'path');
       p.setAttribute('class', cls);
@@ -1851,15 +1867,17 @@ body { overflow-x: clip; }
     }
     row.append(svg);
     const t = document.createElement('span');
-    t.className = 'vg-row__dur';
+    t.className = 'vg-row__dur' + (dated ? '' : ' is-project');
     t.textContent = dated ? dur(b - a + 1) : 'Project';
     row.append(t);
     rowsEl.append(row);
   }
   for (let y = START[0] + 1; y <= now.getFullYear(); y++) {
     const s = document.createElement('span');
-    s.style.left = ((Math.floor(idx(y, 1) / 3) + 0.5) / N) * 100 + '%';
-    s.textContent = "'" + String(y).slice(2);
+    // each year label starts where that year's first square starts
+    s.style.left = ((Math.floor(idx(y, 1) / 3) + (1 - SQ) / 2) / N) * 100 + '%';
+    s.textContent = y;
+    if (y === now.getFullYear()) s.className = 'is-now';
     axis.append(s);
   }
 })();
