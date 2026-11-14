@@ -527,6 +527,7 @@ body { overflow-x: clip; }
 /* full-bleed: the map spans the whole window, outside the content column */
 .xmap { position: relative; width: 100vw; max-width: none; margin: 0 calc(50% - 50vw); overflow: hidden; overflow: clip; }
 
+.xmap__inner { position: relative; will-change: transform; }
 .xmap canvas, .xmap svg { display: block; width: 100%; height: auto; }
 .xmap svg { position: absolute; inset: 0; height: 100%; overflow: visible; }
 .xmap__worked-tone { color: color-mix(in srgb, var(--ink-600) 76%, var(--stone-400)); display: none; }
@@ -565,7 +566,8 @@ body { overflow-x: clip; }
 
 /* About sections under the map */
 .view--about { padding-top: 0; }
-.about-stats { margin-top: 48px; }
+.about-stats { margin-top: 0; } /* the map below the top bar is cropped by script: Berlin 32px under the bar, cards 48px under Atlanta */
+.about-table { margin-top: var(--gutter); }
 .about-block { padding-top: 112px; }
 .card-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 32px 8px; }
 
@@ -770,8 +772,10 @@ body { overflow-x: clip; }
     <div class="view view--about" id="view-about" hidden>
       <!-- 1 · Where: the map, full width, right under the top bar -->
       <figure class="xmap" id="xmap" data-reveal aria-label="Pixel map of work locations: Tehran (on-site), and remote work with teams in Berlin, Lisbon, Yerevan, Dubai, Atlanta and Los Angeles.">
-        <canvas id="xmap-land" width="800" height="248" aria-hidden="true"></canvas>
-        <svg id="xmap-svg" viewBox="0 0 800 248" role="presentation"></svg>
+        <div class="xmap__inner" id="xmap-inner">
+          <canvas id="xmap-land" width="800" height="248" aria-hidden="true"></canvas>
+          <svg id="xmap-svg" viewBox="0 0 800 248" role="presentation"></svg>
+        </div>
       </figure>
 
       <!-- 2 · Numbers. Users: sum of the published figures only (Digikala, AbanTether, Gala); other products add to the "+" -->
@@ -784,12 +788,8 @@ body { overflow-x: clip; }
         </div>
       </section>
 
-      <!-- 3 · Experience: every role on a timeline -->
-      <section class="about-block" id="about-section" aria-labelledby="xp-title">
-        <div class="work-head" data-reveal>
-          <h2 id="xp-title">Experience</h2>
-          <span class="label">2017 — now</span>
-        </div>
+      <!-- 3 · Experience: every role on a timeline, straight under the cards -->
+      <section class="about-table" id="about-section" aria-label="Experience">
         <div class="card-panel" data-reveal>
           <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
             <div class="vg-head" aria-hidden="true">
@@ -806,9 +806,9 @@ body { overflow-x: clip; }
       <section class="about-block" aria-labelledby="dom-title">
         <div class="work-head" data-reveal>
           <h2 id="dom-title">Domains</h2>
-          <span class="label">Sized by time spent</span>
+          <span class="label">Sized by number of projects</span>
         </div>
-        <figure class="bubbles" id="bubbles" data-reveal aria-label="Product domains sized by time spent in each."></figure>
+        <figure class="bubbles" id="bubbles" data-reveal aria-label="Product domains sized by the number of projects in each."></figure>
       </section>
 
       <!-- 5 · Bio -->
@@ -1549,6 +1549,7 @@ body { overflow-x: clip; }
    Land is drawn on a canvas (≈160k pixels); routes, markers and the moving packets sit in an SVG on top. */
 (() => {
   const fig = document.getElementById('xmap');
+  const inner = document.getElementById('xmap-inner') || fig;
   const canvas = document.getElementById('xmap-land');
   const svg = document.getElementById('xmap-svg');
   if (!fig || !canvas || !svg) return;
@@ -1589,10 +1590,13 @@ body { overflow-x: clip; }
     // top and bottom edges fade out in pixels: an 8×8 ordered dither thins the dots row by row
     const B8 = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21];
     const smooth = (t) => t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
+    // the fade follows the visible (cropped) window, not the whole raster
+    const cssCell = w / MAP.cols;
+    const r0 = crop.top / cssCell, r1 = (crop.bottom || MAP.rows * cssCell) / cssCell;
     const fade = new Float32Array(MAP.rows);
     for (let r = 0; r < MAP.rows; r++) {
-      const y = r / (MAP.rows - 1);
-      fade[r] = Math.min(smooth(y / 0.22), smooth((1 - y) / 0.3));
+      const y = (r + 0.5 - r0) / (r1 - r0);
+      fade[r] = y <= 0 || y >= 1 ? 0 : Math.min(smooth(y / 0.2), smooth((1 - y) / 0.25));
     }
     const keep = (c, r) => fade[r] >= 1 || (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < fade[r];
     // sea: a faint grid, one dot per degree
@@ -1616,13 +1620,12 @@ body { overflow-x: clip; }
     runs(workedRuns, getComputedStyle(probe).color);
     probe.remove();
   };
-  paint();
+  let crop = { top: 0, bottom: 0 };
   let rt;
-  const later = () => { clearTimeout(rt); rt = setTimeout(paint, 80); };
+  const later = () => { clearTimeout(rt); rt = setTimeout(fit, 80); };
   addEventListener('resize', later);
-  addEventListener('viewchange', (e) => { if (e.detail.id === 'about') paint(); });
-  if ('ResizeObserver' in window) new ResizeObserver(later).observe(fig);
-  (document.fonts?.ready || Promise.resolve()).then(paint);
+  addEventListener('viewchange', (e) => { if (e.detail.id === 'about') fit(); });
+  (document.fonts?.ready || Promise.resolve()).then(() => fit());
 
   // ---- cities ----
   const cities = {
@@ -1643,7 +1646,7 @@ body { overflow-x: clip; }
     lab.style.left = (c.c[0] / MAP.cols) * 100 + '%';
     lab.style.top = (c.c[1] / MAP.rows) * 100 + '%';
     lab.innerHTML = `${c.name}<span>${c.note}</span>`;
-    fig.append(lab);
+    inner.append(lab);
   }
 
   // ---- routes: pixel arcs from Tehran to each remote team, one dot per half degree ----
@@ -1739,6 +1742,29 @@ body { overflow-x: clip; }
     };
     requestAnimationFrame(tick);
   }
+  // ---- crop the map to its cities: Berlin's label 32px under the top bar, the cards 48px under Atlanta's label ----
+  const fit = () => {
+    const w = fig.clientWidth;
+    if (!w) return;
+    const full = Math.round(w * MAP.rows / MAP.cols);
+    inner.style.transform = '';
+    fig.style.height = full + 'px';
+    const ir = inner.getBoundingClientRect();
+    const box = (k) => {
+      const lab = inner.querySelector(`.xmap__label[data-city="${k}"]`);
+      const r = lab && lab.getBoundingClientRect();
+      return r && r.height ? r : inner.querySelector(`.city[data-city="${k}"]`).getBoundingClientRect();
+    };
+    const labels = [...inner.querySelectorAll('.xmap__label, .city')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
+    const top = Math.max(0, box('berlin').top - ir.top - 32);
+    const lowest = Math.max(...labels.map((r) => r.bottom - ir.top));
+    const bottom = Math.min(full, Math.max(box('atlanta').bottom - ir.top + 48, lowest + 12)); // other labels just need to stay clear
+    crop = { top, bottom };
+    inner.style.transform = `translateY(${-top}px)`;
+    fig.style.height = Math.round(bottom - top) + 'px';
+    paint();
+  };
+  fit();
 })();
 
 
@@ -1810,15 +1836,14 @@ body { overflow-x: clip; }
     if (y === now.getFullYear()) s.className = 'is-now';
     axis.append(s);
   }
-  // ---- Domains: one bubble per domain, its area = months spent there (roles in the same domain add up) ----
+  // ---- Domains: one bubble per domain, its area = number of projects in it (a role counts as x.n projects, 1 by default) ----
   const bubblesEl = document.getElementById('bubbles');
   if (bubblesEl) {
     const groups = new Map();
     for (const x of roles) {
-      if (!x.d || !x.s) continue;
-      const m = idx(...parse(x.e)) - idx(...parse(x.s)) + 1;
+      if (!x.d) continue;
       const o = groups.get(x.d) || { d: x.d, m: 0, co: [], live: false };
-      o.m += m; o.co.push(x.co); if (!x.e) o.live = true;
+      o.m += x.n || 1; o.co.push(x.co); if (x.s && !x.e) o.live = true;
       groups.set(x.d, o);
     }
     const items = [...groups.values()].sort((p, q) => q.m - p.m);
@@ -1864,7 +1889,7 @@ body { overflow-x: clip; }
         lab.style.top = c.y + 'px';
         lab.style.maxWidth = Math.round(c.R * 1.75) + 'px';
         const fs = Math.max(12, Math.min(22, c.R * 0.15));
-        lab.innerHTML = `<span class="bub-name" style="font-size:${fs.toFixed(1)}px">${c.it.d}</span><span class="bub-dur">${dur(c.it.m)}</span>` +
+        lab.innerHTML = `<span class="bub-name" style="font-size:${fs.toFixed(1)}px">${c.it.d}</span><span class="bub-dur">${c.it.m} project${c.it.m === 1 ? '' : 's'}</span>` +
           (c.R > 70 ? `<span class="bub-co">${c.it.co.join(' · ')}</span>` : '');
         bubblesEl.append(lab);
         return { ...c, lab };
