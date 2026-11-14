@@ -529,19 +529,7 @@ body { overflow-x: clip; }
 
 .xmap__inner { position: relative; will-change: transform; }
 .xmap canvas, .xmap svg { display: block; width: 100%; height: auto; }
-.xmap svg { position: absolute; inset: 0; height: 100%; overflow: visible; }
-.xmap__worked-tone { color: color-mix(in srgb, var(--ink-600) 76%, var(--stone-400)); display: none; }
-.xmap .arc { fill: var(--ash-300); opacity: 0.65; transition: opacity 240ms ease; }
-.xmap .core { fill: var(--fg); }
-.xmap .halo { fill: var(--ash-300); }
-.xmap .ring { fill: var(--stone-100); animation: bit-blink 1.06s steps(1, end) infinite; }
-.xmap .pkt { fill: var(--stone-100); }
-.xmap [data-city="berlin"] .ring { animation-delay: -0.27s; }
-.xmap [data-city="dubai"] .ring { animation-delay: -0.53s; }
-.xmap [data-city="la"] .ring { animation-delay: -0.8s; }
-.xmap [data-city="atlanta"] .ring { animation-delay: -0.4s; }
-.xmap [data-city="yerevan"] .ring { animation-delay: -0.66s; }
-.xmap [data-city="lisbon"] .ring { animation-delay: -0.15s; }
+#xmap-fx { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
 .xmap__label {
   position: absolute;
   display: grid;
@@ -557,6 +545,9 @@ body { overflow-x: clip; }
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   transition: opacity 240ms ease;
 }
+.xmap__label b { display: flex; align-items: center; gap: 7px; font-weight: inherit; }
+.xmap__label b::before { content: ""; width: 6px; height: 6px; background: var(--c, var(--fg)); flex: none; }
+.xmap__label--ul b, .xmap__label--dl b { justify-content: flex-end; }
 .xmap__label span { color: var(--muted); letter-spacing: 0.06em; }
 .xmap__label--ur { transform: translate(16px, calc(-100% - 8px)); }
 .xmap__label--dr { transform: translate(16px, 10px); }
@@ -565,7 +556,7 @@ body { overflow-x: clip; }
 .xmap__label--r { transform: translate(16px, -50%); }
 
 /* About sections under the map */
-.view--about { padding-top: 0; }
+.view.view--about { padding-top: 0; } /* beats the narrow-screen .view padding too */
 .about-stats { margin-top: 0; } /* the map below the top bar is cropped by script: Berlin 32px under the bar, cards 48px under Atlanta */
 .about-table { margin-top: var(--gutter); }
 .about-block { padding-top: 112px; }
@@ -603,11 +594,8 @@ body { overflow-x: clip; }
 
 /* domains: packed bubbles drawn as pixel dots, labels in HTML on top */
 .bubbles { position: relative; margin: 0; }
-.bubbles svg { display: block; width: 100%; height: auto; overflow: visible; }
-.bub-fill { fill: var(--ink-600); }
-.bub-ring { fill: var(--taupe-400); opacity: 0.55; }
-.is-live .bub-ring { fill: var(--stone-100); opacity: 1; }
-.bub-label { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 6px; text-align: center; pointer-events: none; }
+.bubbles canvas { display: block; image-rendering: pixelated; }
+.bub-label { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 6px; text-align: center; pointer-events: none; text-shadow: 0 1px 0 rgba(0,0,0,.7), 0 0 8px rgba(0,0,0,.55); }
 .bub-name { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.015em; line-height: 1.15; color: var(--fg); text-wrap: balance; }
 .bub-dur { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg); font-variant-numeric: tabular-nums; }
 .bub-co { font-family: var(--font-mono); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
@@ -716,6 +704,10 @@ body { overflow-x: clip; }
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('is-intro');
 </script>
 <script src="portrait.js"></script>
+<script>
+/* pixelfx core (createFrame, clearFrame, composite, painterFor, PAL ramps), MIT, (c) 2026 Patch and Hugo Duprez, https://github.com/patch-gg/pixelfx */
+var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor;var ft=Object.getOwnPropertyNames;var it=Object.prototype.hasOwnProperty;var st=(a,t)=>{for(var e in t)S(a,e,{get:t[e],enumerable:!0})},at=(a,t,e,n)=>{if(t&&typeof t=="object"||typeof t=="function")for(let o of ft(t))!it.call(a,o)&&o!==e&&S(a,o,{get:()=>t[o],enumerable:!(n=ot(t,o))||n.enumerable});return a};var ct=a=>at(S({},"__esModule",{value:!0}),a);var Mt={};st(Mt,{PAL:()=>G,at:()=>R,blend:()=>W,clearFrame:()=>tt,composite:()=>nt,createFrame:()=>z,fit:()=>T,hex:()=>g,mix:()=>L,painterFor:()=>et,scale:()=>N});var mt=Math.PI*2,y=(a,t=0,e=1)=>a<t?t:a>e?e:a;var F=(a,t,e)=>255<<24|(e&255)<<16|(t&255)<<8|a&255,I=a=>a&255,Y=a=>a>>>8&255,X=a=>a>>>16&255;function g(a){if(typeof a=="number")return a;let t=a.replace("#","");t.length===3&&(t=t[0]+t[0]+t[1]+t[1]+t[2]+t[2]);let e=parseInt(t.slice(0,6),16);return F(e>>16&255,e>>8&255,e&255)}function L(a,t,e){return e=y(e),F(I(a)+(I(t)-I(a))*e,Y(a)+(Y(t)-Y(a))*e,X(a)+(X(t)-X(a))*e)}var N=(a,t)=>F(Math.min(255,I(a)*t),Math.min(255,Y(a)*t),Math.min(255,X(a)*t));var ht=a=>a.map(g);function T(a,t){return a=a.map(g),a.length===t?a:Array.from({length:t},(e,n)=>a[Math.round(n*(a.length-1)/Math.max(1,t-1))])}var R=(a,t)=>a[y(Math.floor(t*a.length),0,a.length-1)];function W(a,t){let e=y(t)*(a.length-1),n=Math.min(a.length-2,Math.floor(e));return L(a[n],a[n+1],e-n)}var G={fire:["#1f0b10","#4a1118","#8c1d1c","#cc3a1a","#f2701f","#ffae35","#ffe27a","#fff8d6"],ember:["#1a0a0e","#3d1012","#701a14","#a8301a","#e0561e","#ff8a2a","#ffc46a"],lava:["#14060a","#380a10","#6e1210","#ac2410","#e8501a","#ff8c2a","#ffd25a"],smoke:["#0e0c12","#1d1a22","#2e2a35","#433e4b","#5c5664","#7b7484","#a39cab"],dust:["#1c1610","#33281c","#4f3f2c","#6e5a40","#927a58","#b89f78","#dcc8a2"],ice:["#0c1430","#162c5c","#1f4f94","#2f7fcc","#58b4ec","#9bdcff","#d8f4ff","#ffffff"],water:["#081830","#0e2e5a","#14508c","#1c76bc","#36a2e0","#78ccf4","#c4ecff","#ffffff"],electric:["#0a0f2e","#172a78","#2550d0","#3f8cff","#7cc8ff","#c8f0ff","#ffffff"],volt:["#24160a","#5e3a0c","#a8680f","#e8a218","#ffd23c","#fff08a","#ffffff"],poison:["#0d1a0c","#173a14","#265e18","#3f8a1e","#6cb82a","#a8e04a","#e0ff8a"],holy:["#2a1c08","#5a3e10","#9a6c18","#d8a428","#ffd84a","#fff09a","#fffbe6","#ffffff"],heal:["#08201a","#0f3f2c","#17663e","#24924e","#3ec466","#7ee88a","#c8ffc4","#ffffff"],arcane:["#140a26","#2b1252","#481c88","#6b2cc0","#9a48ec","#c684ff","#ecc8ff","#ffffff"],shadow:["#050308","#0f0a18","#1c1230","#2c1a4a","#432468","#5e3290","#8048b8","#a970e0"],blood:["#14040a","#3a0a14","#6a101c","#a01824","#d42a30","#ff5a50","#ff9a8a"],earth:["#140e0a","#2a1e14","#47321e","#69492a","#8e6638","#b88a52","#dcb47c"],stone:["#0e0e12","#1c1c24","#2c2c38","#42424f","#5c5c6b","#7d7d8c","#a4a4b2","#d0d0da"],gold:["#1e1206","#4a2c08","#86520c","#c48412","#f0b424","#ffe066","#fff6c4","#ffffff"],leaf:["#0c1a0e","#163418","#225224","#357530","#4f9a3a","#7cc048","#b4e070","#e4ffb0"],wood:["#160c06","#2e1a0c","#4a2c14","#6a421e","#8e5c2c","#b47c40","#d8a464"],metal:["#0c0e14","#1c2230","#2e3648","#4a5468","#6e7a90","#9aa6ba","#d0d8e6","#ffffff"],bone:["#1a1814","#3a352c","#5e5648","#8a806c","#b8ad96","#e4dcc8","#fffaf0"],neon:["#1a0516","#3d0a33","#701560","#b0228f","#f53cd1","#ff86e6","#ffd2f6","#ffffff"],cyber:["#041418","#08303a","#0c5260","#108088","#18b4b0","#4ce8d8","#b4fff0","#ffffff"],matrix:["#020a04","#05200c","#0a3c16","#106624","#1a9a34","#3cd650","#a4ffa8","#e8ffe8"],candy:["#ff4a5a","#ff9a2a","#ffe03c","#5ad84a","#3cc8ff","#7a6cff","#f53cd1"],night:["#07060d","#0c0a18","#131026","#1b1734","#241f44","#2f2956"]},Ct=Object.fromEntries(Object.entries(G).map(([a,t])=>[a,ht(t)])),gt=g("#ffffff"),Jt=g("#000000"),yt=g("#0b0a10"),Bt=g("#f53cd1");var rt={A:".#.|#.#|###|#.#|#.#",B:"##.|#.#|##.|#.#|##.",C:".##|#..|#..|#..|.##",D:"##.|#.#|#.#|#.#|##.",E:"###|#..|##.|#..|###",F:"###|#..|##.|#..|#..",G:".##|#..|#.#|#.#|.##",H:"#.#|#.#|###|#.#|#.#",I:"###|.#.|.#.|.#.|###",J:"..#|..#|..#|#.#|.#.",K:"#.#|#.#|##.|#.#|#.#",L:"#..|#..|#..|#..|###",M:"#.#|###|###|#.#|#.#",N:"##.|#.#|#.#|#.#|#.#",O:".#.|#.#|#.#|#.#|.#.",P:"##.|#.#|##.|#..|#..",Q:".#.|#.#|#.#|##.|.##",R:"##.|#.#|##.|#.#|#.#",S:".##|#..|.#.|..#|##.",T:"###|.#.|.#.|.#.|.#.",U:"#.#|#.#|#.#|#.#|###",V:"#.#|#.#|#.#|#.#|.#.",W:"#.#|#.#|###|###|#.#",X:"#.#|#.#|.#.|#.#|#.#",Y:"#.#|#.#|.#.|.#.|.#.",Z:"###|..#|.#.|#..|###",0:"###|#.#|#.#|#.#|###",1:".#.|##.|.#.|.#.|###",2:"##.|..#|.#.|#..|###",3:"##.|..#|.#.|..#|##.",4:"#.#|#.#|###|..#|..#",5:"###|#..|##.|..#|##.",6:".##|#..|###|#.#|###",7:"###|..#|.#.|.#.|.#.",8:"###|#.#|###|#.#|###",9:"###|#.#|###|..#|##.","+":"...|.#.|###|.#.|...","-":"...|...|###|...|...","!":"#|#|#|.|#","?":"##.|..#|.#.|...|.#.",".":".|.|.|.|#",",":"..|..|..|.#|#.",":":".|#|.|#|.","/":"..#|..#|.#.|#..|#..","%":"#.#|..#|.#.|#..|#.#",x:"...|#.#|.#.|#.#|...","*":"#.#|.#.|#.#|...|...","'":"#|#|.|.|.","(":".#|#.|#.|#.|.#",")":"#.|.#|.#|.#|#.","<":"..#|.#.|#..|.#.|..#",">":"#..|.#.|..#|.#.|#..","=":"...|###|...|###|...",_:"...|...|...|...|###","#":"#.#|###|#.#|###|#.#"},lt={A:".###.|#...#|#...#|#####|#...#|#...#|#...#",B:"####.|#...#|#...#|####.|#...#|#...#|####.",C:".###.|#...#|#....|#....|#....|#...#|.###.",D:"####.|#...#|#...#|#...#|#...#|#...#|####.",E:"#####|#....|#....|####.|#....|#....|#####",F:"#####|#....|#....|####.|#....|#....|#....",G:".###.|#...#|#....|#.###|#...#|#...#|.####",H:"#...#|#...#|#...#|#####|#...#|#...#|#...#",I:"###|.#.|.#.|.#.|.#.|.#.|###",J:"..###|...#.|...#.|...#.|...#.|#..#.|.##..",K:"#...#|#..#.|#.#..|##...|#.#..|#..#.|#...#",L:"#....|#....|#....|#....|#....|#....|#####",M:"#...#|##.##|#.#.#|#.#.#|#...#|#...#|#...#",N:"#...#|#...#|##..#|#.#.#|#..##|#...#|#...#",O:".###.|#...#|#...#|#...#|#...#|#...#|.###.",P:"####.|#...#|#...#|####.|#....|#....|#....",Q:".###.|#...#|#...#|#...#|#.#.#|#..#.|.##.#",R:"####.|#...#|#...#|####.|#.#..|#..#.|#...#",S:".####|#....|#....|.###.|....#|....#|####.",T:"#####|..#..|..#..|..#..|..#..|..#..|..#..",U:"#...#|#...#|#...#|#...#|#...#|#...#|.###.",V:"#...#|#...#|#...#|#...#|#...#|.#.#.|..#..",W:"#...#|#...#|#...#|#.#.#|#.#.#|#.#.#|.#.#.",X:"#...#|#...#|.#.#.|..#..|.#.#.|#...#|#...#",Y:"#...#|#...#|.#.#.|..#..|..#..|..#..|..#..",Z:"#####|....#|...#.|..#..|.#...|#....|#####",0:".###.|#...#|#..##|#.#.#|##..#|#...#|.###.",1:".#.|##.|.#.|.#.|.#.|.#.|###",2:".###.|#...#|....#|...#.|..#..|.#...|#####",3:"#####|...#.|..#..|...#.|....#|#...#|.###.",4:"...#.|..##.|.#.#.|#..#.|#####|...#.|...#.",5:"#####|#....|####.|....#|....#|#...#|.###.",6:"..##.|.#...|#....|####.|#...#|#...#|.###.",7:"#####|....#|...#.|..#..|.#...|.#...|.#...",8:".###.|#...#|#...#|.###.|#...#|#...#|.###.",9:".###.|#...#|#...#|.####|....#|...#.|.##..","!":"#|#|#|#|#|.|#","?":".###.|#...#|....#|...#.|..#..|.....|..#..","+":".....|..#..|..#..|#####|..#..|..#..|.....","-":"....|....|....|####|....|....|....",".":".|.|.|.|.|.|#",",":"..|..|..|..|..|.#|#.",":":".|.|#|.|.|#|.","/":"....#|....#|...#.|..#..|.#...|#....|#....","%":"##...|##..#|...#.|..#..|.#...|#..##|...##",x:".....|.....|#...#|.#.#.|..#..|.#.#.|#...#","*":".....|..#..|#.#.#|.###.|#.#.#|..#..|.....","'":"#|#|.|.|.|.|.","<":"...#|..#.|.#..|#...|.#..|..#.|...#",">":"#...|.#..|..#.|...#|..#.|.#..|#...","=":"....|....|####|....|####|....|....","(":"..#|.#.|#..|#..|#..|.#.|..#",")":"#..|.#.|..#|..#|..#|.#.|#..","#":".#.#.|.#.#.|#####|.#.#.|#####|.#.#.|.#.#."};function Q(a,t){let e={};for(let[n,o]of Object.entries(a)){let c=o.split("|");if(e[n]={w:c[0].length,rows:c.map(i=>[...i].map(f=>f==="#"))},c.length!==t)throw new Error(`glyph ${n} has ${c.length} rows, expected ${t}`)}return e}var P={mini:{h:5,space:2,gap:1,glyphs:Q(rt,5)},big:{h:7,space:3,gap:1,glyphs:Q(lt,7)}};function U(a,t="mini"){let e=P[t],n=0;for(let o of String(a)){let c=e.glyphs[o]??e.glyphs[o.toUpperCase()];n+=(c?c.w:e.space)+e.gap}return Math.max(0,n-e.gap)}function E(a,t,e){let n=P[t],o=0;for(let c of String(a)){let i=n.glyphs[c]??n.glyphs[c.toUpperCase()];if(!i){o+=n.space+n.gap;continue}for(let f=0;f<n.h;f++)for(let s=0;s<i.w;s++)i.rows[f][s]&&e(o+s,f);o+=i.w+n.gap}}var kt=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(a=>(a+.5)/16),pt={c:0,a:1,l:0,k:0},K=new WeakMap,D=(a,...t)=>typeof a=="function"?a(...t):a,O=class{constructor(t){this.frame=t,this.reset()}reset(){let t=this.frame;return this.w=t.w,this.h=t.h,this.ox=t.ox|0,this.oy=t.oy|0,this.C=t.color,this.L=t.light,this.tx=0,this.ty=0,this.fx=1,this.cs=1,this.sn=0,this.fade=1,this.lightK=1,this.layer="front",this}place(t,e,n=!1,o=0){return this.tx=t,this.ty=e,this.fx=n?-1:1,this.cs=Math.cos(o),this.sn=Math.sin(o),this}toX(t,e){return this.tx+t*this.fx*this.cs-e*this.sn}toY(t,e){return this.ty+t*this.fx*this.sn+e*this.cs}fromX(t,e){let n=t-this.tx,o=e-this.ty;return(n*this.cs+o*this.sn)*this.fx}fromY(t,e){let n=t-this.tx,o=e-this.ty;return-n*this.sn+o*this.cs}cellX(t,e){return Math.floor(this.toX(Math.floor(t)+.5,Math.floor(e)+.5))}cellY(t,e){return Math.floor(this.toY(Math.floor(t)+.5,Math.floor(e)+.5))}put(t,e,n,o=1){if(!n||(o*=this.fade,o<1&&o<=kt[(e&3)<<2|t&3]))return;let c=t-this.ox,i=e-this.oy;c<0||i<0||c>=this.w||i>=this.h||(this.C[i*this.w+c]=n)}add(t,e,n,o=1){if(o*=this.fade*this.lightK,o<=.004)return;let c=t-this.ox,i=e-this.oy;if(c<0||i<0||c>=this.w||i>=this.h)return;let f=i*this.w+c,s=this.L[f],h=Math.min(255,(s&255)+(n&255)*o)|0,l=Math.min(255,(s>>>8&255)+(n>>>8&255)*o)|0,r=Math.min(255,(s>>>16&255)+(n>>>16&255)*o)|0;this.L[f]=255<<24|r<<16|l<<8|h}blendPx(t,e,n,o){if(o*=this.fade,!n||o<=.004)return;let c=t-this.ox,i=e-this.oy;if(c<0||i<0||c>=this.w||i>=this.h)return;let f=i*this.w+c,s=this.C[f],h=(s>>>24)/255,l=o+h*(1-o),r=o/l,k=u=>(n>>>u&255)*r+(s>>>u&255)*(1-r)&255;this.C[f]=(l*255&255)<<24|k(16)<<16|k(8)<<8|k(0)}blend(t,e,n,o){this.blendPx(this.cellX(t,e),this.cellY(t,e),n,o)}disc(t,e,n,o,c){if(n<.5)return this.blend(t,e,D(o,0,0),D(c,0,0));this.each(t-n,e-n,t+n,e+n,(i,f,s,h)=>{let l=i-t,r=f-e,k=l*l+r*r;if(k>n*n)return;let u=Math.sqrt(k)/n,p=Math.atan2(r,l);this.blendPx(s,h,D(o,u,p),D(c,u,p))})}get(t,e){let n=this.cellX(t,e)-this.ox,o=this.cellY(t,e)-this.oy;return n<0||o<0||n>=this.w||o>=this.h?0:this.C[o*this.w+n]}px(t,e,n){this.put(this.cellX(t,e),this.cellY(t,e),n,1)}dot(t,e,n,o=1){o>0&&this.put(this.cellX(t,e),this.cellY(t,e),n,o)}light(t,e,n,o=1){this.add(this.cellX(t,e),this.cellY(t,e),n,o)}each(t,e,n,o,c){let i=1/0,f=-1/0,s=1/0,h=-1/0;for(let p=0;p<4;p++){let d=p&1?n:t,x=p&2?o:e,M=this.toX(d,x),m=this.toY(d,x);M<i&&(i=M),M>f&&(f=M),m<s&&(s=m),m>h&&(h=m)}let l=Math.max(Math.floor(i),this.ox),r=Math.min(Math.ceil(f),this.ox+this.w-1),k=Math.max(Math.floor(s),this.oy),u=Math.min(Math.ceil(h),this.oy+this.h-1);for(let p=k;p<=u;p++)for(let d=l;d<=r;d++){let x=d+.5,M=p+.5;c(this.fromX(x,M),this.fromY(x,M),d,p)}}shade(t,e,n,o,c){let i=pt;this.each(t,e,n,o,(f,s,h,l)=>{i.c=0,i.a=1,i.l=0,i.k=0;let r=c(f,s,i)||i.c;r&&this.put(h,l,r,i.a),i.k>0&&this.add(h,l,i.l||r,i.k)})}line(t,e,n,o,c,i=1){let f=this.cellX(t,e),s=this.cellY(t,e),h=this.cellX(n,o),l=this.cellY(n,o),r=Math.abs(h-f),k=-Math.abs(l-s),u=f<h?1:-1,p=s<l?1:-1,d=Math.max(r,-k)||1,x=typeof c=="function",M=typeof i=="function",m=r+k,b=0;for(;;){let C=b++/d;if(this.put(f,s,x?c(C):c,M?i(C):i),f===h&&s===l)break;let B=2*m;B>=k&&(m+=k,f+=u),B<=r&&(m+=r,s+=p)}}polyline(t,e,n=1){for(let o=1;o<t.length;o++)this.line(t[o-1][0],t[o-1][1],t[o][0],t[o][1],e,n)}beam(t,e,n,o,c,i,f=1){let s=c/2,h=n-t,l=o-e,r=h*h+l*l||1e-9;this.shade(Math.min(t,n)-s,Math.min(e,o)-s,Math.max(t,n)+s,Math.max(e,o)+s,(k,u,p)=>{let d=y(((k-t)*h+(u-e)*l)/r),x=t+h*d-k,M=e+l*d-u,m=x*x+M*M;if(m>s*s)return;let b=Math.sqrt(m)/s;p.c=D(i,d,b),p.a=D(f,d,b)})}circle(t,e,n,o,c=1){if(n<.6)return this.dot(t,e,D(o,0,0),D(c,0,0));this.shade(t-n,e-n,t+n,e+n,(i,f,s)=>{let h=i-t,l=f-e,r=h*h+l*l;if(r>n*n)return;let k=Math.sqrt(r)/n,u=Math.atan2(l,h);s.c=D(o,k,u),s.a=D(c,k,u)})}ellipse(t,e,n,o,c,i=1){n<=0||o<=0||this.shade(t-n,e-o,t+n,e+o,(f,s,h)=>{let l=(f-t)/n,r=(s-e)/o,k=l*l+r*r;if(k>1)return;let u=Math.sqrt(k),p=Math.atan2(r,l);h.c=D(c,u,p),h.a=D(i,u,p)})}ring(t,e,n,o,c,i=1){let f=Math.max(0,n-o);this.shade(t-n,e-n,t+n,e+n,(s,h,l)=>{let r=s-t,k=h-e,u=r*r+k*k;if(u>n*n||u<f*f)return;let p=o>0?(Math.sqrt(u)-f)/(n-f||1):1,d=Math.atan2(k,r);l.c=D(c,p,d),l.a=D(i,p,d)})}arc(t,e,n,o,c,i,f,s=1){let h=i-c,l=typeof o=="function";this.shade(t-n,e-n,t+n,e+n,(r,k,u)=>{let p=r-t,d=k-e,x=Math.sqrt(p*p+d*d);if(x>n)return;let M=Math.atan2(d,p)-c;if(M-=Math.floor(M/(Math.PI*2))*Math.PI*2,M>h)return;let m=M/h,b=l?o(m):o;if(b<=0||x<n-b)return;let C=(x-(n-b))/b;u.c=D(f,m,C),u.a=D(s,m,C)})}rect(t,e,n,o,c,i=1){if(this.sn===0){let f=Math.round(t),s=Math.round(e),h=Math.round(t+n),l=Math.round(e+o);for(let r=s;r<l;r++)for(let k=f;k<h;k++)this.put(this.cellX(k,r),this.cellY(k,r),c,i);return}this.shade(t,e,t+n,e+o,(f,s,h)=>{f<t||s<e||f>=t+n||s>=e+o||(h.c=c,h.a=i)})}poly(t,e,n=1){let o=1/0,c=1/0,i=-1/0,f=-1/0;for(let[h,l]of t)h<o&&(o=h),h>i&&(i=h),l<c&&(c=l),l>f&&(f=l);let s=t.length;this.shade(o,c,i,f,(h,l,r)=>{let k=!1;for(let u=0,p=s-1;u<s;p=u++){let[d,x]=t[u],[M,m]=t[p];x>l!=m>l&&h<(M-d)*(l-x)/(m-x)+d&&(k=!k)}k&&(r.c=D(e,h,l),r.a=D(n,h,l))})}tri(t,e,n,o,c,i,f,s=1){this.poly([[t,e],[n,o],[c,i]],f,s)}glow(t,e,n,o,c=.5){if(n<1||c<=.004)return;let i=this.toX(t,e),f=this.toY(t,e),s=Math.floor(i-n),h=Math.ceil(i+n),l=Math.floor(f-n),r=Math.ceil(f+n);for(let k=l;k<=r;k++){let u=(k+.5-f)/n;for(let p=s;p<=h;p++){let d=(p+.5-i)/n,x=d*d+u*u;if(x>=1)continue;let M=1-Math.sqrt(x);this.add(p,k,o,M*M*c)}}}glowLine(t,e,n,o,c,i,f=.5){if(c<1||f<=.004)return;let s=this.toX(t,e),h=this.toY(t,e),l=this.toX(n,o),r=this.toY(n,o),k=l-s,u=r-h,p=k*k+u*u||1e-9,d=Math.floor(Math.min(s,l)-c),x=Math.ceil(Math.max(s,l)+c),M=Math.floor(Math.min(h,r)-c),m=Math.ceil(Math.max(h,r)+c);for(let b=M;b<=m;b++)for(let C=d;C<=x;C++){let B=C+.5,w=b+.5,A=y(((B-s)*k+(w-h)*u)/p),J=s+k*A-B,j=h+u*A-w,H=Math.sqrt(J*J+j*j)/c;if(H>=1)continue;let q=1-H;this.add(C,b,i,q*q*f)}}glowRing(t,e,n,o,c,i=.5){if(o<1||i<=.004)return;let f=this.toX(t,e),s=this.toY(t,e),h=n+o;for(let l=Math.floor(s-h);l<=Math.ceil(s+h);l++)for(let r=Math.floor(f-h);r<=Math.ceil(f+h);r++){let k=Math.abs(Math.hypot(r+.5-f,l+.5-s)-n)/o;if(k>=1)continue;let u=1-k;this.add(r,l,c,u*u*i)}}sprite(t,e,n,o,c={}){let i=K.get(t);i||K.set(t,i=t.map(r=>[...r]));let f=c.scale??1,s=c.a??1,h=i[0]?.length??0,l={};for(let r=0;r<i.length;r++)for(let k=0;k<i[r].length;k++){let u=i[r][k];if(u==="."||u===" ")continue;let p=c.tint;if(p===void 0&&(p=l[u],p===void 0&&(p=l[u]=e[u]===void 0?0:g(e[u]))),!p)continue;let d=c.flip?h-1-k:k,x=c.flipY?i.length-1-r:r;f===1?this.dot(n+d,o+x,p,s):this.rect(n+d*f,o+x*f,f,f,p,s)}}text(t,e,n,o,c={}){let i=c.font??"mini",f=c.scale??1,s=c.a??1,h=U(t,i)*f,l=Math.round(c.align==="center"?e-h/2:c.align==="right"?e-h:e),r=Math.round(n),k=c.outline,u=c.shadow;k!==void 0&&E(t,i,(p,d)=>this.rect(l+p*f-1,r+d*f-1,f+2,f+2,k,s)),u!==void 0&&E(t,i,(p,d)=>this.rect(l+p*f+1,r+d*f+1,f,f,u,s)),E(t,i,(p,d)=>this.rect(l+p*f,r+d*f,f,f,D(o,p,d),s))}measure(t,e={}){let n=e.scale??1;return[U(t,e.font??"mini")*n,P[e.font??"mini"].h*n]}mask(t,e,n,o,c=1){for(let i=0;i<t.h;i++)for(let f=0;f<t.w;f++)t.data[i*t.w+f]&&this.dot(e+f,n+i,D(o,f,i),D(c,f,i))}outline(t,e,n,o,c=1){let i=(f,s)=>f>=0&&s>=0&&f<t.w&&s<t.h&&t.data[s*t.w+f];for(let f=-1;f<=t.h;f++)for(let s=-1;s<=t.w;s++)!i(s,f)&&(i(s-1,f)||i(s+1,f)||i(s,f-1)||i(s,f+1))&&this.dot(e+s,n+f,D(o,s,f),D(c,s,f))}};var $=["....kkkkk...","..kkhhhhhk..",".khhhhhhhhk.",".khhhhhhhhhk",".khhssssshhk",".khsessesshk",".khsessesshk","..ksssssssk.","...kkSSSkk..","..kttttttk..",".kttTttTttk.",".ksttTTttsk.",".kstttttttk.","..kbbbbbbk..","..kppkkppk..","..kppk.kppk.","..kppk.kppk.","..koook.kook","..kkkkk.kkkk"],ut={k:"#17121f",h:"#7a4128",s:"#f3c49d",S:"#c98b6c",e:"#17121f",t:"#5f6f94",T:"#46536f",b:"#8a5a32",p:"#38334a",o:"#6a4030",H:"#a35d34",w:"#ffffff",m:"#a3564a",g:"#e8c060",L:"#7f90b6",O:"#8f5a3f",P:"#4b4560",c:"#f53cd1",C:"#ff8fe6",D:"#a31f8a"},dt={k:"#0e0c14",A:"#e4e6ec",B:"#b6b9c3",C:"#868995",D:"#5c5e6a",E:"#6e707c",F:"#4b4d58",G:"#34353f",J:"#2a2b33",m:"#f53cd1"},V=["...........kkk..........","..........kAABk.........",".........kAAABJk........",".........kABBJJk........",".........kBBBJCDk.......",".........kBCJDDDk.......",".........kkJJJDk........",".......kkkkABBJCkk......","......kAABCJBCCCkDk.....","......kABBCJCCCmDkDk....","......kBBCDDJCDDDkDk....","......kABCDJDDDDDkk.....",".....kAABDkDDDDJkk......",".....kABCDkDDJJGkk......",".....kABCkJJJGGGkk......","....kJJCDkFFFGGGk.......","....kAJJDkJJJGGGk.......","....kJCJJkABBJGGk.......",".....kJCCkBBCDJJJk......",".....kCCCJBBCDJJDk......",".....kCCCDJCCDkJDDk.....","......kCDDJBCDkDDDk.....",".......kDJJJCDkDDDkk....",".......kJBCJCDkDDDkk....",".......kBDJBCDkCDDkk....","........kJJBCDkCDDk.....","........kBBBCDkCCDDk....","........kBBBCDkCCDDk....",".........kBBCDkJDDDk....","........kBJJJJkCJJJk....","........kBBCCDkCCDDk....","........kBBCDDkCDDk.....","........kBBCDkCCDDk.....","........kBCCDkCCDDk.....","........kBCDDkCDDDk.....",".......kJBCJkkkDJkkkk...",".......kAJJAAAAkCCCCCk..","........kkkkkkkkkkkkk..."];function v(a,t=1){let e=a.length*t,n=a[0].length*t,o=new Uint8Array(n*e);return a.forEach((c,i)=>[...c].forEach((f,s)=>{if(f!==".")for(let h=0;h<t*t;h++)o[(i*t+(h/t|0))*n+s*t+h%t]=1})),{w:n,h:e,data:o}}var Ot={1:v($,1),2:v(V,1)};function _(a,t){let e=a[0].length,n=new Uint32Array(e*a.length);return a.forEach((o,c)=>[...o].forEach((i,f)=>n[c*e+f]=i==="."?0:g(t[i]))),n}var St={1:_($,ut),2:_(V,dt)};function z(a,t,e=0,n=0){return{w:a,h:t,ox:e,oy:n,color:new Uint32Array(a*t),light:new Uint32Array(a*t)}}function tt(a){return a.color.fill(0),a.light.fill(0),a}var Z=new WeakMap;function et(a){let t=Z.get(a);return t||Z.set(a,t=new O(a)),t.reset()}function nt(a,t,e=null,n=1){let o=a.w*a.h,c=a.color,i=a.light,f=typeof e=="number";for(let s=0;s<o;s++){let h=c[s],l=i[s]&16777215,r,k,u,p,d=h>>>24;if(d===255)r=h&255,k=h>>>8&255,u=h>>>16&255,p=255;else if(e===null)r=h&255,k=h>>>8&255,u=h>>>16&255,p=d;else{let M=f?e:e[s],m=d/255;r=(h&255)*m+(M&255)*(1-m),k=(h>>>8&255)*m+(M>>>8&255)*(1-m),u=(h>>>16&255)*m+(M>>>16&255)*(1-m),p=255}if(l){let M=(l&255)*n,m=(l>>>8&255)*n,b=(l>>>16&255)*n;if(p<255){let C=p/255,B=r*C+M,w=k*C+m,A=u*C+b,J=Math.min(1,Math.max(C,Math.max(M,m,b)/255));J>0&&(r=Math.min(255,B/J),k=Math.min(255,w/J),u=Math.min(255,A/J),p=J*255)}else r=Math.min(255,r+M),k=Math.min(255,k+m),u=Math.min(255,u+b)}let x=s*4;t[x]=r,t[x+1]=k,t[x+2]=u,t[x+3]=p}return t}return ct(Mt);})();
+</script>
 
 <header class="site-header">
   <div class="container topbar">
@@ -774,7 +766,7 @@ body { overflow-x: clip; }
       <figure class="xmap" id="xmap" data-reveal aria-label="Pixel map of work locations: Tehran (on-site), and remote work with teams in Berlin, Lisbon, Yerevan, Dubai, Atlanta and Los Angeles.">
         <div class="xmap__inner" id="xmap-inner">
           <canvas id="xmap-land" width="800" height="248" aria-hidden="true"></canvas>
-          <svg id="xmap-svg" viewBox="0 0 800 248" role="presentation"></svg>
+          <canvas id="xmap-fx" aria-hidden="true"></canvas>
         </div>
       </figure>
 
@@ -1545,52 +1537,98 @@ body { overflow-x: clip; }
   });
 })();
 
-/* About: pixel map (0.25° per pixel, equirectangular, 130°W–70°E, 80°N–56°S), full-bleed behind the About content.
-   Land is drawn on a canvas (≈160k pixels); routes, markers and the moving packets sit in an SVG on top. */
+/* About: pixel map (0.25° per land dot, equirectangular, 130°W–70°E, 70°N–8°N), full width under the top bar.
+   Land is a static dot grid on one canvas; routes, packets, markers and their glow are a live pixelfx frame
+   (half-degree art pixels, a color buffer plus an additive light buffer) on a second canvas.
+   Each city has its own palette ramp (pixelfx PAL), and the countries worked with are tinted with it. */
 (() => {
   const fig = document.getElementById('xmap');
-  const inner = document.getElementById('xmap-inner') || fig;
-  const canvas = document.getElementById('xmap-land');
-  const svg = document.getElementById('xmap-svg');
-  if (!fig || !canvas || !svg) return;
-  const NS = 'http://www.w3.org/2000/svg';
-  const MAP = { cols: 800, rows: 248, top: 70, left: -130, step: 0.25, rle: '1.3,5.8,j.3,s.5,1f.1u,3j.2,3r.g,4y.5,59.7,5k.4,5t.16,8c.c,8r.2,8u.33,gi.4,go.14,hz.3,l0.6,l7.3,lv.d|0.f,j.4,r.a,1g.1m,37.1,3i.6,3t.f,49.2,4y.c,5h.5,5p.3,5w.z,6w.1,8d.b,8r.32,gh.8,gq.1e,l3.1,l5.f,lv.d|0.17,1i.1m,37.1,3i.9,3s.2,3z.2,42.d,4y.d,5p.2,5v.2,5z.12,8g.7,8s.2z,gc.1u,i7.2,ju.6,l5.i,m0.8|0.1b,1t.r,2n.i,3b.1,3e.e,3z.e,4i.3,4z.f,5n.3,5v.1,61.10,8r.2x,g6.2,gc.26,jt.8,l6.m,m1.7|0.1p,1t.n,2l.4,2s.b,39.2,3e.h,3y.2,41.d,4h.7,50.f,5m.3,5x.5,64.t,8r.2u,g2.6,g9.1,ge.27,jt.6,kc.5,kw.5,l7.p,m3.5|0.1r,1u.h,2f.b,2s.1,33.2,3k.9,41.d,4g.8,4x.i,62.2,66.q,8k.5,8q.2s,g2.2m,ja.8,ka.6,km.f,l3.v,m3.5|0.1s,2d.9,2n.4,2t.1,3i.6,3z.q,4x.d,5y.4,63.2,68.t,8j.2s,g2.6,g9.2i,jc.8,k3.c,kk.1o|0.1o,2e.g,2x.2,3h.b,3v.s,4s.3,4w.g,5w.8,65.3,6b.s,8j.2c,ay.4,fx.3,g1.1,g6.2q,jd.9,k0.28|0.1p,24.5,2g.l,39.4,3i.2,3m.6,3u.t,4s.k,5v.9,65.6,6c.w,79.1,8i.2d,fv.1,g3.2v,jc.b,jv.2d|0.2c,2f.1c,3u.u,4u.k,5v.9,6e.y,8h.2b,g3.2x,jc.5,js.2g|0.2g,2h.1a,3v.v,4s.n,5v.8,6e.y,7d.2,8h.29,g2.2z,jb.5,jr.2h|0.2g,2i.2w,6d.13,7h.1,8h.29,g0.32,jc.7,jr.2h|0.5c,6c.19,8i.27,fz.24,i4.x,jd.2v|0.5a,6a.1d,8i.25,fx.28,i8.s,jd.2s,m6.2|0.4u,4z.8,68.r,71.l,8h.24,bw.3,cm.3,cs.1,fw.2b,id.l,j3.7,jd.2v|0.4w,52.2,66.t,73.h,8i.1q,a9.8,bt.3,bx.5,c7.1,cb.3,cf.2,cj.a,fw.2e,im.8,j1.37|0.4v,4x.4,53.2,68.o,6x.2,76.c,8j.1w,bt.a,c6.3,ca.j,fu.2h,iy.3a|0.4i,4k.9,4w.6,55.2,69.p,77.a,8j.1o,a8.2,ab.1,br.c,c4.s,fr.1,ft.14,h7.14,iv.3d|0.4m,4n.4,4v.5,51.2,5u.5,61.1,64.v,78.7,8m.1f,bs.1,bz.y,fs.13,h9.11,iv.3d|0.4s,4v.b,5t.17,79.1,7b.4,8n.1d,by.10,fr.13,h7.1,h9.12,ie.1,ij.3,iw.3c|0.4r,4v.e,5r.1c,74.1,8n.1b,bs.15,fn.16,h7.15,ii.8,ix.3b|0.4q,4u.i,5r.e,66.11,8n.1c,bz.v,fo.16,h5.17,ij.3p|0.4p,4u.j,5s.9,6a.y,8o.1b,c0.u,fm.18,h4.1b,il.3n|0.4n,4u.j,5e.1,5g.1,6c.v,8p.19,c0.p,fk.18,h2.1f,io.3k|0.4g,4s.d,5a.9,6e.w,8q.18,bx.p,fj.5,fp.12,h0.58|0.4f,4r.d,5b.7,5v.2,6h.c,6v.f,8q.17,c6.b,fd.3,fh.18,gy.5a|0.4d,4x.5,5q.4,5w.1,6h.e,6y.a,79.1,8r.15,cb.4,fc.19,gx.5b|0.4d,4y.2,5s.1,6i.f,71.8,8s.13,fa.19,gu.5e|0.4c,56.6,6k.f,75.4,8u.z,f7.1b,gt.5f|0.48,55.7,5u.1,67.1,6l.2,6q.c,79.1,8v.x,f5.1b,gs.5g|0.46,54.6,5k.3,5s.9,62.1,67.4,6s.b,79.1,8v.w,f2.1c,gt.5f|0.44,55.1,5j.4,5r.m,6w.8,8x.u,do.2,f0.1e,gt.5f|0.43,5j.3,5s.n,72.1,77.1,8z.t,f0.1e,gt.5f|0.42,5k.2,5t.o,76.3,8z.s,f0.1d,gu.5e|0.40,5t.o,78.1,90.q,f0.1d,gu.5e|0.40,5s.v,92.o,f0.1d,gu.5e|0.3z,5q.1,5s.y,93.m,f0.1d,gt.5f|0.3y,5t.x,9c.d,eb.1,f0.1g,gt.5f|0.3y,5t.w,6v.2,78.2,9e.9,ea.2,f0.1i,gn.1,gw.g,he.1,hm.4m|0.3x,5u.v,78.3,9f.9,ea.2,f1.1i,gm.3,gu.1,gx.b,ho.4k|0.3x,5u.w,77.5,9j.4,f0.2,f3.1h,h0.1,hm.4m|0.3x,5t.x,76.7,f1.1i,ha.4,hk.4o|0.3x,5t.x,76.8,f0.m,fn.v,h4.54|0.3x,5r.10,75.a,e3.1,f1.1,f3.i,fo.u,gy.1,h2.56|0.3y,5q.14,74.c,e2.3,f2.g,fp.q,gx.3,h2.56|0.44,5q.15,72.e,dw.1,dz.5,f2.f,fp.n,gy.3,h2.56|0.44,5s.15,6z.j,dp.2,dw.8,f4.b,fp.m,gv.6,h3.55|0.45,5u.1o,do.3,du.8,f6.7,fq.l,gw.1,h6.52|0.45,5w.1o,do.1,dt.7,fr.k,gi.3,h5.53|0.46,5x.1o,dm.2,dq.1,dt.g,fk.2,fr.k,gh.3,gv.4,h5.53|0.46,5x.1o,dm.1,dp.3,dt.g,fi.4,fs.j,gg.3,gu.7,h5.53|0.46,48.8,5x.1p,dm.1,dr.h,fe.8,ft.h,gb.1,gh.1,gt.8,h4.54|0.4l,5y.1p,dt.e,fd.3,fh.4,fu.h,gs.5g|0.4n,5y.1o,dr.f,fd.1,ff.6,fv.g,gs.5g|0.4p,5k.1,5m.3,5y.1o,dr.2,du.b,fc.c,fv.f,gs.5g|0.4q,5l.3,5x.1r,dt.c,fc.9,fs.g,gs.5g|0.4u,5k.2,5w.1t,dq.2,du.1,dw.c,fc.9,fm.1,fq.4,fv.6,gs.5g|0.4x,5v.1w,dr.1,dt.3,dx.c,fd.6,fk.2,fo.7,fw.5,gs.5g|0.4z,5t.1y,dt.1,dx.d,fe.9,fo.6,fw.5,gt.5f|0.5a,5r.25,dj.9,dw.e,fe.4,fk.3,fq.3,g3.2,gt.5f|0.5b,5n.2b,7z.1,di.b,dv.g,fd.7,fo.5,gf.3,go.5k|0.5b,5l.2h,dh.d,e2.b,ff.5,fp.2,fx.1,ga.8,gn.5l|0.5b,5m.2f,dd.1,di.c,dy.1,e2.c,ff.a,ft.6,g9.5z|0.5b,5n.2g,dc.h,dx.1,e3.d,ff.9,fr.9,g4.64|0.5c,5o.2f,dc.f,e4.c,fe.6u|0.5c,5o.24,7u.d,dc.f,e4.c,f8.70|0.5c,5o.2l,dc.g,dy.1,e1.g,f2.76|0.1,2.59,5c.4,5o.2l,df.d,dy.j,f1.77|3.59,5d.4,5p.2k,de.e,dy.o,ez.79|3.1,5.58,5p.2k,dd.e,e0.n,ey.7a|5.1,7.57,5q.2j,dd.e,dz.o,ey.7a|7.58,5p.2k,db.d,dx.q,ex.7b|7.1,9.58,5o.2k,db.a,dv.q,ew.7c|7.5b,5m.1,5o.2i,dc.6,dw.1,dz.l,eu.7e|9.5a,5l.2g,85.5,e2.1,e4.i,et.7f|9.7p,84.5,dz.m,ep.7j|7.2,b.2,e.7i,84.5,dy.m,em.7m|7.5,e.7h,83.4,dw.8,e5.3,ea.2,em.7m|8.7l,82.5,dv.7,em.7m|9.6t,7l.3,81.5,du.2,el.7n|b.9,l.6f,7a.5,81.4,86.4,ei.7q|d.8,m.1,o.6b,7c.6,80.8,8f.1,e9.2,eg.7s|e.9,p.1,r.68,7e.6,7z.c,8d.4,e9.7z|h.8,r.64,71.9,7g.5,7z.j,e7.1,e9.7z|j.7,t.60,6x.e,7y.j,e2.2,e9.7z|k.7,u.5y,6v.g,7v.m,8j.1,dx.8b|l.1,o.3,t.5y,6t.h,7x.n,dx.8b|l.64,6r.h,7w.m,dy.8a|l.64,6q.f,77.1,7u.n,8i.2,dy.8a|m.6n,7l.1,7v.3,7z.8,88.7,8g.6,e3.85|n.5z,6n.l,7k.1,8b.2,8g.5,e6.82|n.5y,6m.m,89.3,8g.5,e7.4j,ir.1,it.3f|o.6l,7b.1,7p.2,88.3,8f.5,e8.4d,iq.1d,k7.2,kb.1x|o.6l,7b.1,7o.3,e8.3r,i0.h,in.1d,kc.1w|n.6n,7d.7,7n.3,ea.3l,hz.f,io.19,kc.1w|o.6o,7e.1,7g.2,7m.7,eb.3j,hz.1,i1.b,ip.17,kc.1w|o.6q,7m.2,7p.3,eb.3i,i6.6,in.18,kc.1w|o.73,eb.1l,fz.1s,i3.a,im.16,kb.1x|o.6i,78.g,eb.1i,fy.1t,i2.g,ij.1,il.15,k6.22|o.6f,78.e,eb.1j,fy.3,g2.1p,i5.d,ij.16,k5.23|o.6c,76.d,eb.1j,fz.1,g1.1,g3.1n,i6.7,il.14,k4.24|n.6c,74.b,eb.1i,g4.1k,i6.4,im.11,k1.3,k5.23|n.68,73.8,eb.1j,g4.1j,i7.1,ip.z,k1.27|n.65,73.7,ea.13,fi.c,g5.1i,is.x,k3.25|n.62,73.6,ea.12,fl.b,g6.1h,it.x,k4.24|n.60,75.2,dj.c,ea.z,fl.d,g7.1g,iu.w,k4.24|n.5z,dh.1e,ey.9,fl.e,ga.1c,iw.u,k5.23|m.60,df.1e,f2.4,fm.d,ga.1a,iy.s,k6.22|m.5z,df.1e,fh.1,fn.d,gb.1,gd.17,j0.r,k7.21|m.5z,dg.1d,ff.3,fo.d,gg.13,j2.q,ka.1y|m.5y,dh.1c,fe.4,fp.d,gi.11,j2.r,ka.1y|m.60,dg.1d,fe.4,fr.c,gk.10,j3.q,ka.1y|n.5z,dg.1d,ff.3,fs.h,gl.z,i2.b,j3.r,ka.2,kg.1s|n.61,dg.1b,ff.3,ft.f,gm.z,i0.g,j2.u,ka.2,kg.1s|n.5v,6l.1,6n.1,dh.18,fg.1,fv.e,gm.11,hy.j,j1.v,kb.1,kh.1r|n.5o,dh.15,fg.2,fz.d,gm.21,is.2,iy.z,ki.1q|n.5s,dh.13,fd.6,g0.e,gm.m,h9.9,hp.29,kb.2,ki.1q|n.5p,dh.12,fd.6,g2.e,gl.i,h6.1,hc.5,hn.2d,kb.1x|m.5m,dg.12,fe.5,g4.8,gd.5,gl.k,hd.2o,kb.1x|n.5l,dg.11,fe.5,g4.7,gg.2,gm.d,h1.1,h3.1,hb.1,hd.2l,kb.1x|o.5k,dg.10,er.2,ew.1,fe.5,g7.3,gg.2,gn.c,h8.2,hc.2m,kb.1,kd.1v|p.5i,df.10,eq.4,fd.6,g7.4,gn.d,hc.2m,ke.1u|p.5h,df.10,er.2,fd.6,g8.4,gp.c,hc.2,hf.2i,kc.1w|p.59,5z.4,64.1,de.11,fd.3,fh.1,g8.5,gq.a,hc.2,hf.2i,kf.1t|p.59,5z.4,de.12,el.1,g8.4,gr.b,hf.2h,kf.1t|q.58,5z.5,b9.1,df.11,g8.3,gq.1,gs.9,h2.3,hf.2h,kf.1t|r.5d,ba.1,dh.y,g7.3,gq.1,gs.d,hc.2k,kf.1t|s.57,60.3,dg.y,fu.4,g2.7,gq.1,gt.6,h0.4,h5.1,he.2i,kf.1t|t.56,61.2,bl.2,dg.x,fu.c,g7.1,gt.8,h3.1,h7.1,hh.2f,kf.1t|u.55,60.2,dg.x,fu.b,gt.8,h5.1,h8.1,hc.1,hf.2i,kf.1t|u.55,60.1,dg.u,fi.1,fx.8,gu.5,h0.2,hh.2k,kf.1t|u.55,dg.t,f9.1,fg.5,fz.6,gu.6,h8.2,hh.2l,kg.1s|w.54,dq.i,eu.6,f3.i,fm.3,g2.3,gv.1,gx.3,hg.1,hj.2l,kc.1w|w.54,dq.8,en.11,gx.1,gz.2,hi.1,hn.8,hz.b,ic.3,ig.3s|w.55,dr.4,ej.14,hk.1,hp.5,i0.9,if.3t|x.52,ds.3,eh.15,hj.2,hq.1,i2.5,if.3t|y.53,dt.2,ee.19,g1.1,if.3t|z.52,ds.3,ec.1c,hg.1,if.3t|10.50,dr.5,ea.1e,h2.9,i4.5,if.3t|11.4x,dr.1x,h5.8,i2.6,if.3t|11.4y,dr.1x,h7.1,i1.6,if.3t|11.4w,dq.1x,i2.3,ig.3s|14.4q,dp.1w,if.3t|17.4m,dp.1v,ie.3u|1a.4i,dn.1y,fn.1,ie.3u|1c.4d,dl.23,id.3v|1d.4b,di.27,id.3v|1e.49,dh.2a,ic.3w|1f.47,cj.1,dg.2j,gu.4,ic.3w|1f.45,ck.1,df.2n,gr.9,ic.3w|1g.42,df.2q,gp.c,ib.3x|1g.41,de.2s,go.g,ib.3x|1h.3z,de.2s,go.k,ia.3y|1h.8,1q.3p,dd.2t,go.l,ha.3,hw.1,ia.3y|1i.7,1t.3m,dc.2w,go.t,ht.7,i9.3z|1i.7,1v.3j,dc.32,go.y,hr.4h|1j.6,1v.3j,dc.34,go.5k|1k.6,1w.3i,dd.35,gn.5l|1k.6,1w.2x,4v.k,dd.36,gm.5m|1k.6,1x.2i,4g.2,4x.i,dd.6j,jx.2b|1l.6,1x.2m,4y.4,55.a,dd.6h,k1.27|1m.6,1y.1y,3x.3,45.d,56.9,dc.4q,i3.1q,k1.27|1n.8,1y.1y,4b.8,57.9,db.4r,i3.1p,k2.26|1p.6,1y.1y,4c.1,4f.1,4i.2,58.8,cx.1,da.4t,i4.1p,k3.25|1q.5,1y.1,20.1v,59.8,cg.1,d9.4u,i4.1p,k3.25|1r.5,21.1s,59.9,cg.1,cw.1,d7.4x,i5.5,ib.1j,k4.24|1r.6,22.1o,59.8,cl.2,cv.2,d6.54,ib.1j,k4.24|1r.6,23.1m,59.9,cj.1,cl.1,cp.1,d3.52,i7.1o,k5.23|1o.1,1r.6,24.1k,58.a,cp.1,d0.56,i8.1,id.1i,k6.22|1o.a,25.1i,5a.9,cz.58,ie.1i,k9.1z|1q.9,26.1h,59.a,cz.58,ie.1j,ka.1y|1r.9,27.1f,5a.a,cy.5a,if.1k,kc.1w|1t.8,28.1f,5b.9,cy.5a,ig.1k,ke.8,kn.2,ks.1g|1w.6,29.1e,5b.9,5p.3,5u.1,cx.5b,ih.1j,kh.3,km.1,ks.1g|1x.5,2b.1c,5c.8,5v.1,cv.5e,ih.1k,ks.1g|1z.4,2a.1d,5d.7,5v.1,cu.5f,ii.1j,k2.1,k4.1,ko.2,ks.1g|1z.4,2a.1e,5e.6,cu.5g,ij.1i,k4.2,ko.2,kt.1f|1z.5,2b.1c,5f.4,ct.5i,ij.1i,k3.3,km.4,kv.1d|1z.5,2d.1a,5f.4,5x.1,ct.5i,ik.1i,k3.3,kl.5,l0.1,l2.q,lu.e|1z.6,2f.17,5g.1,5r.1,5u.1,cs.5k,il.1h,k3.4,kk.6,l8.4,ld.1,lv.d|1z.7,2f.17,5r.2,cs.5k,il.1l,kj.7,lv.d|20.5,2g.16,5r.2,cs.5l,il.1l,ki.8,lx.b|22.4,2i.14,5r.2,cr.5n,im.1k,ki.9,lx.b|23.5,2j.12,5s.2,cq.5o,io.1j,ka.i,lx.b|25.4,2k.11,5t.1,cp.5q,ip.25,ly.a|26.4,2l.10,co.5q,iq.29,m1.7|27.4,2m.z,co.5q,iq.2a,m2.6|27.3,2m.z,5a.7,63.1,cn.5s,ir.29,m3.5|28.1,2n.y,55.g,cn.5s,ir.2a,m4.4|2p.w,53.j,67.2,cm.5v,is.2b|2p.w,52.6,5c.e,5r.1,cm.5w,is.2c,m4.4|2p.w,52.4,5d.g,cl.5y,is.2b,m4.4|2p.x,51.3,58.1,5j.b,ck.60,is.2b,m5.3|2l.1,2q.x,4m.3,58.2,5l.b,ck.60,is.2a,m6.2|2r.v,4h.c,5q.7,ck.60,is.29,m7.1|2r.w,4f.e,5q.b,69.3,ck.61,it.27|2q.x,4e.f,5r.a,cl.60,it.26|2r.x,4e.e,5t.c,cm.5z,iu.25|2p.10,4e.d,4s.1,5v.c,cn.5y,iv.21,kx.1,kz.1|2q.10,4e.c,5u.d,cn.5y,ix.1z|2q.10,4d.d,5t.5,61.3,6b.3,6h.4,cn.5y,iy.1x|2r.10,4d.d,6b.d,cm.5z,iz.1w|2s.z,4d.d,6d.e,cm.5z,j0.1v|2t.z,4c.e,6d.e,cn.5z,j0.1v|2w.x,4a.g,6b.j,cn.5z,j1.1t|2x.z,45.3,4b.e,66.3,6e.h,cn.61,j1.1q|2y.z,41.m,4o.1,5r.6,66.o,6z.7,cn.62,j2.1p|30.1o,5r.8,68.1,6c.1,6g.4,6z.6,co.62,j2.1o|34.1j,5t.6,6h.2,co.63,j3.1m|36.1h,cn.64,j4.1h|37.1g,cn.65,j5.1g|39.1e,bn.1,cn.65,j5.1g|3c.1b,cm.67,j3.1,j6.1a|3e.19,cm.67,j4.1,j7.16|3h.15,7m.1,cm.67,j7.13|3k.c,3z.m,7l.1,bw.1,cm.67,j7.12|3m.8,41.l,4o.3,4t.1,4v.8,cm.68,j7.12|3p.2,42.12,7m.1,cl.69,iw.1,j7.12|43.12,7m.1,cl.6b,j7.10|44.13,bt.1,ck.6d,j7.y|45.12,7n.1,bq.1,cj.6g,j7.u|46.11,7n.2,cj.6i,j8.q|48.z,ck.6i,j8.o|49.y,ck.6i,j8.n|4b.v,7o.1,cl.6j,j9.i|4g.q,cl.6k,j9.h|4j.n,cl.6l,j9.e|4n.1,4q.g,7t.1,cl.6m,j9.9|4p.h,cl.6n,ja.7|4q.g,cl.6o,jb.2,kd.5|4s.e,6g.3,cl.6p,ke.3|4t.c,6f.5,6n.2,6s.1,7l.1,cn.6n|4t.c,6e.5,6n.2,cn.6m,k2.3|4u.b,6c.6,6n.2,cq.6i,k1.4|4w.9,6b.6,6m.7,cq.6k,ju.1,jx.8|4x.8,67.a,6k.b,7c.1,cr.6k,jp.g|4x.9,63.e,6i.d,7b.1,7n.1,cs.6j,jj.1,jn.i|4x.9,62.t,6z.4,7b.8,7m.2,ct.6k,jh.o|4x.a,62.f,6i.m,7a.7,7m.2,cu.7a|4x.b,61.g,6j.z,7l.3,cv.79|4y.a,61.f,6j.13,cx.77|4z.1,51.9,5m.1,61.f,6j.15,cx.77|53.8,5k.7,60.h,6j.16,cy.75|55.6,5i.b,5z.1q,cz.74|55.9,5g.6,5o.6,5y.1q,cz.73|55.g,5q.5,5w.1r,7p.3,cz.73|56.e,5o.1,5r.5,5x.1w,cz.72|58.1,5c.6,5r.5,5x.1y,d0.70', worked: '||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||fd.1,ff.1|ff.5,fx.1|ff.9,fu.5|fg.8,fr.8|fe.n|f9.3,fe.n|f8.u|f9.t|f8.t|f7.v|f8.u|f7.w|f6.x|f4.z|f4.10|f4.10|f4.x,g2.1|f4.u|f5.p|f4.p|f5.p|f6.o|f6.p|3v.2,f8.1,fa.n|t.34,fc.n|u.37,42.2,fb.o|t.3d,fb.n|l.8,u.3g,4b.2,4k.5,fa.l|m.45,fa.m|m.48,fa.4,fh.c,fv.1|n.49,6r.1,fk.2|n.4c,6q.7|o.4d,6p.8|o.4d,6o.9|o.4g,6n.a|o.4g,6n.a|o.4i,6m.b|o.4k,6m.c|o.4m,6l.d|o.4m,6i.i|o.4m,63.x|o.4n,61.x|o.4n,60.v|n.4o,5y.u|n.4o,5x.s|n.4o,5p.y|n.4o,5n.z|m.4p,5o.x|m.4o,5o.x|m.4o,5m.z|m.4n,5j.11|n.4l,5e.17,di.1|n.4l,5c.1a,dh.5,dn.3|n.60,dh.a|o.5u,dh.a|n.5o,dh.8,jb.6|n.5r,dh.8,ja.8|n.5n,dh.8,jb.7|n.5l,dh.8,ja.9|n.5l,dg.8,jb.9|o.5k,dg.8,je.5|p.5i,df.8,je.2,jh.4,jr.1|p.5h,df.8,jc.4,jj.3,jp.4|p.59,5z.4,64.1,de.a,jc.5,jk.2,jn.6|p.59,5z.4,de.a,jd.f|q.58,5z.5,df.8,jd.g|s.56,5z.5,dh.6,jd.i|s.56,60.3,dh.7,jd.j,kp.4|t.56,61.1,dg.7,jd.j,kk.c|u.55,60.2,dh.5,je.j,kj.h|u.55,60.1,dh.5,jf.m,kh.l|v.54,dg.6,jf.n,kg.n|w.54,jf.p,kd.2,kg.p|w.54,jg.r,k8.11|w.54,jh.1s|x.52,jh.1s|y.53,jj.1q|z.52,jk.1p|10.50,jk.1p|11.4x,jk.1p|11.4y,jj.1p|11.4u,ji.1q|16.4o,ji.1p|17.4m,ji.1o|1a.4g,ji.1o|1c.4c,jj.1n|1e.4a,jk.1n|1e.49,jk.1m|1f.46,jm.1l|1f.6,1p.3v,jn.1k|1q.3s,jp.1i|1t.3o,jq.1h|1w.3k,jr.1g|20.f,2n.2s,jr.1g|23.c,2o.2r,jr.1k|2p.2p,jr.1k|2q.2o,js.1j|2s.2m,js.1i|2t.1r,4l.2,4p.2,4s.1,4v.j,jt.1g|2t.1m,4g.2,4x.i,ju.2,jx.2,k0.18|2t.1q,4y.4,55.a,k1.17|2u.7,37.p,3x.2,45.2,48.1,4a.7,56.9,k2.16|2w.5,38.o,4b.5,4h.2,57.9,k2.17|2y.2,39.n,4i.2,58.8,k3.17|3a.l,59.8,k3.17|3a.j,59.9,k4.17|3b.f,59.8,k5.19|3c.d,59.9,k5.1a|3c.b,59.9,k6.19|3d.a,5a.9,k9.16|3e.9,59.a,kb.14|3e.8,5a.9,kc.d,kr.q|3f.7,5b.9,ke.8,kn.2,ks.p|3f.7,5c.8,kh.3,km.1,ks.n|3g.7,5c.8,ks.l|3j.4,5d.7,kt.i|3m.1,5e.6,ko.1,kt.i|5f.4,kn.2,kw.f|5f.4,km.3,l3.8|kl.4,l9.1|kj.6|ki.5|ki.5|k6.1,ka.3,ke.a|k7.f|k8.e|k9.d|ka.b|kc.9|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||' };
-  const U = 1 / MAP.step;      // map pixels per degree
-  const M = U / 2;             // one marker pixel = half a degree
-  const el = (tag, attrs) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
-  const cell = (lon, lat) => [(lon - MAP.left) / MAP.step, (MAP.top - lat) / MAP.step];
+  const inner = document.getElementById('xmap-inner');
+  const land = document.getElementById('xmap-land');
+  const fxc = document.getElementById('xmap-fx');
+  if (!fig || !inner || !land || !fxc || !window.PFX) return;
+  const { createFrame, clearFrame, composite, painterFor, PAL, hex, at, mix } = PFX;
+  const MAP = {"cols":800,"rows":248,"top":70,"left":-130,"step":0.25,"rle":"1.3,5.8,j.3,s.5,1f.1u,3j.2,3r.g,4y.5,59.7,5k.4,5t.16,8c.c,8r.2,8u.33,gi.4,go.14,hz.3,l0.6,l7.3,lv.d|0.f,j.4,r.a,1g.1m,37.1,3i.6,3t.f,49.2,4y.c,5h.5,5p.3,5w.z,6w.1,8d.b,8r.32,gh.8,gq.1e,l3.1,l5.f,lv.d|0.17,1i.1m,37.1,3i.9,3s.2,3z.2,42.d,4y.d,5p.2,5v.2,5z.12,8g.7,8s.2z,gc.1u,i7.2,ju.6,l5.i,m0.8|0.1b,1t.r,2n.i,3b.1,3e.e,3z.e,4i.3,4z.f,5n.3,5v.1,61.10,8r.2x,g6.2,gc.26,jt.8,l6.m,m1.7|0.1p,1t.n,2l.4,2s.b,39.2,3e.h,3y.2,41.d,4h.7,50.f,5m.3,5x.5,64.t,8r.2u,g2.6,g9.1,ge.27,jt.6,kc.5,kw.5,l7.p,m3.5|0.1r,1u.h,2f.b,2s.1,33.2,3k.9,41.d,4g.8,4x.i,62.2,66.q,8k.5,8q.2s,g2.2m,ja.8,ka.6,km.f,l3.v,m3.5|0.1s,2d.9,2n.4,2t.1,3i.6,3z.q,4x.d,5y.4,63.2,68.t,8j.2s,g2.6,g9.2i,jc.8,k3.c,kk.1o|0.1o,2e.g,2x.2,3h.b,3v.s,4s.3,4w.g,5w.8,65.3,6b.s,8j.2c,ay.4,fx.3,g1.1,g6.2q,jd.9,k0.28|0.1p,24.5,2g.l,39.4,3i.2,3m.6,3u.t,4s.k,5v.9,65.6,6c.w,79.1,8i.2d,fv.1,g3.2v,jc.b,jv.2d|0.2c,2f.1c,3u.u,4u.k,5v.9,6e.y,8h.2b,g3.2x,jc.5,js.2g|0.2g,2h.1a,3v.v,4s.n,5v.8,6e.y,7d.2,8h.29,g2.2z,jb.5,jr.2h|0.2g,2i.2w,6d.13,7h.1,8h.29,g0.32,jc.7,jr.2h|0.5c,6c.19,8i.27,fz.24,i4.x,jd.2v|0.5a,6a.1d,8i.25,fx.28,i8.s,jd.2s,m6.2|0.4u,4z.8,68.r,71.l,8h.24,bw.3,cm.3,cs.1,fw.2b,id.l,j3.7,jd.2v|0.4w,52.2,66.t,73.h,8i.1q,a9.8,bt.3,bx.5,c7.1,cb.3,cf.2,cj.a,fw.2e,im.8,j1.37|0.4v,4x.4,53.2,68.o,6x.2,76.c,8j.1w,bt.a,c6.3,ca.j,fu.2h,iy.3a|0.4i,4k.9,4w.6,55.2,69.p,77.a,8j.1o,a8.2,ab.1,br.c,c4.s,fr.1,ft.14,h7.14,iv.3d|0.4m,4n.4,4v.5,51.2,5u.5,61.1,64.v,78.7,8m.1f,bs.1,bz.y,fs.13,h9.11,iv.3d|0.4s,4v.b,5t.17,79.1,7b.4,8n.1d,by.10,fr.13,h7.1,h9.12,ie.1,ij.3,iw.3c|0.4r,4v.e,5r.1c,74.1,8n.1b,bs.15,fn.16,h7.15,ii.8,ix.3b|0.4q,4u.i,5r.e,66.11,8n.1c,bz.v,fo.16,h5.17,ij.3p|0.4p,4u.j,5s.9,6a.y,8o.1b,c0.u,fm.18,h4.1b,il.3n|0.4n,4u.j,5e.1,5g.1,6c.v,8p.19,c0.p,fk.18,h2.1f,io.3k|0.4g,4s.d,5a.9,6e.w,8q.18,bx.p,fj.5,fp.12,h0.58|0.4f,4r.d,5b.7,5v.2,6h.c,6v.f,8q.17,c6.b,fd.3,fh.18,gy.5a|0.4d,4x.5,5q.4,5w.1,6h.e,6y.a,79.1,8r.15,cb.4,fc.19,gx.5b|0.4d,4y.2,5s.1,6i.f,71.8,8s.13,fa.19,gu.5e|0.4c,56.6,6k.f,75.4,8u.z,f7.1b,gt.5f|0.48,55.7,5u.1,67.1,6l.2,6q.c,79.1,8v.x,f5.1b,gs.5g|0.46,54.6,5k.3,5s.9,62.1,67.4,6s.b,79.1,8v.w,f2.1c,gt.5f|0.44,55.1,5j.4,5r.m,6w.8,8x.u,do.2,f0.1e,gt.5f|0.43,5j.3,5s.n,72.1,77.1,8z.t,f0.1e,gt.5f|0.42,5k.2,5t.o,76.3,8z.s,f0.1d,gu.5e|0.40,5t.o,78.1,90.q,f0.1d,gu.5e|0.40,5s.v,92.o,f0.1d,gu.5e|0.3z,5q.1,5s.y,93.m,f0.1d,gt.5f|0.3y,5t.x,9c.d,eb.1,f0.1g,gt.5f|0.3y,5t.w,6v.2,78.2,9e.9,ea.2,f0.1i,gn.1,gw.g,he.1,hm.4m|0.3x,5u.v,78.3,9f.9,ea.2,f1.1i,gm.3,gu.1,gx.b,ho.4k|0.3x,5u.w,77.5,9j.4,f0.2,f3.1h,h0.1,hm.4m|0.3x,5t.x,76.7,f1.1i,ha.4,hk.4o|0.3x,5t.x,76.8,f0.m,fn.v,h4.54|0.3x,5r.10,75.a,e3.1,f1.1,f3.i,fo.u,gy.1,h2.56|0.3y,5q.14,74.c,e2.3,f2.g,fp.q,gx.3,h2.56|0.44,5q.15,72.e,dw.1,dz.5,f2.f,fp.n,gy.3,h2.56|0.44,5s.15,6z.j,dp.2,dw.8,f4.b,fp.m,gv.6,h3.55|0.45,5u.1o,do.3,du.8,f6.7,fq.l,gw.1,h6.52|0.45,5w.1o,do.1,dt.7,fr.k,gi.3,h5.53|0.46,5x.1o,dm.2,dq.1,dt.g,fk.2,fr.k,gh.3,gv.4,h5.53|0.46,5x.1o,dm.1,dp.3,dt.g,fi.4,fs.j,gg.3,gu.7,h5.53|0.46,48.8,5x.1p,dm.1,dr.h,fe.8,ft.h,gb.1,gh.1,gt.8,h4.54|0.4l,5y.1p,dt.e,fd.3,fh.4,fu.h,gs.5g|0.4n,5y.1o,dr.f,fd.1,ff.6,fv.g,gs.5g|0.4p,5k.1,5m.3,5y.1o,dr.2,du.b,fc.c,fv.f,gs.5g|0.4q,5l.3,5x.1r,dt.c,fc.9,fs.g,gs.5g|0.4u,5k.2,5w.1t,dq.2,du.1,dw.c,fc.9,fm.1,fq.4,fv.6,gs.5g|0.4x,5v.1w,dr.1,dt.3,dx.c,fd.6,fk.2,fo.7,fw.5,gs.5g|0.4z,5t.1y,dt.1,dx.d,fe.9,fo.6,fw.5,gt.5f|0.5a,5r.25,dj.9,dw.e,fe.4,fk.3,fq.3,g3.2,gt.5f|0.5b,5n.2b,7z.1,di.b,dv.g,fd.7,fo.5,gf.3,go.5k|0.5b,5l.2h,dh.d,e2.b,ff.5,fp.2,fx.1,ga.8,gn.5l|0.5b,5m.2f,dd.1,di.c,dy.1,e2.c,ff.a,ft.6,g9.5z|0.5b,5n.2g,dc.h,dx.1,e3.d,ff.9,fr.9,g4.64|0.5c,5o.2f,dc.f,e4.c,fe.6u|0.5c,5o.24,7u.d,dc.f,e4.c,f8.70|0.5c,5o.2l,dc.g,dy.1,e1.g,f2.76|0.1,2.59,5c.4,5o.2l,df.d,dy.j,f1.77|3.59,5d.4,5p.2k,de.e,dy.o,ez.79|3.1,5.58,5p.2k,dd.e,e0.n,ey.7a|5.1,7.57,5q.2j,dd.e,dz.o,ey.7a|7.58,5p.2k,db.d,dx.q,ex.7b|7.1,9.58,5o.2k,db.a,dv.q,ew.7c|7.5b,5m.1,5o.2i,dc.6,dw.1,dz.l,eu.7e|9.5a,5l.2g,85.5,e2.1,e4.i,et.7f|9.7p,84.5,dz.m,ep.7j|7.2,b.2,e.7i,84.5,dy.m,em.7m|7.5,e.7h,83.4,dw.8,e5.3,ea.2,em.7m|8.7l,82.5,dv.7,em.7m|9.6t,7l.3,81.5,du.2,el.7n|b.9,l.6f,7a.5,81.4,86.4,ei.7q|d.8,m.1,o.6b,7c.6,80.8,8f.1,e9.2,eg.7s|e.9,p.1,r.68,7e.6,7z.c,8d.4,e9.7z|h.8,r.64,71.9,7g.5,7z.j,e7.1,e9.7z|j.7,t.60,6x.e,7y.j,e2.2,e9.7z|k.7,u.5y,6v.g,7v.m,8j.1,dx.8b|l.1,o.3,t.5y,6t.h,7x.n,dx.8b|l.64,6r.h,7w.m,dy.8a|l.64,6q.f,77.1,7u.n,8i.2,dy.8a|m.6n,7l.1,7v.3,7z.8,88.7,8g.6,e3.85|n.5z,6n.l,7k.1,8b.2,8g.5,e6.82|n.5y,6m.m,89.3,8g.5,e7.4j,ir.1,it.3f|o.6l,7b.1,7p.2,88.3,8f.5,e8.4d,iq.1d,k7.2,kb.1x|o.6l,7b.1,7o.3,e8.3r,i0.h,in.1d,kc.1w|n.6n,7d.7,7n.3,ea.3l,hz.f,io.19,kc.1w|o.6o,7e.1,7g.2,7m.7,eb.3j,hz.1,i1.b,ip.17,kc.1w|o.6q,7m.2,7p.3,eb.3i,i6.6,in.18,kc.1w|o.73,eb.1l,fz.1s,i3.a,im.16,kb.1x|o.6i,78.g,eb.1i,fy.1t,i2.g,ij.1,il.15,k6.22|o.6f,78.e,eb.1j,fy.3,g2.1p,i5.d,ij.16,k5.23|o.6c,76.d,eb.1j,fz.1,g1.1,g3.1n,i6.7,il.14,k4.24|n.6c,74.b,eb.1i,g4.1k,i6.4,im.11,k1.3,k5.23|n.68,73.8,eb.1j,g4.1j,i7.1,ip.z,k1.27|n.65,73.7,ea.13,fi.c,g5.1i,is.x,k3.25|n.62,73.6,ea.12,fl.b,g6.1h,it.x,k4.24|n.60,75.2,dj.c,ea.z,fl.d,g7.1g,iu.w,k4.24|n.5z,dh.1e,ey.9,fl.e,ga.1c,iw.u,k5.23|m.60,df.1e,f2.4,fm.d,ga.1a,iy.s,k6.22|m.5z,df.1e,fh.1,fn.d,gb.1,gd.17,j0.r,k7.21|m.5z,dg.1d,ff.3,fo.d,gg.13,j2.q,ka.1y|m.5y,dh.1c,fe.4,fp.d,gi.11,j2.r,ka.1y|m.60,dg.1d,fe.4,fr.c,gk.10,j3.q,ka.1y|n.5z,dg.1d,ff.3,fs.h,gl.z,i2.b,j3.r,ka.2,kg.1s|n.61,dg.1b,ff.3,ft.f,gm.z,i0.g,j2.u,ka.2,kg.1s|n.5v,6l.1,6n.1,dh.18,fg.1,fv.e,gm.11,hy.j,j1.v,kb.1,kh.1r|n.5o,dh.15,fg.2,fz.d,gm.21,is.2,iy.z,ki.1q|n.5s,dh.13,fd.6,g0.e,gm.m,h9.9,hp.29,kb.2,ki.1q|n.5p,dh.12,fd.6,g2.e,gl.i,h6.1,hc.5,hn.2d,kb.1x|m.5m,dg.12,fe.5,g4.8,gd.5,gl.k,hd.2o,kb.1x|n.5l,dg.11,fe.5,g4.7,gg.2,gm.d,h1.1,h3.1,hb.1,hd.2l,kb.1x|o.5k,dg.10,er.2,ew.1,fe.5,g7.3,gg.2,gn.c,h8.2,hc.2m,kb.1,kd.1v|p.5i,df.10,eq.4,fd.6,g7.4,gn.d,hc.2m,ke.1u|p.5h,df.10,er.2,fd.6,g8.4,gp.c,hc.2,hf.2i,kc.1w|p.59,5z.4,64.1,de.11,fd.3,fh.1,g8.5,gq.a,hc.2,hf.2i,kf.1t|p.59,5z.4,de.12,el.1,g8.4,gr.b,hf.2h,kf.1t|q.58,5z.5,b9.1,df.11,g8.3,gq.1,gs.9,h2.3,hf.2h,kf.1t|r.5d,ba.1,dh.y,g7.3,gq.1,gs.d,hc.2k,kf.1t|s.57,60.3,dg.y,fu.4,g2.7,gq.1,gt.6,h0.4,h5.1,he.2i,kf.1t|t.56,61.2,bl.2,dg.x,fu.c,g7.1,gt.8,h3.1,h7.1,hh.2f,kf.1t|u.55,60.2,dg.x,fu.b,gt.8,h5.1,h8.1,hc.1,hf.2i,kf.1t|u.55,60.1,dg.u,fi.1,fx.8,gu.5,h0.2,hh.2k,kf.1t|u.55,dg.t,f9.1,fg.5,fz.6,gu.6,h8.2,hh.2l,kg.1s|w.54,dq.i,eu.6,f3.i,fm.3,g2.3,gv.1,gx.3,hg.1,hj.2l,kc.1w|w.54,dq.8,en.11,gx.1,gz.2,hi.1,hn.8,hz.b,ic.3,ig.3s|w.55,dr.4,ej.14,hk.1,hp.5,i0.9,if.3t|x.52,ds.3,eh.15,hj.2,hq.1,i2.5,if.3t|y.53,dt.2,ee.19,g1.1,if.3t|z.52,ds.3,ec.1c,hg.1,if.3t|10.50,dr.5,ea.1e,h2.9,i4.5,if.3t|11.4x,dr.1x,h5.8,i2.6,if.3t|11.4y,dr.1x,h7.1,i1.6,if.3t|11.4w,dq.1x,i2.3,ig.3s|14.4q,dp.1w,if.3t|17.4m,dp.1v,ie.3u|1a.4i,dn.1y,fn.1,ie.3u|1c.4d,dl.23,id.3v|1d.4b,di.27,id.3v|1e.49,dh.2a,ic.3w|1f.47,cj.1,dg.2j,gu.4,ic.3w|1f.45,ck.1,df.2n,gr.9,ic.3w|1g.42,df.2q,gp.c,ib.3x|1g.41,de.2s,go.g,ib.3x|1h.3z,de.2s,go.k,ia.3y|1h.8,1q.3p,dd.2t,go.l,ha.3,hw.1,ia.3y|1i.7,1t.3m,dc.2w,go.t,ht.7,i9.3z|1i.7,1v.3j,dc.32,go.y,hr.4h|1j.6,1v.3j,dc.34,go.5k|1k.6,1w.3i,dd.35,gn.5l|1k.6,1w.2x,4v.k,dd.36,gm.5m|1k.6,1x.2i,4g.2,4x.i,dd.6j,jx.2b|1l.6,1x.2m,4y.4,55.a,dd.6h,k1.27|1m.6,1y.1y,3x.3,45.d,56.9,dc.4q,i3.1q,k1.27|1n.8,1y.1y,4b.8,57.9,db.4r,i3.1p,k2.26|1p.6,1y.1y,4c.1,4f.1,4i.2,58.8,cx.1,da.4t,i4.1p,k3.25|1q.5,1y.1,20.1v,59.8,cg.1,d9.4u,i4.1p,k3.25|1r.5,21.1s,59.9,cg.1,cw.1,d7.4x,i5.5,ib.1j,k4.24|1r.6,22.1o,59.8,cl.2,cv.2,d6.54,ib.1j,k4.24|1r.6,23.1m,59.9,cj.1,cl.1,cp.1,d3.52,i7.1o,k5.23|1o.1,1r.6,24.1k,58.a,cp.1,d0.56,i8.1,id.1i,k6.22|1o.a,25.1i,5a.9,cz.58,ie.1i,k9.1z|1q.9,26.1h,59.a,cz.58,ie.1j,ka.1y|1r.9,27.1f,5a.a,cy.5a,if.1k,kc.1w|1t.8,28.1f,5b.9,cy.5a,ig.1k,ke.8,kn.2,ks.1g|1w.6,29.1e,5b.9,5p.3,5u.1,cx.5b,ih.1j,kh.3,km.1,ks.1g|1x.5,2b.1c,5c.8,5v.1,cv.5e,ih.1k,ks.1g|1z.4,2a.1d,5d.7,5v.1,cu.5f,ii.1j,k2.1,k4.1,ko.2,ks.1g|1z.4,2a.1e,5e.6,cu.5g,ij.1i,k4.2,ko.2,kt.1f|1z.5,2b.1c,5f.4,ct.5i,ij.1i,k3.3,km.4,kv.1d|1z.5,2d.1a,5f.4,5x.1,ct.5i,ik.1i,k3.3,kl.5,l0.1,l2.q,lu.e|1z.6,2f.17,5g.1,5r.1,5u.1,cs.5k,il.1h,k3.4,kk.6,l8.4,ld.1,lv.d|1z.7,2f.17,5r.2,cs.5k,il.1l,kj.7,lv.d|20.5,2g.16,5r.2,cs.5l,il.1l,ki.8,lx.b|22.4,2i.14,5r.2,cr.5n,im.1k,ki.9,lx.b|23.5,2j.12,5s.2,cq.5o,io.1j,ka.i,lx.b|25.4,2k.11,5t.1,cp.5q,ip.25,ly.a|26.4,2l.10,co.5q,iq.29,m1.7|27.4,2m.z,co.5q,iq.2a,m2.6|27.3,2m.z,5a.7,63.1,cn.5s,ir.29,m3.5|28.1,2n.y,55.g,cn.5s,ir.2a,m4.4|2p.w,53.j,67.2,cm.5v,is.2b|2p.w,52.6,5c.e,5r.1,cm.5w,is.2c,m4.4|2p.w,52.4,5d.g,cl.5y,is.2b,m4.4|2p.x,51.3,58.1,5j.b,ck.60,is.2b,m5.3|2l.1,2q.x,4m.3,58.2,5l.b,ck.60,is.2a,m6.2|2r.v,4h.c,5q.7,ck.60,is.29,m7.1|2r.w,4f.e,5q.b,69.3,ck.61,it.27|2q.x,4e.f,5r.a,cl.60,it.26|2r.x,4e.e,5t.c,cm.5z,iu.25|2p.10,4e.d,4s.1,5v.c,cn.5y,iv.21,kx.1,kz.1|2q.10,4e.c,5u.d,cn.5y,ix.1z|2q.10,4d.d,5t.5,61.3,6b.3,6h.4,cn.5y,iy.1x|2r.10,4d.d,6b.d,cm.5z,iz.1w|2s.z,4d.d,6d.e,cm.5z,j0.1v|2t.z,4c.e,6d.e,cn.5z,j0.1v|2w.x,4a.g,6b.j,cn.5z,j1.1t|2x.z,45.3,4b.e,66.3,6e.h,cn.61,j1.1q|2y.z,41.m,4o.1,5r.6,66.o,6z.7,cn.62,j2.1p|30.1o,5r.8,68.1,6c.1,6g.4,6z.6,co.62,j2.1o|34.1j,5t.6,6h.2,co.63,j3.1m|36.1h,cn.64,j4.1h|37.1g,cn.65,j5.1g|39.1e,bn.1,cn.65,j5.1g|3c.1b,cm.67,j3.1,j6.1a|3e.19,cm.67,j4.1,j7.16|3h.15,7m.1,cm.67,j7.13|3k.c,3z.m,7l.1,bw.1,cm.67,j7.12|3m.8,41.l,4o.3,4t.1,4v.8,cm.68,j7.12|3p.2,42.12,7m.1,cl.69,iw.1,j7.12|43.12,7m.1,cl.6b,j7.10|44.13,bt.1,ck.6d,j7.y|45.12,7n.1,bq.1,cj.6g,j7.u|46.11,7n.2,cj.6i,j8.q|48.z,ck.6i,j8.o|49.y,ck.6i,j8.n|4b.v,7o.1,cl.6j,j9.i|4g.q,cl.6k,j9.h|4j.n,cl.6l,j9.e|4n.1,4q.g,7t.1,cl.6m,j9.9|4p.h,cl.6n,ja.7|4q.g,cl.6o,jb.2,kd.5|4s.e,6g.3,cl.6p,ke.3|4t.c,6f.5,6n.2,6s.1,7l.1,cn.6n|4t.c,6e.5,6n.2,cn.6m,k2.3|4u.b,6c.6,6n.2,cq.6i,k1.4|4w.9,6b.6,6m.7,cq.6k,ju.1,jx.8|4x.8,67.a,6k.b,7c.1,cr.6k,jp.g|4x.9,63.e,6i.d,7b.1,7n.1,cs.6j,jj.1,jn.i|4x.9,62.t,6z.4,7b.8,7m.2,ct.6k,jh.o|4x.a,62.f,6i.m,7a.7,7m.2,cu.7a|4x.b,61.g,6j.z,7l.3,cv.79|4y.a,61.f,6j.13,cx.77|4z.1,51.9,5m.1,61.f,6j.15,cx.77|53.8,5k.7,60.h,6j.16,cy.75|55.6,5i.b,5z.1q,cz.74|55.9,5g.6,5o.6,5y.1q,cz.73|55.g,5q.5,5w.1r,7p.3,cz.73|56.e,5o.1,5r.5,5x.1w,cz.72|58.1,5c.6,5r.5,5x.1y,d0.70"};
+  const WORKED = {"Iran":"|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||je.1,jr.1|jc.4,jp.4|jc.5,jn.6|jd.f|jd.g|jd.i|jd.j,kp.4|jd.j,kk.c|je.j,kj.h|jf.m,kh.l|jf.n,kg.n|jf.p,kd.2,kg.p|jg.r,k8.11|jh.1s|jh.1s|jj.1q|jk.1p|jk.1p|jk.1p|jj.1p|ji.1q|ji.1p|ji.1o|ji.1o|jj.1n|jk.1n|jk.1m|jm.1l|jn.1k|jp.1i|jq.1h|jr.1g|jr.1g|jr.1k|jr.1k|js.1j|js.1i|jt.1g|ju.2,jx.2,k0.18|k1.17|k2.16|k2.17|k3.17|k3.17|k4.17|k5.19|k5.1a|k6.19|k9.16|kb.14|kc.d,kr.q|ke.8,kn.2,ks.p|kh.3,km.1,ks.n|ks.l|kt.i|kt.i|kw.f|l3.8|l9.1","United Arab Emirates":"||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||ko.1|kn.2|km.3|kl.4|kj.6|ki.5|ki.5|k6.1,ka.3,ke.a|k7.f|k8.e|k9.d|ka.b|kc.9","Germany":"||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||fd.1,ff.1|ff.5,fx.1|ff.9,fu.5|fg.8,fr.8|fe.n|f9.3,fe.n|f8.u|f9.t|f8.t|f7.v|f8.u|f7.w|f6.x|f4.z|f4.10|f4.10|f4.x,g2.1|f4.u|f5.p|f4.p|f5.p|f6.o|f6.p|f8.1,fa.n|fc.n|fb.o|fb.n|fa.l|fa.m|fa.4,fh.c,fv.1|fk.2","Armenia":"|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||jb.6|ja.8|jb.7|ja.9|jb.9|je.5|jh.4|jj.3|jk.2","United States of America":"|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||3v.2|t.34|u.37,42.2|t.3d|l.8,u.3g,4b.2,4k.5|m.45|m.48|n.49,6r.1|n.4c,6q.7|o.4d,6p.8|o.4d,6o.9|o.4g,6n.a|o.4g,6n.a|o.4i,6m.b|o.4k,6m.c|o.4m,6l.d|o.4m,6i.i|o.4m,63.x|o.4n,61.x|o.4n,60.v|n.4o,5y.u|n.4o,5x.s|n.4o,5p.y|n.4o,5n.z|m.4p,5o.x|m.4o,5o.x|m.4o,5m.z|m.4n,5j.11|n.4l,5e.17|n.4l,5c.1a|n.60|o.5u|n.5o|n.5r|n.5n|n.5l|n.5l|o.5k|p.5i|p.5h|p.59,5z.4,64.1|p.59,5z.4|q.58,5z.5|s.56,5z.5|s.56,60.3|t.56,61.1|u.55,60.2|u.55,60.1|v.54|w.54|w.54|w.54|x.52|y.53|z.52|10.50|11.4x|11.4y|11.4u|16.4o|17.4m|1a.4g|1c.4c|1e.4a|1e.49|1f.46|1f.6,1p.3v|1q.3s|1t.3o|1w.3k|20.f,2n.2s|23.c,2o.2r|2p.2p|2q.2o|2s.2m|2t.1r,4l.2,4p.2,4s.1,4v.j|2t.1m,4g.2,4x.i|2t.1q,4y.4,55.a|2u.7,37.p,3x.2,45.2,48.1,4a.7,56.9|2w.5,38.o,4b.5,4h.2,57.9|2y.2,39.n,4i.2,58.8|3a.l,59.8|3a.j,59.9|3b.f,59.8|3c.d,59.9|3c.b,59.9|3d.a,5a.9|3e.9,59.a|3e.8,5a.9|3f.7,5b.9|3f.7,5c.8|3g.7,5c.8|3j.4,5d.7|3m.1,5e.6|5f.4|5f.4","Portugal":"|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||di.1|dh.5,dn.3|dh.a|dh.a|dh.8|dh.8|dh.8|dh.8|dg.8|dg.8|df.8|df.8|de.a|de.a|df.8|dh.6|dh.7|dg.7|dh.5|dh.5|dg.6"};
+  const U = 1 / MAP.step;                 // land dots per degree
   const tok = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-  svg.setAttribute('viewBox', `0 0 ${MAP.cols} ${MAP.rows}`);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- palettes: one hue per place, dark to bright ----
+  const R = (name) => PAL[name].map(hex);
+  const cities = {
+    tehran: { ll: [51.39, 35.69], home: true, name: 'Tehran', note: '4 roles', pos: 'dl', pal: 'gold' },
+    yerevan: { ll: [44.51, 40.18], name: 'Yerevan', note: 'Fill Studio', pos: 'ul', pal: 'ember' },
+    dubai: { ll: [55.27, 25.2], name: 'Dubai', note: 'UI8', pos: 'r', pal: 'neon' },
+    berlin: { ll: [13.4, 52.52], name: 'Berlin', note: 'Djoid', pos: 'ul', pal: 'arcane' },
+    lisbon: { ll: [-9.14, 38.72], name: 'Lisbon', note: 'Kidcare', pos: 'dl', pal: 'heal' },
+    atlanta: { ll: [-84.39, 33.75], name: 'Atlanta', note: 'Trakdesk', pos: 'dr', pal: 'electric' },
+    la: { ll: [-118.24, 34.05], name: 'Los Angeles', note: 'Gala', pos: 'dr', pal: 'cyber' }
+  };
+  const COUNTRY = { 'Iran': 'gold', 'United Arab Emirates': 'neon', 'Germany': 'arcane', 'Armenia': 'ember', 'United States of America': 'cyber', 'Portugal': 'heal' };
+  for (const k in cities) cities[k].ramp = R(cities[k].pal);
 
   const decode = (rle) => {
-    const rows = [];
+    const out = [];
     rle.split('|').forEach((row, r) => {
       if (!row) return;
-      row.split(',').forEach((run) => {
-        const [a, b] = run.split('.').map((v) => parseInt(v, 36));
-        rows.push(r, a, b);
-      });
+      row.split(',').forEach((run) => { const [a, b] = run.split('.').map((v) => parseInt(v, 36)); out.push(r, a, b); });
     });
-    return rows;
+    return out;
   };
   const landRuns = decode(MAP.rle);
-  const workedRuns = decode(MAP.worked);
+  const worked = Object.entries(WORKED).map(([name, rle]) => ({ ramp: R(COUNTRY[name]), runs: decode(rle) }));
 
-  // ---- land on canvas, redrawn crisply for the current size ----
+  // ---- labels (HTML, so they stay crisp), each with its city's swatch ----
+  const cell = (lon, lat) => [(lon - MAP.left) / MAP.step, (MAP.top - lat) / MAP.step];
+  for (const k in cities) {
+    const c = cities[k];
+    c.c = cell(...c.ll);
+    const lab = document.createElement('div');
+    lab.className = `xmap__label xmap__label--${c.pos}`;
+    lab.dataset.city = k;
+    lab.style.left = (c.c[0] / MAP.cols) * 100 + '%';
+    lab.style.top = (c.c[1] / MAP.rows) * 100 + '%';
+    lab.style.setProperty('--c', PAL[c.pal][5]);
+    lab.innerHTML = `<b>${c.name}</b><span>${c.note}</span>`;
+    inner.append(lab);
+  }
+
+  // ---- crop: Berlin's label 32px under the top bar, the cards 48px under Atlanta's label ----
+  let crop = { top: 0, bottom: 0 };
+  const box = (k, ir, full) => {
+    const lab = inner.querySelector(`.xmap__label[data-city="${k}"]`);
+    const r = lab && lab.getBoundingClientRect();
+    if (r && r.height) return { top: r.top - ir.top, bottom: r.bottom - ir.top };
+    const y = (cities[k].c[1] / MAP.rows) * full; // labels hidden on phones: use the marker itself
+    return { top: y - 10, bottom: y + 10 };
+  };
+
+  // ---- static land: dots on the 0.25° grid, two-tone texture, worked countries in their city's hue ----
+  const B8 = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21];
+  const smooth = (t) => t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
+  // cheap value noise for a terrain-like texture (seeded, stable across repaints)
+  const hash = (x, y) => { let h = (x * 374761393 + y * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  const vnoise = (x, y) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = smooth(x - xi), yf = smooth(y - yi);
+    const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+    return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+  };
+  const terrain = (c, r) => 0.6 * vnoise(c / 22, r / 22) + 0.4 * vnoise(c / 7, r / 7);
+  const LAND = ['#1c1f2b', '#23283a', '#2c3349'].map(hex);
+  const css = (n) => `rgb(${n & 255},${(n >>> 8) & 255},${(n >>> 16) & 255})`;
+
   const paint = () => {
     const w = fig.clientWidth;
     if (!w) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const W = Math.round(w * dpr), H = Math.round(W * MAP.rows / MAP.cols);
-    canvas.width = W; canvas.height = H;
-    const g = canvas.getContext('2d');
+    land.width = W; land.height = H;
+    const g = land.getContext('2d');
     const cs = W / MAP.cols;
     const size = Math.max(1, Math.round(cs * 0.7));
     const off = Math.max(0, Math.floor((cs - size) / 2));
-    // top and bottom edges fade out in pixels: an 8×8 ordered dither thins the dots row by row
-    const B8 = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21];
-    const smooth = (t) => t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
-    // the fade follows the visible (cropped) window, not the whole raster
+    // the fade follows the visible (cropped) window: an 8×8 ordered dither thins the dots row by row
     const cssCell = w / MAP.cols;
     const r0 = crop.top / cssCell, r1 = (crop.bottom || MAP.rows * cssCell) / cssCell;
     const fade = new Float32Array(MAP.rows);
@@ -1600,149 +1638,133 @@ body { overflow-x: clip; }
     }
     const keep = (c, r) => fade[r] >= 1 || (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < fade[r];
     // sea: a faint grid, one dot per degree
-    g.fillStyle = tok('--ink-700');
+    g.fillStyle = '#181b25';
     const seaStep = Math.round(U);
     for (let r = 2; r < MAP.rows; r += seaStep) for (let c = 2; c < MAP.cols; c += seaStep) if (keep(c, r)) g.fillRect(Math.round(c * cs), Math.round(r * cs), size, size);
-    const runs = (list, color) => {
-      g.fillStyle = color;
+    // a dot's tone: the terrain value picks a ramp step, dithered between neighbours (hard steps, no blending)
+    const tone = (ramp, c, r, lo, hi) => {
+      const v = lo + terrain(c, r) * (hi - lo), i = Math.floor(v), f = v - i;
+      return ramp[Math.min(hi, (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < f ? i + 1 : i)];
+    };
+    const runs = (list, ramp, lo, hi) => {
+      let last = -1;
       for (let i = 0; i < list.length; i += 3) {
         const r = list[i];
         if (!fade[r]) continue;
         const y = Math.round(r * cs) + off;
-        for (let c = list[i + 1], e = c + list[i + 2]; c < e; c++) if (keep(c, r)) g.fillRect(Math.round(c * cs) + off, y, size, size);
+        for (let c = list[i + 1], e = c + list[i + 2]; c < e; c++) {
+          if (!keep(c, r)) continue;
+          const t = tone(ramp, c, r, lo, hi);
+          if (t !== last) { g.fillStyle = css(t); last = t; }
+          g.fillRect(Math.round(c * cs) + off, y, size, size);
+        }
       }
     };
-    runs(landRuns, tok('--ink-600'));
-    // countries worked with sit a little lighter
-    const probe = document.createElement('span');
-    probe.className = 'xmap__worked-tone';
-    fig.append(probe);
-    runs(workedRuns, getComputedStyle(probe).color);
-    probe.remove();
+    runs(landRuns, LAND, 0, 2);
+    for (const wk of worked) runs(wk.runs, [LAND[1], wk.ramp[1], wk.ramp[2]], 0, 2);
   };
-  let crop = { top: 0, bottom: 0 };
-  let rt;
-  const later = () => { clearTimeout(rt); rt = setTimeout(fit, 80); };
-  addEventListener('resize', later);
-  addEventListener('viewchange', (e) => { if (e.detail.id === 'about') fit(); });
-  (document.fonts?.ready || Promise.resolve()).then(() => fit());
 
-  // ---- cities ----
-  const cities = {
-    tehran: { ll: [51.39, 35.69], home: true, name: 'Tehran', note: '4 roles', pos: 'dl' },
-    yerevan: { ll: [44.51, 40.18], name: 'Yerevan', note: 'Fill Studio', pos: 'ul' },
-    dubai: { ll: [55.27, 25.2], name: 'Dubai', note: 'UI8', pos: 'r' },
-    berlin: { ll: [13.4, 52.52], name: 'Berlin', note: 'Djoid', pos: 'ul' },
-    lisbon: { ll: [-9.14, 38.72], name: 'Lisbon', note: 'Kidcare', pos: 'dl' },
-    atlanta: { ll: [-84.39, 33.75], name: 'Atlanta', note: 'Trakdesk', pos: 'dr' },
-    la: { ll: [-118.24, 34.05], name: 'Los Angeles', note: 'Gala', pos: 'dr' }
-  };
-  for (const k in cities) {
-    const c = cities[k];
-    c.c = cell(...c.ll);
-    const lab = document.createElement('div');
-    lab.className = `xmap__label xmap__label--${c.pos}`;
-    lab.dataset.city = k;
-    lab.style.left = (c.c[0] / MAP.cols) * 100 + '%';
-    lab.style.top = (c.c[1] / MAP.rows) * 100 + '%';
-    lab.innerHTML = `${c.name}<span>${c.note}</span>`;
-    inner.append(lab);
-  }
+  // ---- live layer: a pixelfx frame at half-degree art pixels ----
+  const FW = MAP.cols / 2, FH = MAP.rows / 2;
+  fxc.width = FW; fxc.height = FH;
+  const ctx = fxc.getContext('2d');
+  const frame = createFrame(FW, FH);
+  const img = ctx.createImageData(FW, FH);
+  const P = (k) => [cities[k].c[0] / 2, cities[k].c[1] / 2];
+  const [hx, hy] = P('tehran');
+  const GOLD = cities.tehran.ramp;
 
-  // ---- routes: pixel arcs from Tehran to each remote team, one dot per half degree ----
-  const [hx, hy] = cities.tehran.c;
-  const arcs = {};
-  const arcLayer = el('g', {});
-  svg.append(arcLayer);
-  const snap = (v) => Math.round(v / M) * M;
-  for (const k of Object.keys(cities).filter((k) => !cities[k].home)) {
-    const [tx, ty] = cities[k].c;
-    const dist = Math.hypot(tx - hx, ty - hy);
-    const cx = (hx + tx) / 2, cy = Math.max(2 * U, Math.min(hy, ty) - Math.min(dist * 0.3, 26 * U));
+  // routes: a quadratic arc from Tehran to each remote team, one entry per art pixel; the far ones rise higher
+  // (but stay inside the visible band) so the routes west don't run on top of each other
+  const LIFT = { la: 0.62, atlanta: 0.42, lisbon: 0.3, berlin: 0.35, yerevan: 0.5, dubai: 0.5 };
+  let routes = [];
+  const buildRoutes = (topPx) => routes = Object.keys(cities).filter((k) => !cities[k].home).map((k, i) => {
+    const [tx, ty] = P(k), dist = Math.hypot(tx - hx, ty - hy);
+    const cx = (hx + tx) / 2, cy = Math.max(topPx, Math.min(hy, ty) - dist * LIFT[k]);
     const pts = [];
     let last = '';
-    for (let i = 0; i <= 1600; i++) {
-      const t = i / 1600, m = 1 - t;
-      const x = snap(m * m * hx + 2 * m * t * cx + t * t * tx);
-      const y = snap(m * m * hy + 2 * m * t * cy + t * t * ty);
+    for (let s = 0; s <= 2400; s++) {
+      const t = s / 2400, m = 1 - t;
+      const x = Math.round(m * m * hx + 2 * m * t * cx + t * t * tx), y = Math.round(m * m * hy + 2 * m * t * cy + t * t * ty);
       const key = x + ',' + y;
       if (key === last) continue;
       last = key;
-      if (Math.max(Math.abs(x - hx), Math.abs(y - hy)) < 3.5 * U || Math.max(Math.abs(x - tx), Math.abs(y - ty)) < 2.5 * U) continue;
+      if (Math.max(Math.abs(x - hx), Math.abs(y - hy)) < 4 || Math.max(Math.abs(x - tx), Math.abs(y - ty)) < 3) continue;
       pts.push([x, y]);
     }
-    let d = '';
-    pts.forEach(([x, y], i) => { if (i % 2 === 0) d += `M${x - 0.3 * M} ${y - 0.3 * M}h${0.6 * M}v${0.6 * M}h${-0.6 * M}z`; });
-    const path = el('path', { class: 'arc', d, 'data-city': k });
-    arcLayer.append(path);
-    arcs[k] = { pts };
-  }
+    return { k, pts, ramp: cities[k].ramp, offset: i * 0.83, speed: 34 };  // speed: art pixels per second
+  });
+  buildRoutes(3);
+  // sparkles over the sea and land, a little life between the routes (seeded positions)
+  const motes = Array.from({ length: 46 }, (_, i) => ({ x: hash(i, 7) * FW, y: 6 + hash(i, 11) * (FH - 12), p: 1.6 + hash(i, 13) * 2.6, o: hash(i, 17) * 9 }));
 
-  // ---- markers, drawn on a half-degree pixel grid ----
-  const px = (x, y, s = 0.86) => `M${x - (s / 2) * M} ${y - (s / 2) * M}h${s * M}v${s * M}h${-s * M}z`;
-  for (const k in cities) {
-    const [x, y] = cities[k].c;
-    const g = el('g', { class: 'city', 'data-city': k });
-    let core = '', edge = '', ring = '';
-    if (cities[k].home) {
-      // home base: a 5×5 pixel block with clipped corners, bright centre
-      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
-        if (Math.abs(dx) === 2 && Math.abs(dy) === 2) continue;
-        const p = px(x + dx * M, y + dy * M);
-        if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) core += p; else edge += p;
-      }
-    } else {
-      // remote team: a pixel diamond
-      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
-        const m = Math.abs(dx) + Math.abs(dy);
-        if (m > 2) continue;
-        const p = px(x + dx * M, y + dy * M);
-        if (m <= 1) core += p; else edge += p;
+  const render = (t) => {
+    clearFrame(frame);
+    const p = painterFor(frame);
+    // twinkles: light only, each on its own rhythm
+    for (const m of motes) {
+      const s = Math.sin((t + m.o) * (Math.PI * 2) / m.p);
+      if (s > 0.55) p.light(m.x, m.y, hex('#9aa6ba'), (s - 0.55) * 0.9);
+    }
+    // dotted routes, warm at Tehran and taking the destination's hue on the way
+    for (const rt of routes) {
+      const n = rt.pts.length;
+      rt.pts.forEach(([x, y], i) => {
+        if (i % 2) return;
+        const u = i / n;
+        p.dot(x, y, u < 0.5 ? mix(GOLD[3], rt.ramp[4], u * 1.2) : rt.ramp[u < 0.8 ? 4 : 5], 0.85);
+      });
+    }
+    // packets: a white-hot head in the city's colour with a cooling tail and glow; a ripple where it lands
+    if (!reduced) for (const rt of routes) {
+      const n = rt.pts.length, travel = n / rt.speed, cycle = travel + 1.6;
+      const tt = (t + rt.offset * cycle) % cycle;
+      if (tt < travel) {
+        const head = Math.floor(tt * rt.speed);
+        for (let j = 0; j < 9; j++) {
+          const i = head - j;
+          if (i < 0 || i >= n) continue;
+          const [x, y] = rt.pts[i];
+          p.dot(x, y, j === 0 ? rt.ramp[7] : at(rt.ramp, 0.9 - j * 0.09), j < 3 ? 1 : 1 - j * 0.1);
+        }
+        const [x, y] = rt.pts[Math.min(n - 1, head)];
+        p.glow(x, y, 6, rt.ramp[5], 0.55);
+      } else {
+        const a = (tt - travel) / 1.6, [x, y] = P(rt.k);
+        p.ring(x, y, 3 + a * 8, 1, rt.ramp[5], (1 - a) * 0.9);
+        p.glowRing(x, y, 3 + a * 8, 2, rt.ramp[5], (1 - a) * 0.35);
       }
     }
-    // a pixel circle around each city that blinks like the tab cursor
-    const R = cities[k].home ? 5 : 4;
-    const seen = new Set();
-    for (let a = 0; a < 360; a += 2) {
-      const dx = Math.round(Math.cos(a * Math.PI / 180) * R), dy = Math.round(Math.sin(a * Math.PI / 180) * R);
-      const key = dx + ',' + dy;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      if ((dx + dy) % 2) continue;
-      ring += px(x + dx * M, y + dy * M, 0.6);
-    }
-    g.append(el('path', { class: 'ring', d: ring }), el('path', { class: 'halo', d: edge }), el('path', { class: 'core', d: core }));
-    svg.append(g);
-  }
-
-  // ---- packets: a bright pixel with a short fading tail runs each route ----
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const packets = Object.values(arcs).map((a, i) => {
-      const parts = [1, 0.55, 0.25].map((o) => { const r = el('rect', { class: 'pkt', width: 0.9 * M, height: 0.9 * M, opacity: 0 }); r.dataset.o = o; svg.append(r); return r; });
-      return { a, parts, offset: i * 700, speed: 13 };
-    });
-    const t0 = performance.now();
-    const tick = (now) => {
-      for (const q of packets) {
-        const n = q.a.pts.length;
-        const travel = n * q.speed, cycle = travel + 1400;
-        const t = (Math.max(0, now - t0) + q.offset) % cycle;
-        const head = Math.floor(t / q.speed);
-        q.parts.forEach((r, j) => {
-          const i = head - j * 2;
-          if (t < travel && i >= 0 && i < n) {
-            const [x, y] = q.a.pts[i];
-            r.setAttribute('x', x - 0.45 * M);
-            r.setAttribute('y', y - 0.45 * M);
-            r.setAttribute('opacity', r.dataset.o);
-          } else r.setAttribute('opacity', 0);
-        });
+    // markers: a pixel diamond for each team, Tehran a bigger clipped square with a turning dotted ring
+    for (const k in cities) {
+      const c = cities[k], [x, y] = P(k), r = c.ramp;
+      const beat = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(t * 2.4 + x);
+      p.glow(x, y, c.home ? 10 : 7, r[5], 0.28 + beat * 0.2);
+      if (c.home) {
+        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+          if (Math.abs(dx) === 2 && Math.abs(dy) === 2) continue;
+          const edge = Math.abs(dx) === 2 || Math.abs(dy) === 2;
+          p.dot(x + dx, y + dy, edge ? r[4] : dx === -1 && dy === -1 ? r[7] : r[6]);
+        }
+        const spin = reduced ? 0 : t * 0.9;
+        for (let a = 0; a < 16; a++) {
+          const ang = spin + a * Math.PI / 8;
+          p.dot(x + Math.cos(ang) * 5.4, y + Math.sin(ang) * 5.4, a % 2 ? r[3] : r[5]);
+        }
+      } else {
+        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+          const m = Math.abs(dx) + Math.abs(dy);
+          if (m > 2) continue;
+          p.dot(x + dx, y + dy, m === 0 ? r[7] : m === 1 ? r[6] : r[4]);
+        }
+        // a slow halo ring that breathes in and out with the beat
+        p.ring(x, y, 4.2 + beat * 0.8, 1, r[3], 0.35 + beat * 0.4);
       }
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }
-  // ---- crop the map to its cities: Berlin's label 32px under the top bar, the cards 48px under Atlanta's label ----
+    }
+    composite(frame, img.data, null);
+    ctx.putImageData(img, 0, 0);
+  };
+
   const fit = () => {
     const w = fig.clientWidth;
     if (!w) return;
@@ -1750,20 +1772,34 @@ body { overflow-x: clip; }
     inner.style.transform = '';
     fig.style.height = full + 'px';
     const ir = inner.getBoundingClientRect();
-    const box = (k) => {
-      const lab = inner.querySelector(`.xmap__label[data-city="${k}"]`);
-      const r = lab && lab.getBoundingClientRect();
-      return r && r.height ? r : inner.querySelector(`.city[data-city="${k}"]`).getBoundingClientRect();
-    };
-    const labels = [...inner.querySelectorAll('.xmap__label, .city')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
-    const top = Math.max(0, box('berlin').top - ir.top - 32);
-    const lowest = Math.max(...labels.map((r) => r.bottom - ir.top));
-    const bottom = Math.min(full, Math.max(box('atlanta').bottom - ir.top + 48, lowest + 12)); // other labels just need to stay clear
+    const labels = [...inner.querySelectorAll('.xmap__label')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
+    const top = Math.max(0, box('berlin', ir, full).top - 32);
+    const lowest = labels.length ? Math.max(...labels.map((r) => r.bottom - ir.top)) : 0;
+    const bottom = Math.min(full, Math.max(box('atlanta', ir, full).bottom + 48, lowest + 12));
     crop = { top, bottom };
+    // arcs may bend up to just under the visible top edge (in half-degree art pixels)
+    buildRoutes((top / w) * FW + 4);
     inner.style.transform = `translateY(${-top}px)`;
     fig.style.height = Math.round(bottom - top) + 'px';
     paint();
+    render(performance.now() / 1000);
   };
+
+  // ---- run only while the map is on screen and the About page is open ----
+  let onScreen = false, raf = 0, lastT = 0;
+  const loop = (now) => {
+    raf = 0;
+    if (!onScreen || reduced) return;
+    if (now - lastT > 1000 / 30) { lastT = now; render(now / 1000); }
+    raf = requestAnimationFrame(loop);
+  };
+  const kick = () => { if (!raf && onScreen && !reduced) raf = requestAnimationFrame(loop); };
+  if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; kick(); }).observe(fig);
+  else { onScreen = true; kick(); }
+  let rt;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(fit, 80); });
+  addEventListener('viewchange', (e) => { if (e.detail.id === 'about') { fit(); kick(); } });
+  (document.fonts?.ready || Promise.resolve()).then(() => fit());
   fit();
 })();
 
@@ -1866,71 +1902,111 @@ body { overflow-x: clip; }
       }
       return placed;
     };
-    const draw = () => {
+    // each domain glows in its own pixelfx ramp
+    const DOMPAL = { 'Q-commerce & e-commerce': 'fire', 'Design assets': 'neon', 'AI & music tech': 'arcane', 'Fintech & crypto': 'heal', 'Web3 & DeFi': 'cyber', 'SaaS, cloud & networks': 'ice', 'Insurtech CRM': 'gold' };
+    const PX = 3;                                  // one art pixel = 3 CSS px
+    const F = window.PFX;
+    const B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+    let orbs = [], frame = null, img = null, ctx = null, cv = null;
+    const layout = () => {
       const W = bubblesEl.clientWidth;
-      if (!W) return;
+      if (!W || !F) return false;
       const aspect = Math.max(0.7, Math.min(3, W / 440)); // tall cluster on phones, wide band on desktop
       const placed = pack(aspect);
       const minX = Math.min(...placed.map((p) => p.x - p.r)), maxX = Math.max(...placed.map((p) => p.x + p.r));
       const minY = Math.min(...placed.map((p) => p.y - p.r)), maxY = Math.max(...placed.map((p) => p.y + p.r));
-      const PAD = 4;
-      const k = Math.min((W - PAD * 2) / (maxX - minX), 200 / placed[0].r); // biggest bubble at most 200px across its radius
+      const PAD = 18;                              // room for the glow and the orbiting motes
+      const k = Math.min((W - PAD * 2) / (maxX - minX), 170 / placed[0].r);
       const H = Math.round((maxY - minY) * k + PAD * 2);
       const ox = (W - (maxX - minX) * k) / 2 - minX * k, oy = PAD - minY * k;
       bubblesEl.innerHTML = '';
       bubblesEl.style.height = H + 'px';
-      // labels first, so the dots can leave room for them
-      const holes = [];
-      const circles = placed.map((p) => {
-        const c = { x: ox + p.x * k, y: oy + p.y * k, R: p.r * k, it: p.it };
+      cv = document.createElement('canvas');
+      cv.width = Math.floor(W / PX); cv.height = Math.ceil(H / PX); // floor: never wider than the column
+      cv.style.width = cv.width * PX + 'px'; cv.style.height = cv.height * PX + 'px';
+      cv.setAttribute('aria-hidden', 'true');
+      bubblesEl.append(cv);
+      ctx = cv.getContext('2d');
+      frame = F.createFrame(cv.width, cv.height);
+      img = ctx.createImageData(cv.width, cv.height);
+      orbs = placed.map((p, i) => {
+        const x = ox + p.x * k, y = oy + p.y * k, R = p.r * k;
         const lab = document.createElement('div');
         lab.className = 'bub-label';
-        lab.style.left = c.x + 'px';
-        lab.style.top = c.y + 'px';
-        lab.style.maxWidth = Math.round(c.R * 1.75) + 'px';
-        const fs = Math.max(12, Math.min(22, c.R * 0.15));
-        lab.innerHTML = `<span class="bub-name" style="font-size:${fs.toFixed(1)}px">${c.it.d}</span><span class="bub-dur">${c.it.m} project${c.it.m === 1 ? '' : 's'}</span>` +
-          (c.R > 70 ? `<span class="bub-co">${c.it.co.join(' · ')}</span>` : '');
+        lab.style.left = x + 'px';
+        lab.style.top = y + 'px';
+        lab.style.maxWidth = Math.round(R * 1.6) + 'px';
+        const fs = Math.max(12, Math.min(20, R * 0.15));
+        lab.innerHTML = `<span class="bub-name" style="font-size:${fs.toFixed(1)}px">${p.it.d}</span><span class="bub-dur">${p.it.m} project${p.it.m === 1 ? '' : 's'}</span>` +
+          (R > 70 ? `<span class="bub-co">${p.it.co.join(' · ')}</span>` : '');
         bubblesEl.append(lab);
-        return { ...c, lab };
+        const ramp = F.PAL[DOMPAL[p.it.d] || 'stone'].map(F.hex);
+        // motes on tilted orbits: each passes in front of the orb and behind it
+        const motes = Array.from({ length: 4 }, (_, j) => ({ a: (j / 4) * Math.PI * 2 + i, sp: 0.35 + 0.12 * ((i + j) % 3), tilt: 0.28 + 0.1 * j, r: 1.12 + 0.08 * (j % 2) }));
+        return { x: x / PX, y: y / PX, R: R / PX, ramp, live: p.it.live, motes, seed: i * 1.7 };
       });
-      const fr = bubblesEl.getBoundingClientRect();
-      // an oval clearing around each label, so the text sits on plain background
-      for (const c of circles) { const r = c.lab.getBoundingClientRect(); holes.push([(r.left + r.right) / 2 - fr.left, (r.top + r.bottom) / 2 - fr.top, r.width / 2 + 14, r.height / 2 + 12]); }
-      const inHole = (x, y) => holes.some(([hx, hy, rx, ry]) => ((x - hx) / rx) ** 2 + ((y - hy) / ry) ** 2 < 1);
-      // dots on one shared 8px grid, so neighbouring bubbles line up like the map
-      const STEP = 8, DOT = 3, RD = 2.6;
-      const NS2 = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(NS2, 'svg');
-      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      svg.setAttribute('aria-hidden', 'true');
-      for (const c of circles) {
-        const g = document.createElementNS(NS2, 'g');
-        if (c.it.live) g.setAttribute('class', 'is-live');
-        let fill = '', ring = '';
-        for (let y = Math.ceil((c.y - c.R) / STEP) * STEP; y <= c.y + c.R; y += STEP)
-          for (let x = Math.ceil((c.x - c.R) / STEP) * STEP; x <= c.x + c.R; x += STEP)
-            if (Math.hypot(x - c.x, y - c.y) <= c.R - 7 && !inHole(x, y)) fill += `M${x - DOT / 2} ${y - DOT / 2}h${DOT}v${DOT}h${-DOT}z`;
-        const n = Math.round((2 * Math.PI * c.R) / 7);
-        for (let i = 0; i < n; i++) {
-          const t = (i / n) * Math.PI * 2;
-          const x = Math.round(c.x + Math.cos(t) * c.R), y = Math.round(c.y + Math.sin(t) * c.R);
-          ring += `M${x - RD / 2} ${y - RD / 2}h${RD}v${RD}h${-RD}z`;
-        }
-        for (const [cls, d] of [['bub-fill', fill], ['bub-ring', ring]]) {
-          const path = document.createElementNS(NS2, 'path');
-          path.setAttribute('class', cls);
-          path.setAttribute('d', d);
-          g.append(path);
-        }
-        svg.append(g);
-      }
-      bubblesEl.prepend(svg);
+      return true;
     };
+    // a lit pixel sphere: light from the top left, hard ramp steps dithered at their edges, a rim of
+    // bounce light on the bottom right, a specular glint; the centre stays dark enough to hold the label
+    const LX = -0.55, LY = -0.62, LZ = 0.56;
+    const render = (t) => {
+      if (!frame) return;
+      F.clearFrame(frame);
+      const p = F.painterFor(frame);
+      for (const o of orbs) {
+        const { x: cx, y: cy, R, ramp } = o;
+        const breathe = 0.5 + 0.5 * Math.sin(t * 1.3 + o.seed);
+        p.glowRing(cx, cy, R + 2, 5, ramp[4], 0.1 + (o.live ? 0.1 : 0.04) * breathe);
+        const drawMote = (front) => {
+          for (const m of o.motes) {
+            const ang = m.a + t * m.sp, ex = Math.cos(ang) * R * m.r, ez = Math.sin(ang);
+            if ((ez > 0) !== front) continue;
+            const mx = cx + ex, my = cy + ez * R * m.tilt - ex * 0.18;
+            if (!front && Math.hypot(mx - cx, my - cy) < R) continue;  // hidden behind the orb
+            p.dot(mx, my, ramp[front ? 7 : 5]);
+            if (front) p.light(mx, my, ramp[6], 0.6);
+          }
+        };
+        drawMote(false);
+        const x0 = Math.floor(cx - R), x1 = Math.ceil(cx + R), y0 = Math.floor(cy - R), y1 = Math.ceil(cy + R);
+        for (let py = y0; py <= y1; py++) for (let px = x0; px <= x1; px++) {
+          const dx = (px + 0.5 - cx) / R, dy = (py + 0.5 - cy) / R, d2 = dx * dx + dy * dy;
+          if (d2 > 1) continue;
+          const nz = Math.sqrt(1 - d2);
+          const lam = Math.max(0, dx * LX + dy * LY + nz * LZ);
+          const rim = Math.max(0, (dx * 0.6 + dy * 0.7) * (1 - nz)) * 1.6;      // bounce light, bottom right
+          let v = 0.1 + lam * lam * 3.4 + rim * 1.1;                              // in ramp steps
+          if (d2 > 0.88) v = Math.max(v, 3.3);                                  // a crisp lit outline
+          const i = Math.floor(v), f = v - i;
+          const step = Math.min(5, (B4[(py & 3) * 4 + (px & 3)] + 0.5) / 16 < f ? i + 1 : i);
+          p.put(px, py, ramp[step], 1);
+        }
+        // glint: a 2×2 highlight up and to the left, with a soft light
+        const gx = cx - R * 0.45, gy = cy - R * 0.5;
+        p.rect(Math.round(gx), Math.round(gy), 2, 2, ramp[7]);
+        p.glow(gx + 1, gy + 1, Math.max(4, R * 0.25), ramp[6], 0.25 + breathe * 0.1);
+        drawMote(true);
+      }
+      F.composite(frame, img.data, null);
+      ctx.putImageData(img, 0, 0);
+    };
+    const draw = () => { if (layout()) render(performance.now() / 1000); };
+    let onScreen = false, raf = 0, lastT = 0;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const loop = (now) => {
+      raf = 0;
+      if (!onScreen || still) return;
+      if (now - lastT > 1000 / 30) { lastT = now; render(now / 1000); }
+      raf = requestAnimationFrame(loop);
+    };
+    const kick = () => { if (!raf && onScreen && !still) raf = requestAnimationFrame(loop); };
+    if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; kick(); }).observe(bubblesEl);
+    else { onScreen = true; kick(); }
     draw();
     let bt;
     addEventListener('resize', () => { clearTimeout(bt); bt = setTimeout(draw, 120); });
-    addEventListener('viewchange', (e) => { if (e.detail.id === 'about') requestAnimationFrame(draw); });
+    addEventListener('viewchange', (e) => { if (e.detail.id === 'about') requestAnimationFrame(() => { draw(); kick(); }); });
     (document.fonts?.ready || Promise.resolve()).then(draw);
   }
 })();
