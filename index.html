@@ -557,7 +557,7 @@ body { overflow-x: clip; }
 
 /* About sections under the map */
 .view.view--about { padding-top: 0; } /* beats the narrow-screen .view padding too */
-.about-stats { margin-top: 0; } /* the map below the top bar is cropped by script: Berlin 32px under the bar, cards 48px under Atlanta */
+.about-stats { margin-top: 0; position: relative; z-index: 1; } /* script crops the map: Berlin 32px under the bar; these cards sit 48px under Atlanta, over the map's tail */
 .about-table { margin-top: var(--gutter); }
 .about-block { padding-top: 112px; }
 .card-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 32px 8px; }
@@ -587,7 +587,7 @@ body { overflow-x: clip; }
 
 /* key numbers: four cards */
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
-.stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 26px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 26px; background: color-mix(in srgb, var(--surface) 82%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--radius); }
 .stat__num { margin-bottom: 14px; font-family: var(--font-display); font-size: clamp(2.5rem, 4.4vw, 3.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
 .stat__what { font-size: var(--fs-base); color: var(--fg); }
 .stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; line-height: 1.5; color: var(--muted); }
@@ -1630,11 +1630,14 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const off = Math.max(0, Math.floor((cs - size) / 2));
     // the fade follows the visible (cropped) window: an 8×8 ordered dither thins the dots row by row
     const cssCell = w / MAP.cols;
-    const r0 = crop.top / cssCell, r1 = (crop.bottom || MAP.rows * cssCell) / cssCell;
+    // top: fades in under the top bar; bottom: full strength down to the cards, then fades out behind them
+    // to the raster's own end (8°N)
+    const r0 = crop.top / cssCell, r1 = MAP.rows;
+    const tail = Math.max(0.12, Math.min(0.45, ((crop.fadeFrom ? MAP.rows * cssCell - crop.fadeFrom : 0) / cssCell) / (r1 - r0)));
     const fade = new Float32Array(MAP.rows);
     for (let r = 0; r < MAP.rows; r++) {
       const y = (r + 0.5 - r0) / (r1 - r0);
-      fade[r] = y <= 0 || y >= 1 ? 0 : Math.min(smooth(y / 0.2), smooth((1 - y) / 0.25));
+      fade[r] = y <= 0 || y >= 1 ? 0 : Math.min(smooth(y / 0.2), smooth((1 - y) / tail));
     }
     const keep = (c, r) => fade[r] >= 1 || (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < fade[r];
     // sea: a faint grid, one dot per degree
@@ -1779,12 +1782,16 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const labels = [...inner.querySelectorAll('.xmap__label')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
     const top = Math.max(0, box('berlin', ir, full).top - 32);
     const lowest = labels.length ? Math.max(...labels.map((r) => r.bottom - ir.top)) : 0;
-    const bottom = Math.min(full, Math.max(box('atlanta', ir, full).bottom + 48, lowest + 12));
-    crop = { top, bottom };
+    // where the cards start: 48px under Atlanta's label (other labels just stay clear)
+    const cards = Math.min(full, Math.max(box('atlanta', ir, full).bottom + 48, lowest + 12));
+    crop = { top, bottom: full, fadeFrom: cards };
     // arcs may bend up to just under the visible top edge (in half-degree art pixels)
     buildRoutes((top / w) * FW + 8);
     inner.style.transform = `translateY(${-top}px)`;
-    fig.style.height = Math.round(bottom - top) + 'px';
+    // the map keeps going behind the cards: the figure runs to the raster's end and the cards ride up over it
+    fig.style.height = Math.round(full - top) + 'px';
+    const stats = document.querySelector('.about-stats');
+    if (stats) stats.style.marginTop = -Math.round(full - cards) + 'px';
     paint();
     render(performance.now() / 1000);
   };
