@@ -1664,13 +1664,13 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     for (const wk of worked) runs(wk.runs, [LAND[1], wk.ramp[1], wk.ramp[2]], 0, 2);
   };
 
-  // ---- live layer: a pixelfx frame at half-degree art pixels ----
-  const FW = MAP.cols / 2, FH = MAP.rows / 2;
+  // ---- live layer: a pixelfx frame on the same quarter-degree grid as the land dots ----
+  const FW = MAP.cols, FH = MAP.rows;
   fxc.width = FW; fxc.height = FH;
   const ctx = fxc.getContext('2d');
   const frame = createFrame(FW, FH);
   const img = ctx.createImageData(FW, FH);
-  const P = (k) => [cities[k].c[0] / 2, cities[k].c[1] / 2];
+  const P = (k) => [cities[k].c[0], cities[k].c[1]];
   const [hx, hy] = P('tehran');
   const GOLD = cities.tehran.ramp;
 
@@ -1683,20 +1683,20 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const cx = (hx + tx) / 2, cy = Math.max(topPx, Math.min(hy, ty) - dist * LIFT[k]);
     const pts = [];
     let last = '';
-    for (let s = 0; s <= 2400; s++) {
-      const t = s / 2400, m = 1 - t;
+    for (let s = 0; s <= 4800; s++) {
+      const t = s / 4800, m = 1 - t;
       const x = Math.round(m * m * hx + 2 * m * t * cx + t * t * tx), y = Math.round(m * m * hy + 2 * m * t * cy + t * t * ty);
       const key = x + ',' + y;
       if (key === last) continue;
       last = key;
-      if (Math.max(Math.abs(x - hx), Math.abs(y - hy)) < 4 || Math.max(Math.abs(x - tx), Math.abs(y - ty)) < 3) continue;
+      if (Math.max(Math.abs(x - hx), Math.abs(y - hy)) < 9 || Math.max(Math.abs(x - tx), Math.abs(y - ty)) < 7) continue;
       pts.push([x, y]);
     }
-    return { k, pts, ramp: cities[k].ramp, offset: i * 0.83, speed: 34 };  // speed: art pixels per second
+    return { k, pts, ramp: cities[k].ramp, offset: i * 0.83, speed: 68 };  // speed: art pixels per second
   });
-  buildRoutes(3);
+  buildRoutes(6);
   // sparkles over the sea and land, a little life between the routes (seeded positions)
-  const motes = Array.from({ length: 46 }, (_, i) => ({ x: hash(i, 7) * FW, y: 6 + hash(i, 11) * (FH - 12), p: 1.6 + hash(i, 13) * 2.6, o: hash(i, 17) * 9 }));
+  const motes = Array.from({ length: 90 }, (_, i) => ({ x: hash(i, 7) * FW, y: 12 + hash(i, 11) * (FH - 24), p: 1.6 + hash(i, 13) * 2.6, o: hash(i, 17) * 9 }));
 
   const render = (t) => {
     clearFrame(frame);
@@ -1710,7 +1710,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     for (const rt of routes) {
       const n = rt.pts.length;
       rt.pts.forEach(([x, y], i) => {
-        if (i % 2) return;
+        if (i % 3 === 2) return;
         const u = i / n;
         p.dot(x, y, u < 0.5 ? mix(GOLD[3], rt.ramp[4], u * 1.2) : rt.ramp[u < 0.8 ? 4 : 5], 0.85);
       });
@@ -1721,44 +1721,48 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       const tt = (t + rt.offset * cycle) % cycle;
       if (tt < travel) {
         const head = Math.floor(tt * rt.speed);
-        for (let j = 0; j < 9; j++) {
+        for (let j = 0; j < 18; j++) {
           const i = head - j;
           if (i < 0 || i >= n) continue;
           const [x, y] = rt.pts[i];
-          p.dot(x, y, j === 0 ? rt.ramp[7] : at(rt.ramp, 0.9 - j * 0.09), j < 3 ? 1 : 1 - j * 0.1);
+          p.dot(x, y, j < 2 ? rt.ramp[7] : at(rt.ramp, 0.92 - j * 0.045), j < 5 ? 1 : 1 - j * 0.05);
         }
         const [x, y] = rt.pts[Math.min(n - 1, head)];
-        p.glow(x, y, 6, rt.ramp[5], 0.55);
+        p.rect(x - 1, y - 1, 2, 2, rt.ramp[7]);          // a 2×2 head reads at this size
+        p.glow(x, y, 11, rt.ramp[5], 0.5);
       } else {
         const a = (tt - travel) / 1.6, [x, y] = P(rt.k);
-        p.ring(x, y, 3 + a * 8, 1, rt.ramp[5], (1 - a) * 0.9);
-        p.glowRing(x, y, 3 + a * 8, 2, rt.ramp[5], (1 - a) * 0.35);
+        p.ring(x, y, 7 + a * 16, 1, rt.ramp[5], (1 - a) * 0.9);
+        p.glowRing(x, y, 7 + a * 16, 3, rt.ramp[5], (1 - a) * 0.3);
       }
     }
     // markers: a pixel diamond for each team, Tehran a bigger clipped square with a turning dotted ring
     for (const k in cities) {
       const c = cities[k], [x, y] = P(k), r = c.ramp;
       const beat = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(t * 2.4 + x);
-      p.glow(x, y, c.home ? 10 : 7, r[5], 0.28 + beat * 0.2);
+      p.glow(x, y, c.home ? 20 : 14, r[5], 0.28 + beat * 0.2);
       if (c.home) {
-        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
-          if (Math.abs(dx) === 2 && Math.abs(dy) === 2) continue;
-          const edge = Math.abs(dx) === 2 || Math.abs(dy) === 2;
-          p.dot(x + dx, y + dy, edge ? r[4] : dx === -1 && dy === -1 ? r[7] : r[6]);
+        // a 9×9 bevelled block: lit top-left edge, dark bottom-right edge, bright core
+        for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+          if (Math.abs(dx) + Math.abs(dy) > 6) continue;
+          const edge = Math.max(Math.abs(dx), Math.abs(dy)) === 4 || Math.abs(dx) + Math.abs(dy) === 6;
+          p.dot(x + dx, y + dy, edge ? (dx + dy < 0 ? r[6] : r[3]) : Math.max(Math.abs(dx), Math.abs(dy)) <= 1 ? r[7] : r[5]);
         }
         const spin = reduced ? 0 : t * 0.9;
-        for (let a = 0; a < 16; a++) {
-          const ang = spin + a * Math.PI / 8;
-          p.dot(x + Math.cos(ang) * 5.4, y + Math.sin(ang) * 5.4, a % 2 ? r[3] : r[5]);
+        for (let a = 0; a < 32; a++) {
+          const ang = spin + a * Math.PI / 16;
+          if (a % 4 === 3) continue;
+          p.dot(x + Math.cos(ang) * 10.5, y + Math.sin(ang) * 10.5, a % 4 === 0 ? r[6] : r[4]);
         }
       } else {
-        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+        // a pixel diamond, stepping from a white-hot centre to a dark rim
+        for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
           const m = Math.abs(dx) + Math.abs(dy);
-          if (m > 2) continue;
-          p.dot(x + dx, y + dy, m === 0 ? r[7] : m === 1 ? r[6] : r[4]);
+          if (m > 4) continue;
+          p.dot(x + dx, y + dy, r[[7, 7, 6, 5, 3][m]]);
         }
         // a slow halo ring that breathes in and out with the beat
-        p.ring(x, y, 4.2 + beat * 0.8, 1, r[3], 0.35 + beat * 0.4);
+        p.ring(x, y, 8 + beat * 1.5, 1, r[4], 0.3 + beat * 0.45);
       }
     }
     composite(frame, img.data, null);
@@ -1778,7 +1782,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const bottom = Math.min(full, Math.max(box('atlanta', ir, full).bottom + 48, lowest + 12));
     crop = { top, bottom };
     // arcs may bend up to just under the visible top edge (in half-degree art pixels)
-    buildRoutes((top / w) * FW + 4);
+    buildRoutes((top / w) * FW + 8);
     inner.style.transform = `translateY(${-top}px)`;
     fig.style.height = Math.round(bottom - top) + 'px';
     paint();
@@ -1904,7 +1908,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     };
     // each domain glows in its own pixelfx ramp
     const DOMPAL = { 'Q-commerce & e-commerce': 'fire', 'Design assets': 'neon', 'AI & music tech': 'arcane', 'Fintech & crypto': 'heal', 'Web3 & DeFi': 'cyber', 'SaaS, cloud & networks': 'ice', 'Insurtech CRM': 'gold' };
-    const PX = 3;                                  // one art pixel = 3 CSS px
+    const PX = 2;                                  // one art pixel = 2 CSS px
     const F = window.PFX;
     const B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
     let orbs = [], frame = null, img = null, ctx = null, cv = null;
@@ -1957,15 +1961,15 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       for (const o of orbs) {
         const { x: cx, y: cy, R, ramp } = o;
         const breathe = 0.5 + 0.5 * Math.sin(t * 1.3 + o.seed);
-        p.glowRing(cx, cy, R + 2, 5, ramp[4], 0.1 + (o.live ? 0.1 : 0.04) * breathe);
+        p.glowRing(cx, cy, R + 3, 8, ramp[4], 0.1 + (o.live ? 0.1 : 0.04) * breathe);
         const drawMote = (front) => {
           for (const m of o.motes) {
             const ang = m.a + t * m.sp, ex = Math.cos(ang) * R * m.r, ez = Math.sin(ang);
             if ((ez > 0) !== front) continue;
             const mx = cx + ex, my = cy + ez * R * m.tilt - ex * 0.18;
             if (!front && Math.hypot(mx - cx, my - cy) < R) continue;  // hidden behind the orb
-            p.dot(mx, my, ramp[front ? 7 : 5]);
-            if (front) p.light(mx, my, ramp[6], 0.6);
+            if (front) { p.rect(Math.round(mx), Math.round(my), 2, 2, ramp[7]); p.glow(mx + 1, my + 1, 4, ramp[6], 0.5); }
+            else p.dot(mx, my, ramp[5]);
           }
         };
         drawMote(false);
@@ -1984,7 +1988,8 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
         }
         // glint: a 2×2 highlight up and to the left, with a soft light
         const gx = cx - R * 0.45, gy = cy - R * 0.5;
-        p.rect(Math.round(gx), Math.round(gy), 2, 2, ramp[7]);
+        const gs = Math.max(2, Math.round(R / 22));
+        p.rect(Math.round(gx), Math.round(gy), gs, gs, ramp[7]);
         p.glow(gx + 1, gy + 1, Math.max(4, R * 0.25), ramp[6], 0.25 + breathe * 0.1);
         drawMote(true);
       }
