@@ -617,6 +617,10 @@ body { overflow-x: clip; }
 .heat-label.is-code { gap: 2px; padding: 6px; }
 .heat-label.is-code .heat-name { font-family: var(--font-mono); font-size: 0.8125rem; letter-spacing: 0.06em; }
 .heat-label.is-code .heat-count { font-size: 0.75rem; }
+.heat-tip { position: absolute; z-index: 2; display: grid; gap: 4px; padding: 9px 12px 10px; background: #111214; border: 1px solid var(--line); box-shadow: inset 3px 0 0 var(--c, var(--fg)); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity 140ms ease, transform 140ms ease; white-space: nowrap; }
+.heat-tip.is-on { opacity: 1; transform: none; }
+.heat-tip b { font-weight: 500; font-size: var(--fs-sm); color: var(--fg); }
+.heat-tip span { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); }
 /* domains as a pixel grid: one tile per project, then a legend */
 .waffle { position: relative; margin: 0; display: grid; gap: 32px; }
 .waffle canvas { display: block; image-rendering: pixelated; }
@@ -827,11 +831,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       </section>
 
       <!-- 4 · Domains: a chip floor plan, one block per product domain, area = projects -->
-      <section class="about-block" aria-labelledby="dom-title">
-        <div class="work-head" data-reveal>
-          <h2 id="dom-title">Domains</h2>
-          <span class="label">Area = number of products</span>
-        </div>
+      <section class="about-block" aria-label="Product domains">
         <figure class="chip" id="bubbles" data-reveal aria-label="Product domains as blocks on a chip, each sized by its number of projects: Q-commerce and e-commerce 33, Web3, NFT and DeFi 26, crypto exchange 6, design assets 6, brand and campaign sites 6, SaaS, CRM and cloud 5, media and streaming 3, insurtech 2, gaming 2, and one each for AI and music tech, travel, government, edtech and childcare, and beauty and self-care."></figure>
       </section>
 
@@ -2383,7 +2383,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       return out;
     };
 
-    let blocks = [], frame = null, img = null, ctx = null, FW = 0, FH = 0, revealAt = null;
+    let blocks = [], wires = [], nodes = [], tip = null, frame = null, img = null, ctx = null, FW = 0, FH = 0, revealAt = null;
     const layout = () => {
       const W = heatEl.clientWidth;
       if (!W) return false;
@@ -2399,10 +2399,9 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       frame = F.createFrame(FW, FH);
       img = ctx.createImageData(FW, FH);
       const rects = squarify(items.map((it) => it.m), 0, 0, FW, FH);
-      const legend = [];
       blocks = rects.map((r, i) => {
         const it = items[i];
-        const x0 = Math.round(r.x), y0 = Math.round(r.y), x1 = Math.round(r.x + r.w) - 1, y1 = Math.round(r.y + r.h) - 1; // 1 art px seams
+        const x0 = Math.round(r.x), y0 = Math.round(r.y), x1 = Math.round(r.x + r.w) - 2, y1 = Math.round(r.y + r.h) - 2; // 2 art px seams: the bus
         const ramp = F.PAL[it.pal].map(F.hex);
         const b = { ...it, i, x: x0, y: y0, w: x1 - x0, h: y1 - y0, ramp, led: F.mix(ramp[2], ramp[3], 0.45), off: hash(i, 3) * 9, rate: 0.6 + hash(i, 5) * 0.9 };
         // the label: name, count and share, set large like a market heat map and scaled to the panel
@@ -2420,18 +2419,29 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
         } else {
           lab.classList.add('is-code');
           lab.innerHTML = `<span class="heat-name">${it.code}</span>` + (hc >= 52 ? `<span class="heat-count">${it.m}</span>` : '');
-          legend.push(it);
+          b.small = true;
+          b.tip = `<b>${it.d}</b><span>${unit} · ${share}</span>`;
         }
         heatEl.append(lab);
         b.lab = lab;
         return b;
       });
-      if (legend.length) {
-        const dl = document.createElement('dl');
-        dl.className = 'heat-legend';
-        dl.innerHTML = legend.map((it) => `<div><dt><i style="background:${F.PAL[it.pal][3]}"></i>${it.code}</dt><dd>${it.d} · ${it.m}</dd></div>`).join('');
-        heatEl.append(dl);
+      tip = document.createElement('div');
+      tip.className = 'heat-tip';
+      tip.setAttribute('role', 'tooltip');
+      heatEl.append(tip);
+      // the bus: every seam between panels is a wire; a panel owns the wire along its top and its left
+      wires = [];
+      const seg = (owner, pts, k) => wires.push({ owner, pts, per: (owner.current ? 2.6 : 4.5) + hash(owner.i, k) * 4, off: hash(owner.i, k + 1) * 10, flip: hash(owner.i, k + 2) > 0.5, last: 0 });
+      for (const b of blocks) {
+        if (b.y > 0) { const pts = []; for (let x = Math.max(0, b.x - 2); x <= Math.min(FW - 2, b.x + b.w); x++) pts.push([x, b.y - 2]); seg(b, pts, 11); }
+        if (b.x > 0) { const pts = []; for (let y = Math.max(0, b.y - 2); y <= Math.min(FH - 2, b.y + b.h); y++) pts.push([b.x - 2, y]); seg(b, pts, 21); }
       }
+      // junctions where wires meet or end
+      const seen = new Set();
+      nodes = [];
+      for (const w of wires) for (const q of [w.pts[0], w.pts[w.pts.length - 1]]) { const key = q[0] + ',' + q[1]; if (!seen.has(key)) { seen.add(key); nodes.push({ x: q[0], y: q[1], hit: -9, ramp: w.owner.ramp }); } }
+      for (const b of blocks) b.ripples = [];
       // keep the flicker off the text: each label's text box, in art pixels
       const cr = heatEl.getBoundingClientRect();
       for (const b of blocks) {
@@ -2442,44 +2452,91 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       return true;
     };
 
-    // ---- each frame: panels boot in pixel by pixel, then their LEDs flicker; a refresh sweep runs now and then ----
+    // ---- each frame: panels boot pixel by pixel; packets run the bus between them and land as ripples;
+    // LEDs breathe in tones of their own colour ----
+    const BUS = F.hex('#1d1e21'), NODE = F.hex('#2b2d31'), SPEED = 95;   // packet speed in art px per second
     const render = (t) => {
       if (!frame) return;
       F.clearFrame(frame);
       const p = F.painterFor(frame);
-      const since = revealAt === null ? -1 : t - revealAt;
+      const since = revealAt === null ? -1 : t - revealAt, live = since > 1.6;
+      // packets: one at a time on each wire; when it reaches the end it lights the junction and ripples into its panel
+      if (live) for (const w of wires) {
+        const n = w.pts.length, travel = n / SPEED, local = (t + w.off) % w.per;
+        if (local < travel) {
+          const head = Math.floor((local / travel) * n), r = w.owner.ramp;
+          for (let j = 0; j < 18; j++) {
+            const k = head - j;
+            if (k < 0) break;
+            const [x, y] = w.pts[w.flip ? n - 1 - k : k];
+            const c = j < 2 ? r[6] : j < 6 ? r[5] : r[4], a = j < 6 ? 1 : 1 - (j - 6) / 8;
+            p.put(x, y, c, a); p.put(x + 1, y, c, a); p.put(x, y + 1, c, a); p.put(x + 1, y + 1, c, a);
+          }
+          const [hx, hy] = w.pts[w.flip ? n - 1 - head : head];
+          p.glow(hx + 1, hy + 1, 6, r[4], 0.35);
+        } else if (w.last < travel) {
+          const end = w.flip ? w.pts[0] : w.pts[n - 1], o = w.owner;
+          const node = nodes.find((q) => q.x === end[0] && q.y === end[1]);
+          if (node) { node.hit = t; node.ramp = o.ramp; }
+          o.ripples.push({ x: Math.max(o.x, Math.min(o.x + o.w - 1, end[0])), y: Math.max(o.y, Math.min(o.y + o.h - 1, end[1])), t0: t });
+          if (o.ripples.length > 3) o.ripples.shift();
+        }
+        w.last = local;
+      }
+      // junctions: dim pads that flash in the colour of the packet that just arrived
+      for (const q of nodes) {
+        const a = t - q.hit;
+        p.rect(q.x - 1, q.y - 1, 4, 4, a < 0.35 ? q.ramp[a < 0.12 ? 6 : 5] : NODE);
+        if (a < 0.35) p.glow(q.x + 1, q.y + 1, 7, q.ramp[4], 0.4 * (1 - a / 0.35));
+      }
       for (const b of blocks) {
         const r = b.ramp, start = b.i * 0.07;                              // big panels boot first
         const boot = Math.max(0, Math.min(1, (since - start) / 0.9));
         p.rect(b.x, b.y, b.w, b.h, boot > 0 ? r[2] : r[0]);
-        // the refresh: a diagonal band of light crosses the panel every few seconds
-        const cyc = b.current ? 4.2 : 7.5, ph = ((t + b.off) % cyc) / 1.4, diag = b.w + b.h;
-        const slot = Math.floor(t * b.rate * (b.current ? 2.2 : 1.4));
-        const m = b.mask;
+        const slot = Math.floor(t * b.rate * (b.current ? 1.6 : 1));
+        const m = b.mask, rip = b.ripples.filter((q) => t - q.t0 < 1.8);
+        b.ripples = rip;
         for (let y = b.y + 1; y < b.y + b.h - 1; y += 2) for (let x = b.x + 1; x < b.x + b.w - 1; x += 2) {
           const k = x * 7919 + y;
           if (boot < 1 && hash(k, 77) > boot) continue;                    // still booting: this LED isn't on yet
-          const inText = x > m.x0 && x < m.x1 && y > m.y0 && y < m.y1;
-          let c = b.led;                                                     // resting LEDs sit just above the panel colour
-          if (!inText && boot === 1) {
+          let c = b.led;
+          if (boot === 1 && !(x > m.x0 && x < m.x1 && y > m.y0 && y < m.y1)) {
+            // activity: a few LEDs step up a tone or two, a few drop out; never brighter than the colour's own light tones
             const h = hash(k, slot);
-            if (h > (b.current ? 0.93 : 0.965)) c = h > 0.995 ? r[7] : r[5];  // flicker: a few LEDs on, a rare one white-hot
-            else if (h < 0.06) c = r[2];                                     // and a few off
-            if (ph < 1) {
-              const u = ((x - b.x) + (y - b.y)) / diag;
-              const dd = Math.abs(u - ph);
-              if (dd < 0.012) c = r[5]; else if (dd < 0.03) c = r[4];
+            if (h > (b.current ? 0.95 : 0.975)) c = h > 0.993 ? r[4] : r[3];
+            else if (h < 0.05) c = r[2];
+            // ripples: a ring of light spreading from where the packet landed, cooling behind it
+            for (const q of rip) {
+              const age = t - q.t0, R = age * 70, d = Math.hypot(x - q.x, y - q.y), fade = 1 - age / 1.8;
+              if (Math.abs(d - R) < 1.5) c = fade > 0.45 ? r[5] : r[4];
+              else if (d < R && d > R - 7 * fade) c = r[3];
             }
           }
           p.put(x, y, c, 1);
         }
-        // a boot flash as the panel comes up
-        if (boot > 0 && boot < 1) p.rect(b.x, b.y, b.w, 1, r[6]);
+        if (boot > 0 && boot < 1) p.rect(b.x, b.y, b.w, 1, r[5]);           // the boot line runs along the panel's top edge
         b.lab.classList.toggle('is-on', boot >= 0.6);
       }
       F.composite(frame, img.data, null);
       ctx.putImageData(img, 0, 0);
     };
+
+    // ---- small panels show a code; pointing at one (or tapping it) shows its name and numbers ----
+    const showTip = (e) => {
+      if (!tip) return;
+      const cr = heatEl.getBoundingClientRect(), x = (e.clientX - cr.left) / PX, y = (e.clientY - cr.top) / PX;
+      const b = blocks.find((q) => q.small && x >= q.x && x < q.x + q.w && y >= q.y && y < q.y + q.h);
+      if (!b) { tip.classList.remove('is-on'); return; }
+      tip.innerHTML = b.tip;
+      tip.style.setProperty('--c', F.PAL[b.pal][4]);
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      tip.style.left = Math.max(0, Math.min(cr.width - tw, e.clientX - cr.left - tw / 2)) + 'px';
+      tip.style.top = Math.max(0, e.clientY - cr.top - th - 14) + 'px';
+      tip.classList.add('is-on');
+    };
+    heatEl.addEventListener('pointermove', showTip);
+    heatEl.addEventListener('pointerdown', showTip);
+    heatEl.addEventListener('pointerleave', () => tip && tip.classList.remove('is-on'));
 
     const draw = () => { if (layout()) render(performance.now() / 1000); };
     let onScreen = false, raf = 0, lastT = 0;
