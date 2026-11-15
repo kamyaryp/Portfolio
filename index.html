@@ -605,6 +605,15 @@ body { overflow-x: clip; }
 .die-legend div { display: flex; gap: 10px; align-items: baseline; }
 .die-legend dt { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; color: var(--fg); min-width: 3.5em; }
 .die-legend dd { margin: 0; color: var(--muted); }
+/* domains as a pixel grid: one tile per project, then a legend */
+.waffle { position: relative; margin: 0; display: grid; gap: 32px; }
+.waffle canvas { display: block; image-rendering: pixelated; }
+.waffle-legend { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 32px; }
+.waffle-legend div { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+.waffle-legend dt { display: flex; align-items: center; gap: 12px; font-size: var(--fs-base); color: var(--fg); min-width: 0; white-space: nowrap; }
+.waffle-legend dt i { flex: none; width: 12px; height: 12px; background: var(--s); box-shadow: inset 2px 2px 0 var(--e); }
+.waffle-legend dd em { font-style: normal; margin-right: 10px; font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.waffle-legend dd { margin: 0; white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--fg); font-variant-numeric: tabular-nums; }
 
 
 /* Experience timeline: a table of roles. Type sets the scale: a square is as tall as the company name's capitals,
@@ -804,7 +813,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       <section class="about-block" aria-labelledby="dom-title">
         <div class="work-head" data-reveal>
           <h2 id="dom-title">Domains</h2>
-          <span class="label">Block area = number of projects</span>
+          <span class="label">One tile per project</span>
         </div>
         <figure class="chip" id="bubbles" data-reveal aria-label="Product domains as blocks on a chip, each sized by its number of projects: Q-commerce and e-commerce 33, Web3, NFT and DeFi 26, crypto exchange 6, design assets 6, brand and campaign sites 6, SaaS, CRM and cloud 5, media and streaming 3, insurtech 2, gaming 2, and one each for AI and music tech, travel, government, edtech and childcare, and beauty and self-care."></figure>
       </section>
@@ -1900,9 +1909,11 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
   //   Media & streaming: Cinemarex and its VOD dashboard and app, Khabaryab
   //   Insurtech: EasyBimeh B2B and B2C · Gaming: Mr. Boof, Gala's metaverse game · AI & music: Djoid · Travel: the airline
   //   Government: the ministry · Edtech & childcare: Kidcare · Beauty & self-care: Mootime (salon discovery and booking)
+  // which view the Domains section shows: 'grid' (one tile per project) or 'chip' (a die floor plan)
+  const DOMAINS_VIEW = 'grid';
   const chipEl = document.getElementById('bubbles');
   const F = window.PFX;
-  if (chipEl && F) {
+  if (chipEl && F && DOMAINS_VIEW === 'chip') {
     // Nordic ramps, dark to light: muted, a little grey in every hue
     const NORD = {
       clay:   ['#1d1716', '#2e2320', '#45332d', '#624740', '#82625a', '#a5867c', '#c9b0a6', '#ebdcd5'],
@@ -2156,6 +2167,150 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const kick = () => { if (!raf && onScreen && !still) raf = requestAnimationFrame(loop); };
     if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; kick(); }).observe(chipEl);
     else { onScreen = true; kick(); }
+    draw();
+    let bt;
+    addEventListener('resize', () => { clearTimeout(bt); bt = setTimeout(draw, 120); });
+    addEventListener('viewchange', (e) => { if (e.detail.id === 'about') requestAnimationFrame(() => { draw(); kick(); }); });
+    (document.fonts?.ready || Promise.resolve()).then(draw);
+  }
+  // ---- Domains as a pixel grid: one tile per project (94), grouped by domain, with a legend ----
+  const gridEl = document.getElementById('bubbles');
+  if (gridEl && F && DOMAINS_VIEW === 'grid') {
+    gridEl.className = 'waffle';
+    const NORD = {
+      clay:   ['#1d1716', '#2e2320', '#45332d', '#624740', '#82625a', '#a5867c', '#c9b0a6', '#ebdcd5'],
+      fjord:  ['#141b1b', '#1e2a2a', '#2c3e3d', '#405856', '#5b7774', '#7f9b97', '#a9c1bd', '#dbe7e4'],
+      sage:   ['#171b17', '#232a23', '#334033', '#495a48', '#647862', '#879a84', '#b1c1ad', '#e0e8dc'],
+      blush:  ['#1e1819', '#2f2426', '#463538', '#634b4f', '#836669', '#a7898b', '#cbb0b1', '#ede0e0'],
+      ochre:  ['#1c1912', '#2d271b', '#443b28', '#625539', '#837250', '#a6946f', '#cab996', '#ece2c8'],
+      dusk:   ['#14181f', '#1e2430', '#2c3546', '#404d63', '#5a6a82', '#7d8da4', '#a7b4c6', '#dbe2eb'],
+      lilac:  ['#18161d', '#25222d', '#363242', '#4c475d', '#67617b', '#8a849d', '#b2adc2', '#e2dfea'],
+      oat:    ['#1b1915', '#2b2822', '#403b32', '#5b5447', '#7a7262', '#9d9584', '#c3bcac', '#e9e4da'],
+      pine:   ['#121815', '#1b2520', '#283830', '#3a5045', '#516d5f', '#71907f', '#9db6a8', '#d3e0d8'],
+      ink:    ['#131519', '#1c1f26', '#2a2e38', '#3c424f', '#545b6b', '#747c8e', '#a0a7b6', '#d6dae2'],
+      mist:   ['#161a1c', '#21272a', '#313a3e', '#465256', '#606e72', '#829094', '#abb7ba', '#dde5e7'],
+      stone:  ['#171717', '#232323', '#333333', '#484847', '#626160', '#83827f', '#aba9a5', '#dddbd7'],
+      peach:  ['#1d1815', '#2e2520', '#45372f', '#624d42', '#83685a', '#a68b7b', '#cab1a3', '#ede0d8'],
+      heather:['#1b1619', '#2a2227', '#3e3239', '#574750', '#74606a', '#97828c', '#bdabb3', '#e6dce1']
+    };
+    const items = [
+      { d: 'Q-commerce & e-commerce', m: 33, pal: 'clay', live: true },
+      { d: 'Web3, NFT & DeFi', m: 26, pal: 'fjord' },
+      { d: 'Crypto exchange', m: 6, pal: 'sage' },
+      { d: 'Design assets', m: 6, pal: 'ochre', live: true },
+      { d: 'Brand & campaign sites', m: 6, pal: 'blush' },
+      { d: 'SaaS, CRM & cloud', m: 5, pal: 'dusk' },
+      { d: 'Media & streaming', m: 3, pal: 'lilac' },
+      { d: 'Insurtech', m: 2, pal: 'oat' },
+      { d: 'Gaming', m: 2, pal: 'pine' },
+      { d: 'AI & music tech', m: 1, pal: 'ink' },
+      { d: 'Travel', m: 1, pal: 'mist' },
+      { d: 'Government', m: 1, pal: 'stone' },
+      { d: 'Edtech & childcare', m: 1, pal: 'peach' },
+      { d: 'Beauty & self-care', m: 1, pal: 'heather' }
+    ];
+    items.forEach((it, i) => { it.ramp = NORD[it.pal].map(F.hex); it.i = i; });
+    const tiles = items.flatMap((it) => Array.from({ length: it.m }, () => it));
+    const PX = 2;
+    const SLOT = F.hex('#2c2d30');
+    const hash = (x, y) => { let h = (x * 374761393 + y * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+    let cv = null, ctx = null, frame = null, img = null, cells = [], S = 0, revealAt = null;
+
+    const layout = () => {
+      const W = gridEl.clientWidth;
+      if (!W) return false;
+      const phone = W < 640;
+      // desktop: 4 rows filled column by column, so each domain is one unbroken band; phone: 10 per row
+      const rows = phone ? Math.ceil(tiles.length / 10) : 4, cols = phone ? 10 : Math.ceil(tiles.length / 4);
+      const G = phone ? 2 : 3;                                          // gap, art px
+      S = Math.floor((W / PX - (cols - 1) * G) / cols);                // tile size, art px
+      // the grid spans the whole column: whatever is left over is shared out between the gaps
+      const FW = Math.floor(W / PX), FH = rows * S + (rows - 1) * G;
+      const colX = (c) => Math.round((c * (FW - S)) / (cols - 1));
+      gridEl.innerHTML = '';
+      cv = document.createElement('canvas');
+      cv.width = FW; cv.height = FH;
+      cv.style.width = FW * PX + 'px'; cv.style.height = FH * PX + 'px';
+      cv.setAttribute('aria-hidden', 'true');
+      gridEl.append(cv);
+      ctx = cv.getContext('2d');
+      frame = F.createFrame(FW, FH);
+      img = ctx.createImageData(FW, FH);
+      cells = [];
+      for (let k = 0; k < rows * cols; k++) {
+        const c = phone ? k % cols : Math.floor(k / rows), r = phone ? Math.floor(k / cols) : k % rows;
+        cells.push({ x: colX(c), y: r * (S + G), it: tiles[k] || null, k, c, r });
+      }
+      // legend: a swatch, the domain and its count
+      const dl = document.createElement('dl');
+      dl.className = 'waffle-legend';
+      dl.innerHTML = items.map((it) => `<div><dt><i style="--s:${NORD[it.pal][4]};--e:${NORD[it.pal][6]}"></i>${it.d}</dt><dd>${it.live ? '<em>live</em>' : ''}${it.m}</dd></div>`).join('');
+      gridEl.append(dl);
+      return true;
+    };
+
+    // a tile: bevelled square in its domain's ramp, with a small mark in the middle (dot, bar or plus by domain)
+    const tile = (p, x, y, r, lift, kind) => {
+      p.rect(x, y, S, S, r[3 + lift]);
+      p.rect(x, y, S, 1, r[5 + lift]); p.rect(x, y, 1, S, r[4 + lift]);
+      p.rect(x, y + S - 1, S, 1, r[1]); p.rect(x + S - 1, y, 1, S, r[1]);
+      const m = Math.max(2, Math.round(S / 8)), cx = x + Math.floor(S / 2) - Math.floor(m / 2), cy = y + Math.floor(S / 2) - Math.floor(m / 2);
+      if (kind === 0) p.rect(cx, cy, m, m, r[5 + lift]);
+      else if (kind === 1) p.rect(cx - m, cy, m * 3, m, r[5 + lift]);
+      else { p.rect(cx - m, cy, m * 3, m, r[5 + lift]); p.rect(cx, cy - m, m, m * 3, r[5 + lift]); }
+    };
+
+    const render = (t) => {
+      if (!frame) return;
+      F.clearFrame(frame);
+      const p = F.painterFor(frame);
+      const since = revealAt === null ? -1 : t - revealAt;
+      for (const cell of cells) {
+        const { x, y, it, k } = cell;
+        if (!it) {                                                   // spare slots: a dashed outline
+          for (let i = 0; i < S; i += 2) { p.put(x + i, y, SLOT, 1); p.put(x + i, y + S - 1, SLOT, 1); p.put(x, y + i, SLOT, 1); p.put(x + S - 1, y + i, SLOT, 1); }
+          continue;
+        }
+        const r = it.ramp, at = k * 0.02 + hash(k, 3) * 0.12;   // reveal: one after another, with a little scatter
+        if (since < at) { p.rect(x, y, S, S, r[1], 0.5); continue; }
+        const age = since - at;
+        if (age < 0.18) {                                             // arrives white-hot, then cools into its colour
+          p.rect(x, y, S, S, F.hex('#f2f0ea'));
+          p.glow(x + S / 2, y + S / 2, S * 0.9, r[6], 0.5 * (1 - age / 0.18));
+          continue;
+        }
+        // live domains: a slow wave of light runs along their tiles
+        const wave = it.live ? Math.max(0, Math.sin(t * 1.6 - cell.c * 0.5 - cell.r * 0.3)) : 0;
+        tile(p, x, y, r, wave > 0.85 ? 1 : 0, it.i % 3);
+        if (wave > 0.85) p.glow(x + S / 2, y + S / 2, S * 0.7, r[5], 0.12);
+        // activity: now and then a tile flashes, like a write to memory
+        const beat = Math.floor(t * 1.4 + hash(k, 9) * 7);
+        if (hash(k, beat) > 0.985) {
+          p.rect(x + 2, y + 2, 2, 2, r[7]);
+          p.glow(x + 3, y + 3, 6, r[6], 0.35);
+        }
+      }
+      F.composite(frame, img.data, null);
+      ctx.putImageData(img, 0, 0);
+    };
+
+    const draw = () => { if (layout()) render(performance.now() / 1000); };
+    let onScreen = false, raf = 0, lastT = 0;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (still) revealAt = -1e9;
+    const loop = (now) => {
+      raf = 0;
+      if (!onScreen || still) return;
+      if (now - lastT > 1000 / 30) { lastT = now; render(now / 1000); }
+      raf = requestAnimationFrame(loop);
+    };
+    const kick = () => { if (!raf && onScreen && !still) raf = requestAnimationFrame(loop); };
+    if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      if (onScreen && revealAt === null) revealAt = performance.now() / 1000; // the tiles fill in the first time it's seen
+      kick();
+    }, { threshold: 0.25 }).observe(gridEl);
+    else { onScreen = true; revealAt = 0; kick(); }
     draw();
     let bt;
     addEventListener('resize', () => { clearTimeout(bt); bt = setTimeout(draw, 120); });
