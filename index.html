@@ -593,19 +593,18 @@ body { overflow-x: clip; }
 .stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; line-height: 1.5; color: var(--muted); }
 
 /* domains: packed bubbles drawn as pixel dots, labels in HTML on top */
-/* domains: a full-width strip of space; the planets are a pixelfx frame, the labels HTML on top */
-.bubbles { position: relative; width: 100vw; max-width: none; margin: 0 calc(50% - 50vw); overflow: hidden; }
-.bubbles canvas { display: block; image-rendering: pixelated; }
-.bub-label {
-  position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 6px; text-align: center; pointer-events: none;
-  /* a crisp one-pixel outline, the pixel-art way to keep text readable on any surface */
-  text-shadow: -1px -1px 0 #101114, 1px -1px 0 #101114, -1px 1px 0 #101114, 1px 1px 0 #101114, 0 1px 0 #101114, 0 -1px 0 #101114, 1px 0 0 #101114, -1px 0 0 #101114, 0 2px 8px rgba(10, 11, 14, 0.7);
-}
-.bub-name { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; color: #f4f2ee; text-wrap: balance; }
-.bub-dur { white-space: nowrap; font-family: var(--font-mono); font-size: 0.875rem; color: #e6e3dd; font-variant-numeric: tabular-nums; }
-.bub-label.is-small { gap: 3px; }
-.bub-label.is-small .bub-dur { font-size: 0.75rem; }
-@media (max-width: 640px) { .bub-label.is-small .bub-dur { font-size: 0.6875rem; } .bub-dur { font-size: 0.75rem; } }
+/* domains: a chip on a board. Board and package run full width; the package matches the content column */
+.chip { position: relative; width: 100vw; max-width: none; margin: 0 calc(50% - 50vw); }
+.chip canvas { position: absolute; top: 0; left: 0; display: block; image-rendering: pixelated; }
+.die-label { position: absolute; display: grid; gap: 5px; align-content: start; pointer-events: none; }
+.die-name { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; line-height: 1.12; color: #f1efea; text-wrap: balance; }
+.die-count { font-family: var(--font-mono); font-size: 0.8125rem; letter-spacing: 0.02em; color: #c9c6bf; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.die-label.is-code { gap: 2px; }
+.die-code { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; color: #f1efea; }
+.die-legend { position: absolute; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 24px; font-size: var(--fs-sm); }
+.die-legend div { display: flex; gap: 10px; align-items: baseline; }
+.die-legend dt { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; color: var(--fg); min-width: 3.5em; }
+.die-legend dd { margin: 0; color: var(--muted); }
 
 
 /* Experience timeline: a table of roles. Type sets the scale: a square is as tall as the company name's capitals,
@@ -801,13 +800,13 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
         </div>
       </section>
 
-      <!-- 4 · Domains: a strip of space, one planet per product domain, area = projects -->
+      <!-- 4 · Domains: a chip floor plan, one block per product domain, area = projects -->
       <section class="about-block" aria-labelledby="dom-title">
         <div class="work-head" data-reveal>
           <h2 id="dom-title">Domains</h2>
-          <span class="label">Sized by number of projects</span>
+          <span class="label">Block area = number of projects</span>
         </div>
-        <figure class="bubbles" id="bubbles" data-reveal aria-label="Product domains sized by the number of projects in each."></figure>
+        <figure class="chip" id="bubbles" data-reveal aria-label="Product domains as blocks on a chip, each sized by its number of projects: Q-commerce and e-commerce 33, Web3, NFT and DeFi 26, crypto exchange 6, design assets 6, brand and campaign sites 6, SaaS, CRM and cloud 5, media and streaming 3, insurtech 2, gaming 2, and one each for AI and music tech, travel, government, edtech and childcare, and beauty and self-care."></figure>
       </section>
 
       <!-- 5 · Bio -->
@@ -1890,7 +1889,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     if (y === now.getFullYear()) s.className = 'is-now';
     axis.append(s);
   }
-  // ---- Domains as a small solar system: one planet per domain, its area = projects in it ----
+  // ---- Domains as a chip: a die floor plan, one block per domain, its area = projects in it ----
   // How the 94 projects were grouped:
   //   Commerce: about 30 at Digikala (q-commerce and e-commerce), Fill Studio's two shops, the hardware shop landing page
   //   Web3, NFT & DeFi: Gala's swapping protocol, 2 token dashboards, 2 NFT landing pages, 20 token landing pages; Conjee
@@ -1901,9 +1900,9 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
   //   Media & streaming: Cinemarex and its VOD dashboard and app, Khabaryab
   //   Insurtech: EasyBimeh B2B and B2C · Gaming: Mr. Boof, Gala's metaverse game · AI & music: Djoid · Travel: the airline
   //   Government: the ministry · Edtech & childcare: Kidcare · Beauty & self-care: Mootime (salon discovery and booking)
-  const bubblesEl = document.getElementById('bubbles');
+  const chipEl = document.getElementById('bubbles');
   const F = window.PFX;
-  if (bubblesEl && F) {
+  if (chipEl && F) {
     // Nordic ramps, dark to light: muted, a little grey in every hue
     const NORD = {
       clay:   ['#1d1716', '#2e2320', '#45332d', '#624740', '#82625a', '#a5867c', '#c9b0a6', '#ebdcd5'],
@@ -1921,226 +1920,228 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       peach:  ['#1d1815', '#2e2520', '#45372f', '#624d42', '#83685a', '#a68b7b', '#cab1a3', '#ede0d8'],
       heather:['#1b1619', '#2a2227', '#3e3239', '#574750', '#74606a', '#97828c', '#bdabb3', '#e6dce1']
     };
-    // kind: gas (bands), rock (continents), ice (smooth with caps); ring: has rings; moons: how many
     const items = [
-      { d: 'Q-commerce & e-commerce', m: 33, pal: 'clay', kind: 'gas', moons: 2, live: true },
-      { d: 'Web3, NFT & DeFi', m: 26, pal: 'fjord', kind: 'gas', ring: true, moons: 1 },
-      { d: 'Crypto exchange', m: 6, pal: 'sage', kind: 'rock', moons: 1 },
-      { d: 'Design assets', m: 6, pal: 'ochre', kind: 'gas', ring: true, live: true },
-      { d: 'Brand & campaign sites', m: 6, pal: 'blush', kind: 'rock', moons: 1 },
-      { d: 'SaaS, CRM & cloud', m: 5, pal: 'dusk', kind: 'ice' },
-      { d: 'Media & streaming', m: 3, pal: 'lilac', kind: 'gas' },
-      { d: 'Insurtech', m: 2, pal: 'oat', kind: 'rock' },
-      { d: 'Gaming', m: 2, pal: 'pine', kind: 'rock' },
-      { d: 'AI & music tech', m: 1, pal: 'ink', kind: 'ice' },
-      { d: 'Travel', m: 1, pal: 'mist', kind: 'ice' },
-      { d: 'Government', m: 1, pal: 'stone', kind: 'rock' },
-      { d: 'Edtech & childcare', m: 1, pal: 'peach', kind: 'gas' },
-      { d: 'Beauty & self-care', m: 1, pal: 'heather', kind: 'ice' }
+      { d: 'Q-commerce & e-commerce', code: 'QCM', m: 33, pal: 'clay', live: true },
+      { d: 'Web3, NFT & DeFi', code: 'WEB3', m: 26, pal: 'fjord' },
+      { d: 'Crypto exchange', code: 'CEX', m: 6, pal: 'sage' },
+      { d: 'Design assets', code: 'AST', m: 6, pal: 'ochre', live: true },
+      { d: 'Brand & campaign sites', code: 'BRD', m: 6, pal: 'blush' },
+      { d: 'SaaS, CRM & cloud', code: 'SAAS', m: 5, pal: 'dusk' },
+      { d: 'Media & streaming', code: 'MED', m: 3, pal: 'lilac' },
+      { d: 'Insurtech', code: 'INS', m: 2, pal: 'oat' },
+      { d: 'Gaming', code: 'GME', m: 2, pal: 'pine' },
+      { d: 'AI & music tech', code: 'AI', m: 1, pal: 'ink' },
+      { d: 'Travel', code: 'TRV', m: 1, pal: 'mist' },
+      { d: 'Government', code: 'GOV', m: 1, pal: 'stone' },
+      { d: 'Edtech & childcare', code: 'EDU', m: 1, pal: 'peach' },
+      { d: 'Beauty & self-care', code: 'BTY', m: 1, pal: 'heather' }
     ];
-    const PX = 2;                                   // one art pixel = 2 CSS px
+    const PX = 2;                                  // one art pixel = 2 CSS px
     const B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
     const bayer = (x, y) => (B4[(y & 3) * 4 + (x & 3)] + 0.5) / 16;
     const hash = (x, y) => { let h = (x * 374761393 + y * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
-    const sm = (t) => t * t * (3 - 2 * t);
-    const noise = (x, y, wrap) => {
-      const xi = Math.floor(x), yi = Math.floor(y), xf = sm(x - xi), yf = sm(y - yi);
-      const X0 = ((xi % wrap) + wrap) % wrap, X1 = (X0 + 1) % wrap;
-      const a = hash(X0, yi), b = hash(X1, yi), c = hash(X0, yi + 1), d = hash(X1, yi + 1);
-      return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
-    };
-    // a planet's surface as a seamless strip (longitude wraps), values in ramp steps added to the lighting
-    const TW = 256, TH = 128;
-    const surface = (kind, seed) => {
-      const T = new Float32Array(TW * TH);
-      for (let y = 0; y < TH; y++) for (let x = 0; x < TW; x++) {
-        const lat = y / TH;
-        let v;
-        if (kind === 'gas') {
-          // latitude bands that wobble a little, plus a storm
-          const wob = (noise(x / 24, y / 10 + seed, TW / 24) - 0.5) * 0.12;
-          v = Math.sin((lat + wob) * Math.PI * (7 + (seed % 3))) * 0.9;
-          const sx = (x - (seed * 37) % TW + TW) % TW, sy = y - TH * 0.62;
-          if (Math.hypot(sx / 2.2, sy) < 6) v = -1.2;
-        } else if (kind === 'rock') {
-          const n = 0.65 * noise(x / 22, y / 22 + seed * 3, Math.round(TW / 22)) + 0.35 * noise(x / 9, y / 9 + seed, Math.round(TW / 9));
-          v = n > 0.52 ? 0.9 : -0.6;                  // land and sea, hard edges
+    const C = (h) => F.hex(h);
+    const METAL = ['#1a1b1e', '#25272b', '#33363c', '#474b52', '#61666e', '#80858d', '#a8adb4', '#d8dbdf'].map(C);
+    const PCB = C('#191b1a'), TRACE = C('#26302b'), TRACE_HI = C('#3a4a42');
+
+    // squarified treemap: rows of blocks laid along the shorter side, keeping each block close to square
+    const squarify = (vals, x, y, w, h) => {
+      const total = vals.reduce((a, b) => a + b, 0), areas = vals.map((v) => (v * w * h) / total), out = [];
+      let rect = { x, y, w, h }, row = [], i = 0;
+      const worst = (r, side) => { const s = r.reduce((a, b) => a + b, 0), mx = Math.max(...r), mn = Math.min(...r); return Math.max((side * side * mx) / (s * s), (s * s) / (side * side * mn)); };
+      const lay = (r) => {
+        const s = r.reduce((a, b) => a + b, 0);
+        if (rect.w >= rect.h) {
+          const cw = s / rect.h; let yy = rect.y;
+          for (const a of r) { out.push({ x: rect.x, y: yy, w: cw, h: a / cw }); yy += a / cw; }
+          rect = { x: rect.x + cw, y: rect.y, w: rect.w - cw, h: rect.h };
         } else {
-          const n = noise(x / 30, y / 30 + seed * 5, Math.round(TW / 30));
-          v = (n - 0.5) * 0.8 + (lat < 0.14 || lat > 0.86 ? 1.6 : 0); // soft swirls and white caps
+          const rh = s / rect.w; let xx = rect.x;
+          for (const a of r) { out.push({ x: xx, y: rect.y, w: a / rh, h: rh }); xx += a / rh; }
+          rect = { x: rect.x, y: rect.y + rh, w: rect.w, h: rect.h - rh };
         }
-        T[y * TW + x] = v;
+      };
+      while (i < areas.length) {
+        const side = Math.min(rect.w, rect.h);
+        if (!row.length || worst([...row, areas[i]], side) <= worst(row, side)) row.push(areas[i++]);
+        else { lay(row); row = []; }
       }
-      return T;
+      if (row.length) lay(row);
+      return out;
     };
 
-    // greedy packing with generous gaps; rings and moons ask for room of their own
-    const pack = (aspect) => {
-      const placed = [];
-      for (const it of items) {
-        const r = Math.sqrt(Math.max(it.m, 2.6));
-        const room = r * (it.ring ? 1.55 : it.moons ? 1.4 : 1.15) + 0.9;
-        if (!placed.length) { placed.push({ it, r, room, x: 0, y: 0 }); continue; }
-        let best = null;
-        for (const p of placed) for (let a = 0; a < 360; a += 4) {
-          const t = a * Math.PI / 180, d = p.room + room;
-          const x = p.x + Math.cos(t) * d, y = p.y + Math.sin(t) * d;
-          if (placed.some((q) => Math.hypot(q.x - x, q.y - y) < q.room + room - 1e-6)) continue;
-          const cost = (x / aspect) ** 2 + y * y;
-          if (!best || cost < best.cost) best = { x, y, cost };
-        }
-        placed.push({ it, r, room, x: best.x, y: best.y });
-      }
-      return placed;
-    };
-
-    let planets = [], stars = [], frame = null, img = null, ctx = null, FW = 0, FH = 0;
+    let blocks = [], traces = [], FW = 0, FH = 0, pkg = null, fx = null, fxCtx = null, fxFrame = null, fxImg = null;
     const layout = () => {
-      const W = bubblesEl.clientWidth;
+      const W = chipEl.clientWidth;
       if (!W) return false;
-      const aspect = W < 640 ? 0.38 : Math.min(2.6, W / 520);
-      const placed = pack(aspect);
-      const minX = Math.min(...placed.map((p) => p.x - p.room)), maxX = Math.max(...placed.map((p) => p.x + p.room));
-      const minY = Math.min(...placed.map((p) => p.y - p.room)), maxY = Math.max(...placed.map((p) => p.y + p.room));
-      const PAD = W < 640 ? 46 : 48;  // room for labels wider than small planets
-      const k = Math.min((W - PAD * 2) / (maxX - minX), (W < 640 ? 120 : 190) / placed[0].r);
-      const H = Math.round((maxY - minY) * k + PAD * 2 + 40);
-      const ox = (W - (maxX - minX) * k) / 2 - minX * k, oy = PAD + 20 - minY * k;
-      bubblesEl.innerHTML = '';
-      bubblesEl.style.height = H + 'px';
-      const cv = document.createElement('canvas');
-      FW = Math.floor(W / PX); FH = Math.ceil(H / PX);
-      cv.width = FW; cv.height = FH;
-      cv.style.width = FW * PX + 'px'; cv.style.height = FH * PX + 'px';
-      cv.setAttribute('aria-hidden', 'true');
-      bubblesEl.append(cv);
-      ctx = cv.getContext('2d');
-      frame = F.createFrame(FW, FH);
-      img = ctx.createImageData(FW, FH);
-      // stars: three depths, a few bright ones with a four-point glint; fewer towards the top and bottom edges
-      stars = [];
-      const n = Math.round(FW * FH / 560);
-      for (let i = 0; i < n; i++) {
-        const x = hash(i, 3) * FW, y = hash(i, 5) * FH, edge = Math.min(y, FH - y) / (FH * 0.18);
-        if (hash(i, 9) > edge) continue;
-        const depth = hash(i, 7);
-        stars.push({ x, y, depth, big: depth > 0.985, p: 2 + hash(i, 11) * 5, o: hash(i, 13) * 10 });
-      }
-      planets = placed.map((p, i) => {
-        const x = ox + p.x * k, y = oy + p.y * k, R = p.r * k;
-        const ramp = NORD[p.it.pal].map(F.hex);
-        const lab = document.createElement('div');
-        lab.className = 'bub-label' + (R < 56 ? ' is-small' : '');
-        lab.style.left = x + 'px';
-        lab.style.top = y + 'px';
-        lab.style.maxWidth = Math.round(R * (R < 56 ? 2.4 : 1.7)) + 'px';
-        const fs = R < 56 ? (W < 640 ? 11.5 : 13) : Math.max(W < 640 ? 13 : 15, Math.min(28, R * 0.17));
-        lab.innerHTML = `<span class="bub-name" style="font-size:${fs.toFixed(1)}px">${p.it.d}</span><span class="bub-dur">${p.it.m} project${p.it.m === 1 ? '' : 's'}${p.it.live ? ' · live' : ''}</span>`;
-        bubblesEl.append(lab);
-        // per pixel of the disc: its longitude and latitude on the sphere, and the light it gets (fixed sun, top left)
-        const Ra = R / PX, cx = x / PX, cy = y / PX, tilt = (hash(i, 21) - 0.5) * 0.5;
-        const pix = [];
-        for (let py = Math.floor(cy - Ra); py <= Math.ceil(cy + Ra); py++) for (let px = Math.floor(cx - Ra); px <= Math.ceil(cx + Ra); px++) {
-          const dx = (px + 0.5 - cx) / Ra, dy = (py + 0.5 - cy) / Ra, d2 = dx * dx + dy * dy;
-          if (d2 > 1) continue;
-          const nz = Math.sqrt(1 - d2);
-          // rotate the view by the planet's tilt, then read longitude and latitude
-          const ux = dx * Math.cos(tilt) - dy * Math.sin(tilt), uy = dx * Math.sin(tilt) + dy * Math.cos(tilt);
-          const lon = Math.atan2(ux, nz) / (Math.PI * 2) + 0.5, lat = Math.asin(Math.max(-1, Math.min(1, uy))) / Math.PI + 0.5;
-          const lam = Math.max(0, dx * -0.62 + dy * -0.5 + nz * 0.6);
-          const rim = d2 > 0.9 && lam > 0.05 ? 0.8 : 0;               // a thin lit limb
-          pix.push(px, py, lon, lat, 0.5 + lam * 5.1 + rim);           // light, in ramp steps
+      const phone = W < 640;
+      // the package sits on the content column; the board and its traces run the full width
+      const col = Math.min(1280, W - 32);
+      const pw = Math.floor(col / PX), ph = Math.floor(pw * (phone ? 1.55 : 0.46));
+      const MARGIN = phone ? 26 : 44;                                   // board around the package, in art px
+      FW = Math.floor(W / PX); FH = ph + MARGIN * 2;
+      chipEl.innerHTML = '';
+      chipEl.style.height = FH * PX + 'px';
+      const mk = () => { const c = document.createElement('canvas'); c.width = FW; c.height = FH; c.style.width = FW * PX + 'px'; c.style.height = FH * PX + 'px'; c.setAttribute('aria-hidden', 'true'); chipEl.append(c); return c; };
+      const base = mk(); fx = mk();
+      const px0 = Math.floor((FW - pw) / 2), py0 = MARGIN;
+      pkg = { x: px0, y: py0, w: pw, h: ph };
+      // pins every 6 art px along each side of the package
+      const PIN = 6, PL = phone ? 6 : 9;
+      const pins = [];
+      for (let x = px0 + 10; x < px0 + pw - 10; x += PIN) { pins.push({ x, y: py0 - PL, w: 3, h: PL, side: 'top' }); pins.push({ x, y: py0 + ph, w: 3, h: PL, side: 'bottom' }); }
+      for (let y = py0 + 10; y < py0 + ph - 10; y += PIN) { pins.push({ x: px0 - PL, y, w: PL, h: 3, side: 'left' }); pins.push({ x: px0 + pw, y, w: PL, h: 3, side: 'right' }); }
+      // board traces: from some pins outward, one right-angle jog, then on to the edge
+      traces = [];
+      pins.forEach((p, i) => {
+        if (hash(i, 41) > (phone ? 0.25 : 0.42)) return;
+        const pts = [];
+        const jog = Math.round((hash(i, 43) - 0.5) * 24), run = 6 + Math.round(hash(i, 47) * 18);
+        if (p.side === 'top') { const x = p.x + 1; pts.push([x, p.y], [x, p.y - run], [x + jog, p.y - run - Math.abs(jog)], [x + jog, -4]); }
+        if (p.side === 'bottom') { const x = p.x + 1; pts.push([x, p.y + p.h], [x, p.y + p.h + run], [x + jog, p.y + p.h + run + Math.abs(jog)], [x + jog, FH + 4]); }
+        if (p.side === 'left') { const y = p.y + 1; pts.push([p.x, y], [p.x - run, y], [p.x - run - Math.abs(jog), y + jog], [-4, y + jog]); }
+        if (p.side === 'right') { const y = p.y + 1; pts.push([p.x + p.w, y], [p.x + p.w + run, y], [p.x + p.w + run + Math.abs(jog), y + jog], [FW + 4, y + jog]); }
+        // walk the polyline into single pixels so pulses can ride it
+        const path = [];
+        for (let s = 0; s + 1 < pts.length; s++) {
+          const [ax, ay] = pts[s], [bx, by] = pts[s + 1], n = Math.max(Math.abs(bx - ax), Math.abs(by - ay));
+          for (let k = 0; k < n; k++) path.push([Math.round(ax + ((bx - ax) * k) / n), Math.round(ay + ((by - ay) * k) / n)]);
         }
-        const moons = Array.from({ length: p.it.moons || 0 }, (_, j) => ({
-          r: Math.max(2.5, Ra * (0.13 - j * 0.03)), dist: Ra * (1.45 + j * 0.32), sp: 0.22 - j * 0.07, a: hash(i, 30 + j) * 6.28, inc: 0.3 + j * 0.12
-        }));
-        return { cx, cy, Ra, ramp, tex: surface(p.it.kind, i + 1), pix, spin: 0.006 + hash(i, 17) * 0.01, ring: !!p.it.ring, moons, live: !!p.it.live, seed: i, tilt };
+        traces.push({ path, seed: i, pal: null });
       });
+      // the die: the package's inner area, blocks laid out by the treemap with channels between them
+      const INSET = phone ? 8 : 12, G = phone ? 4 : 5;
+      const die = { x: px0 + INSET, y: py0 + INSET, w: pw - INSET * 2, h: ph - INSET * 2 };
+      const rects = squarify(items.map((it) => it.m), die.x, die.y, die.w, die.h);
+      blocks = rects.map((r, i) => {
+        const x0 = Math.round(r.x + G / 2), y0 = Math.round(r.y + G / 2), x1 = Math.round(r.x + r.w - G / 2), y1 = Math.round(r.y + r.h - G / 2);
+        return { ...items[i], i, x: x0, y: y0, w: x1 - x0, h: y1 - y0, ramp: NORD[items[i].pal].map(C), period: 1.4 + hash(i, 5) * 2.2, phase: hash(i, 7) * 6 };
+      });
+      // HTML labels: name and count in the block's silkscreen corner; blocks too small for them show a code
+      const legend = [];
+      for (const b of blocks) {
+        const lab = document.createElement('div');
+        const wc = b.w * PX, hc = b.h * PX;
+        const big = Math.sqrt(wc * hc);
+        const fs = Math.max(13, Math.min(26, big / 11));
+        const fits = wc >= 104 && hc >= 62;
+        lab.className = 'die-label' + (fits ? '' : ' is-code');
+        const inset = fits ? 10 : 7;
+        lab.style.left = (b.x * PX + inset) + 'px';
+        lab.style.top = (b.y * PX + inset - 1) + 'px';
+        lab.style.maxWidth = (wc - 20) + 'px';
+        const count = wc < 160 ? `${b.m}${b.live ? ' · live' : ''}` : `${b.m} project${b.m === 1 ? '' : 's'}${b.live ? ' · live' : ''}`;
+        lab.innerHTML = fits
+          ? `<span class="die-name" style="font-size:${fs.toFixed(1)}px">${b.d}</span><span class="die-count">${count}</span>`
+          : `<span class="die-code">${b.code}</span>` + (hc >= 46 ? `<span class="die-count">${b.m}</span>` : '');
+        chipEl.append(lab);
+        if (!fits) legend.push(b);
+        b.lab = lab;
+      }
+      if (legend.length) {
+        const ul = document.createElement('dl');
+        ul.className = 'die-legend';
+        ul.innerHTML = legend.map((b) => `<div><dt>${b.code}</dt><dd>${b.d} · ${b.m}</dd></div>`).join('');
+        chipEl.append(ul);
+        chipEl.style.height = FH * PX + ul.offsetHeight + 16 + 'px';
+        ul.style.top = FH * PX + 12 + 'px';
+        ul.style.left = px0 * PX + 'px';
+        ul.style.width = pw * PX + 'px';
+      }
+      // keep each label's area free of texture: measure it in art pixels
+      const cr = chipEl.getBoundingClientRect();
+      for (const b of blocks) {
+        const r = b.lab.getBoundingClientRect();
+        b.clear = { x1: Math.ceil((r.right - cr.left) / PX) + 4, y1: Math.ceil((r.bottom - cr.top) / PX) + 3 };
+      }
+
+      // ---- the static layer: board, traces, package, pins, die, blocks and their silicon ----
+      const frame = F.createFrame(FW, FH), p = F.painterFor(frame);
+      // board: plain, with the traces fading out towards the screen edges
+      for (const t of traces) t.path.forEach(([x, y], k) => {
+        const edge = Math.min(x, FW - x, y, FH - y), a = Math.min(1, edge / 30) * (k < 4 ? 1 : 0.9);
+        if (a > 0) p.put(x, y, TRACE, a);
+      });
+      // package: a dark body with a bevel and a notch on the left
+      p.rect(px0 - 1, py0 - 1, pw + 2, ph + 2, METAL[1]);
+      p.rect(px0, py0, pw, ph, METAL[0]);
+      p.rect(px0, py0, pw, 1, METAL[3]); p.rect(px0, py0, 1, ph, METAL[2]);
+      p.rect(px0, py0 + ph - 1, pw, 1, METAL[1]); p.rect(px0 + pw - 1, py0, 1, ph, METAL[1]);
+      p.circle(px0 + 6, py0 + 6, 2, METAL[2]);                         // pin-one mark
+      for (const q of pins) {
+        p.rect(q.x, q.y, q.w, q.h, METAL[4]);
+        if (q.side === 'top' || q.side === 'bottom') p.rect(q.x, q.y, 1, q.h, METAL[6]); else p.rect(q.x, q.y, q.w, 1, METAL[6]);
+      }
+      // die: darker silicon with a faint grid in the channels
+      p.rect(die.x - 2, die.y - 2, die.w + 4, die.h + 4, C('#0f1012'));
+      for (let y = die.y; y < die.y + die.h; y += 3) for (let x = die.x; x < die.x + die.w; x += 3) p.put(x, y, C('#191a1d'), 1);
+      for (const b of blocks) {
+        const r = b.ramp;
+        p.rect(b.x, b.y, b.w, b.h, r[1]);
+        // silicon: memory arrays, logic and I/O strips, kept off the label's corner
+        const kind = b.i % 3;
+        for (let y = b.y + 3; y < b.y + b.h - 3; y++) for (let x = b.x + 3; x < b.x + b.w - 3; x++) {
+          if (x < b.clear.x1 && y < b.clear.y1) continue;
+          let c = 0;
+          if (kind === 0) { if ((x - b.x) % 4 < 2 && (y - b.y) % 4 < 2) c = ((x >> 3) + (y >> 3)) % 5 ? r[2] : r[3]; }
+          else if (kind === 1) { const cell = hash(x >> 2, y >> 2); if ((y - b.y) % 4 === 0 && cell > 0.45) c = r[2]; else if ((x - b.x) % 6 === 0 && cell > 0.8) c = r[3]; }
+          else { if ((y - b.y) % 3 === 0 && hash(x >> 4, y) > 0.2) c = r[2]; if ((x - b.x) % 12 === 0 && (y - b.y) % 3 !== 0) c = r[3]; }
+          if (c) p.put(x, y, c, 1);
+        }
+        // a bevel: lit top and left edges, a dark bottom and right
+        p.rect(b.x, b.y, b.w, 1, r[5]); p.rect(b.x, b.y, 1, b.h, r[4]);
+        p.rect(b.x, b.y + b.h - 1, b.w, 1, r[0]); p.rect(b.x + b.w - 1, b.y, 1, b.h, r[0]);
+        // bond pads in the corners
+        for (const [cx, cy] of [[b.x + 2, b.y + b.h - 4], [b.x + b.w - 4, b.y + b.h - 4]]) p.rect(cx, cy, 2, 2, r[4]);
+      }
+      const bctx = base.getContext('2d'), bimg = bctx.createImageData(FW, FH);
+      F.composite(frame, bimg.data, null);
+      bctx.putImageData(bimg, 0, 0);
+      fxCtx = fx.getContext('2d');
+      fxFrame = F.createFrame(FW, FH);
+      fxImg = fxCtx.createImageData(FW, FH);
       return true;
     };
 
-    // a small lit sphere (moons): four steps of a cool grey, dithered at the edges
-    const MOON = NORD.stone.map(F.hex);
-    const ball = (p, x, y, r) => {
-      for (let py = Math.floor(y - r); py <= Math.ceil(y + r); py++) for (let px = Math.floor(x - r); px <= Math.ceil(x + r); px++) {
-        const dx = (px + 0.5 - x) / r, dy = (py + 0.5 - y) / r, d2 = dx * dx + dy * dy;
-        if (d2 > 1) continue;
-        const v = 0.8 + Math.max(0, -dx * 0.62 - dy * 0.5 + Math.sqrt(1 - d2) * 0.6) * 4.4, i = Math.floor(v);
-        p.put(px, py, MOON[Math.min(6, bayer(px, py) < v - i ? i + 1 : i)], 1);
-      }
-    };
-    // rings: an ellipse band split into the half behind the planet and the half in front
-    const ring = (p, P, front) => {
-      const rx0 = P.Ra * 1.35, rx1 = P.Ra * 1.9, sq = 0.26, ct = Math.cos(P.tilt), st = Math.sin(P.tilt);
-      const span = Math.ceil(rx1) + 1;
-      for (let py = Math.floor(P.cy - span); py <= Math.ceil(P.cy + span); py++) for (let px = Math.floor(P.cx - span); px <= Math.ceil(P.cx + span); px++) {
-        const X = px + 0.5 - P.cx, Y = py + 0.5 - P.cy;
-        const u = X * ct + Y * st, w = (-X * st + Y * ct) / sq;          // ring plane coordinates
-        const d = Math.hypot(u, w);
-        if (d < rx0 || d > rx1) continue;
-        if ((w > 0) !== front) continue;                               // near side is the lower half
-        if (!front && X * X + Y * Y < P.Ra * P.Ra) continue;          // hidden behind the planet
-        const band = (d - rx0) / (rx1 - rx0);
-        if (band > 0.58 && band < 0.66) continue;                     // a gap in the rings
-        const shade = 2.2 + (1 - band) * 2.2 + (u < 0 ? 0.6 : -0.4);
-        const i = Math.floor(shade);
-        p.put(px, py, P.ramp[Math.min(6, bayer(px, py) < shade - i ? i + 1 : i)], front ? 0.92 : 0.75);
-      }
-    };
-
-    const STAR = ['#e4e8ee', '#9aa2ae', '#5c636e', '#f4f6f9', '#bcc3cd'].map(F.hex);
+    // ---- the live layer: signals on the board, a status LED per block, a scan over the live ones ----
     const render = (t) => {
-      if (!frame) return;
-      F.clearFrame(frame);
-      const p = F.painterFor(frame);
-      // stars twinkle and drift very slowly, nearer ones a touch faster
-      for (const s of stars) {
-        const x = ((s.x - t * (0.4 + s.depth * 1.2)) % FW + FW) % FW;
-        const tw = 0.5 + 0.5 * Math.sin((t + s.o) * (Math.PI * 2) / s.p);
-        const c = s.depth > 0.7 ? STAR[0] : s.depth > 0.35 ? STAR[1] : STAR[2];
-        if (s.big) {
-          p.put(Math.round(x), Math.round(s.y), STAR[3], 1);
-          if (tw > 0.6) for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) p.put(Math.round(x) + ax, Math.round(s.y) + ay, STAR[4], (tw - 0.6) * 2);
-          p.glow(x + 0.5, s.y + 0.5, 4, F.hex('#c8d2de'), 0.12 + tw * 0.15);
-        } else p.put(Math.round(x), Math.round(s.y), c, 0.35 + tw * 0.65);
+      if (!fxFrame) return;
+      F.clearFrame(fxFrame);
+      const p = F.painterFor(fxFrame);
+      // a few signals run out along the board traces at a time
+      traces.forEach((tr, i) => {
+        const n = tr.path.length, cyc = 3.2 + hash(i, 61) * 4, local = (t + hash(i, 63) * cyc) % cyc, run = n / 70;
+        if (local > run) return;
+        const head = Math.floor((local / run) * n);
+        for (let j = 0; j < 8; j++) {
+          const k = head - j;
+          if (k < 0 || k >= n) continue;
+          const [x, y] = tr.path[k], edge = Math.min(1, Math.min(x, FW - x, y, FH - y) / 30);
+          p.put(x, y, j < 2 ? METAL[7] : TRACE_HI, edge * (1 - j / 8));
+        }
+        const [x, y] = tr.path[Math.min(n - 1, head)];
+        p.glow(x, y, 4, METAL[6], 0.25);
+      });
+      for (const b of blocks) {
+        const r = b.ramp;
+        // status LED in the top-right corner, each on its own rhythm
+        const on = Math.sin(t * (Math.PI * 2) / b.period + b.phase) > (b.live ? -0.3 : 0.4);
+        const lx = b.x + b.w - 6, ly = b.y + 4;
+        p.rect(lx, ly, 2, 2, on ? r[7] : r[3]);
+        if (on) p.glow(lx + 1, ly + 1, 5, r[6], 0.45);
+        // live blocks: a scan line sweeps down, lighting the silicon it crosses
+        if (b.live) {
+          // the scan stays under the label's corner
+          const top = Math.max(b.y + 3, b.clear.y1 + 2), sy = top + ((t * 26 + b.i * 17) % Math.max(1, b.y + b.h - 4 - top));
+          for (let x = b.x + 2; x < b.x + b.w - 2; x++) p.put(x, Math.floor(sy), r[6], 0.55);
+          p.glowLine(b.x + 2, sy, b.x + b.w - 3, sy, 3, r[5], 0.18);
+        }
+        // a slow shimmer across the block's top edge
+        const sx = b.x + ((t * 40 + b.i * 53) % (b.w + 30)) - 15;
+        for (let k = 0; k < 6; k++) if (sx + k > b.x && sx + k < b.x + b.w - 1) p.put(Math.floor(sx + k), b.y, r[7], 1 - k / 6);
       }
-      // now and then a shooting star crosses the top of the scene
-      const slot = Math.floor(t / 7), local = t - slot * 7;
-      if (local < 1.1 && hash(slot, 99) > 0.35) {
-        const sx = hash(slot, 101) * FW * 0.8 + FW * 0.15, sy = 8 + hash(slot, 103) * FH * 0.35, u = local / 1.1;
-        for (let j = 0; j < 22; j++) {
-          const q = u * 110 - j;
-          if (q < 0) continue;
-          p.put(Math.round(sx - q), Math.round(sy + q * 0.32), j < 2 ? STAR[3] : STAR[1], (1 - j / 22) * (1 - u * 0.6));
-        }
-        p.glow(sx - u * 110, sy + u * 110 * 0.32, 5, F.hex('#c8d2de'), 0.3 * (1 - u));
-      }
-      for (const P of planets) {
-        const breathe = 0.5 + 0.5 * Math.sin(t * 1.1 + P.seed);
-        // atmosphere: a soft halo, a little stronger on live domains
-        p.glowRing(P.cx, P.cy, P.Ra + 2, 7, P.ramp[5], 0.06 + (P.live ? 0.08 * breathe : 0.02));
-        // moons behind
-        for (const m of P.moons) {
-          const a = m.a + t * m.sp, mx = P.cx + Math.cos(a) * m.dist, my = P.cy + Math.sin(a) * m.dist * m.inc;
-          if (Math.sin(a) < 0 && Math.hypot(mx - P.cx, my - P.cy) > P.Ra + m.r) ball(p, mx, my, m.r);
-        }
-        if (P.ring) ring(p, P, false);
-        // the turning surface: texture value plus fixed light, in hard ramp steps with dithered edges
-        const off = t * P.spin, pix = P.pix, T = P.tex;
-        for (let n = 0; n < pix.length; n += 5) {
-          const lon = pix[n + 2] + off, tx = Math.floor((lon - Math.floor(lon)) * TW), ty = Math.min(TH - 1, Math.floor(pix[n + 3] * TH));
-          const v = pix[n + 4] + T[ty * TW + tx] * Math.min(1, pix[n + 4] / 2.2), i = Math.floor(v);
-          const px = pix[n], py = pix[n + 1];
-          p.put(px, py, P.ramp[Math.max(0, Math.min(7, bayer(px, py) < v - i ? i + 1 : i))], 1);
-        }
-        if (P.ring) ring(p, P, true);
-        for (const m of P.moons) {
-          const a = m.a + t * m.sp, mx = P.cx + Math.cos(a) * m.dist, my = P.cy + Math.sin(a) * m.dist * m.inc;
-          if (Math.sin(a) >= 0) ball(p, mx, my, m.r);
-        }
-      }
-      F.composite(frame, img.data, null);
-      ctx.putImageData(img, 0, 0);
+      F.composite(fxFrame, fxImg.data, null);
+      fxCtx.putImageData(fxImg, 0, 0);
     };
 
     const draw = () => { if (layout()) render(performance.now() / 1000); };
@@ -2149,11 +2150,11 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const loop = (now) => {
       raf = 0;
       if (!onScreen || still) return;
-      if (now - lastT > 1000 / 24) { lastT = now; render(now / 1000); }
+      if (now - lastT > 1000 / 30) { lastT = now; render(now / 1000); }
       raf = requestAnimationFrame(loop);
     };
     const kick = () => { if (!raf && onScreen && !still) raf = requestAnimationFrame(loop); };
-    if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; kick(); }).observe(bubblesEl);
+    if ('IntersectionObserver' in window) new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; kick(); }).observe(chipEl);
     else { onScreen = true; kick(); }
     draw();
     let bt;
