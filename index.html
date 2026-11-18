@@ -1652,7 +1652,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
   const LAND = ['#1b1b1a', '#232322', '#292928', '#3a3a38'].map(hex);
   // countries worked with: a lighter warm grey, carrying only a breath of their city's colour
   const WORK = ['#2a2a28', '#333331', '#3c3b38', '#52514c'].map(hex);
-  const SEA = '#1f1f1e', GRID = '#2a2a29';
+  const SEA = '#1f1f1e';
   // land and worked masks (for coast lighting)
   const landMask = new Uint8Array(MAP.cols * MAP.rows);
   for (let i = 0; i < landRuns.length; i += 3) landMask.fill(1, landRuns[i] * MAP.cols + landRuns[i + 1], landRuns[i] * MAP.cols + landRuns[i + 1] + landRuns[i + 2]);
@@ -1669,30 +1669,37 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const cs = W / MAP.cols;
     const size = Math.max(1, Math.round(cs * 0.7));
     const off = Math.max(0, Math.floor((cs - size) / 2));
-    // the fade follows the visible (cropped) window: an 8×8 ordered dither thins the dots row by row
     const cssCell = w / MAP.cols;
-    // top: fades in under the top bar; bottom: full strength down to the cards, then fades out behind them
-    // to the raster's own end (8°N)
-    const r0 = crop.top / cssCell, r1 = MAP.rows;
-    const tail = Math.max(0.12, Math.min(0.45, ((crop.fadeFrom ? MAP.rows * cssCell - crop.fadeFrom : 0) / cssCell) / (r1 - r0)));
-    const fade = new Float32Array(MAP.rows);
+    // top: a clean cut under the top bar. bottom: full strength down to the cards, then every dot steps
+    // darker towards the page colour (5 hard steps, dithered between neighbours), no overlay, no thinning
+    const r0 = crop.top / cssCell, rs = (crop.fadeFrom || MAP.rows * cssCell) / cssCell, r1 = MAP.rows;
+    const show = new Uint8Array(MAP.rows), dark = new Float32Array(MAP.rows);
     for (let r = 0; r < MAP.rows; r++) {
-      const y = (r + 0.5 - r0) / (r1 - r0);
-      fade[r] = y <= 0 || y >= 1 ? 0 : 1;
+      show[r] = r + 0.5 >= r0 ? 1 : 0;
+      dark[r] = r <= rs ? 0 : Math.min(1, smooth((r - rs) / Math.max(1, r1 - rs)) * 1.08);
     }
-    const keep = (c, r) => fade[r] >= 1 || (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < fade[r];
-    // sea: one faint dot per degree, and a graticule every 10° drawn as a finer dotted line
-    const seaStep = Math.round(U), grid = 10 * U;
-    const lat0 = MAP.top, lon0 = MAP.left;
-    g.fillStyle = SEA;
-    for (let r = 2; r < MAP.rows; r += seaStep) for (let c = 2; c < MAP.cols; c += seaStep) if (!isLand(c, r) && keep(c, r)) g.fillRect(Math.round(c * cs), Math.round(r * cs), size, size);
-    g.fillStyle = GRID;
-    for (let r = 0; r < MAP.rows; r++) for (let c = 0; c < MAP.cols; c++) {
-      const onLat = ((lat0 - r / U) % 10 + 10) % 10 === 0, onLon = ((c / U + lon0) % 10 + 10) % 10 === 0;
-      if (!(onLat && c % 2 === 0) && !(onLon && r % 2 === 0)) continue;
-      if (isLand(c, r) || !keep(c, r)) continue;
-      g.fillRect(Math.round(c * cs) + off, Math.round(r * cs) + off, size, size);
-    }
+    const BG = hex('#141413'), STEPS = 5;
+    const shade = new Map();
+    const ink = (col, c, r) => {
+      const d = dark[r];
+      if (!d) return col;
+      const v = d * STEPS, i = Math.floor(v), lvl = Math.min(STEPS, (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < v - i ? i + 1 : i);
+      if (!lvl) return col;
+      const key = col * 8 + lvl;
+      let out = shade.get(key);
+      if (out === undefined) shade.set(key, out = mix(col, BG, lvl / STEPS));
+      return out;
+    };
+    let last = -1;
+    const dot = (col, c, r, x, y) => {
+      const t = ink(col, c, r);
+      if (t === BG) return;
+      if (t !== last) { g.fillStyle = css(t); last = t; }
+      g.fillRect(x, y, size, size);
+    };
+    // sea: one faint dot per degree, an even texture everywhere
+    const seaStep = Math.round(U), SEAC = hex(SEA);
+    for (let r = 2; r < MAP.rows; r += seaStep) if (show[r]) for (let c = 2; c < MAP.cols; c += seaStep) if (!isLand(c, r)) dot(SEAC, c, r, Math.round(c * cs), Math.round(r * cs));
     // a land dot's tone: terrain picks between the two body tones (dithered, hard steps); coasts facing the
     // light (north-west) take the lit tone, coasts facing away the shadow tone, so each landmass has an edge
     const tone = (ramp, c, r) => {
@@ -1702,17 +1709,11 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       return ramp[Math.min(2, (B8[(r & 7) * 8 + (c & 7)] + 0.5) / 64 < f ? i + 1 : i)];
     };
     const runs = (list, ramp) => {
-      let last = -1;
       for (let i = 0; i < list.length; i += 3) {
         const r = list[i];
-        if (!fade[r]) continue;
+        if (!show[r]) continue;
         const y = Math.round(r * cs) + off;
-        for (let c = list[i + 1], e = c + list[i + 2]; c < e; c++) {
-          if (!keep(c, r)) continue;
-          const t = tone(ramp, c, r);
-          if (t !== last) { g.fillStyle = css(t); last = t; }
-          g.fillRect(Math.round(c * cs) + off, y, size, size);
-        }
+        for (let c = list[i + 1], e = c + list[i + 2]; c < e; c++) dot(tone(ramp, c, r), c, r, Math.round(c * cs) + off, y);
       }
     };
     runs(landRuns, LAND);
@@ -1731,8 +1732,9 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
 
   // routes: a quadratic arc from Tehran to each remote team, one entry per art pixel; the far ones rise higher
   // (but stay inside the visible band) so the routes west don't run on top of each other
-  // positive bends north, negative bends south; LA goes over the top, Atlanta under it, so the two never share a path
-  const LIFT = { la: 0.62, atlanta: -0.16, lisbon: 0.3, berlin: 0.35, yerevan: 0.5, dubai: 0.5 };
+  // how far each arc bows north (a share of its length). LA rides the top edge; Atlanta takes its own,
+  // lower arc over the Atlantic, so the two part as they leave Tehran and never share a path
+  const LIFT = { la: 0.62, atlanta: 0.13, lisbon: 0.3, berlin: 0.35, yerevan: 0.5, dubai: 0.04 };
   let routes = [];
   const buildRoutes = (topPx) => routes = Object.keys(cities).filter((k) => !cities[k].home).map((k, i) => {
     const [tx, ty] = P(k), dist = Math.hypot(tx - hx, ty - hy);
@@ -1839,7 +1841,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     const cards = Math.min(full, Math.max(box('atlanta', ir, full).bottom + 48, lowest + 12));
     crop = { top, bottom: full, fadeFrom: cards };
     // arcs may bend up to just under the visible top edge (in half-degree art pixels)
-    buildRoutes((top / w) * FW + 8);
+    buildRoutes((top / w) * FW + 3);
     inner.style.transform = `translateY(${-top}px)`;
     // the map keeps going behind the cards: the figure runs to the raster's end and the cards ride up over it
     fig.style.height = Math.round(full - top) + 'px';
