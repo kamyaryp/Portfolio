@@ -4,7 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kamyar Portfolio</title>
+<meta name="description" content="Kamyar Yazdanpanah, senior product designer: 8+ years designing commerce, crypto and Web3 products used by millions.">
 <style>
+/* Hallmark · checked: 2026-11-18 · genre: atmospheric (inferred) · scope: #about
+ * floor on #about: 0 FAIL but 44d (structural, printed) · fixed: 7a, 26b, 34, 48, 62, 63, 64, 67, 72, 75, F23 · structural: 44d, 58, 77 printed
+ * built: the project · redesign: polish · v2.0.0
+ * waive 26b: the page has no disabled controls · dismissed 67 on "GEMA × WISE 2025": the award's own name */
 @font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 html, body { margin: 0; }
@@ -34,6 +39,14 @@ img { max-width: 100%; }
   --accent: var(--ash-300);
   --accent-2: var(--taupe-400);
 
+  /* About: type set on the coloured LED panels, warm off-white, and the tooltip ground */
+  --on-panel: #F4F2EE;
+  --on-panel-2: color-mix(in srgb, var(--on-panel) 90%, transparent);
+  --on-panel-3: color-mix(in srgb, var(--on-panel) 76%, transparent);
+  --on-panel-line: color-mix(in srgb, var(--on-panel) 55%, transparent);
+  --panel-shade: color-mix(in srgb, var(--ink-900) 40%, transparent);
+  --tip-bg: #121211;
+
   /* Type */
   --font-display: "Geist", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Geist", "Segoe UI", system-ui, sans-serif;
@@ -62,6 +75,7 @@ img { max-width: 100%; }
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body { min-height: 100%; }
+html { overflow-x: clip; }
 
 body {
   background: var(--bg);
@@ -88,6 +102,8 @@ body {
 /* ---------- Page regions ---------- */
 .site-main, .site-footer { display: grid; }
 .site-main { min-height: 60vh; }
+/* grid items may shrink below their content, so a canvas sized for a wider window never widens the page */
+.site-main > * { min-width: 0; }
 
 /* ---------- Top bar ---------- */
 body::before {
@@ -525,7 +541,7 @@ html.is-writing .nav a::after { opacity: 0 !important; animation: none !importan
 /* clip sideways overflow at the window edge (not at the content gutter), so the full-bleed map reaches both edges */
 body { overflow-x: clip; }
 /* full-bleed: the map spans the whole window, outside the content column */
-.xmap { position: relative; width: 100vw; max-width: none; margin: 0 calc(50% - 50vw); overflow: hidden; overflow: clip; }
+.xmap { position: relative; width: var(--page-w, 100%); max-width: none; margin: 0 calc((100% - var(--page-w, 100%)) / 2); overflow: clip; }
 
 .xmap__inner { position: relative; will-change: transform; }
 .xmap canvas, .xmap svg { display: block; width: 100%; height: auto; }
@@ -535,20 +551,19 @@ body { overflow-x: clip; }
   display: grid;
   gap: 4px;
   white-space: nowrap;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1.3;
   color: var(--fg);
   pointer-events: none;
-  padding: 4px 6px;
+  padding: 4px max(8px, 0.5em);
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   transition: opacity 240ms ease;
 }
-.xmap__label b { display: flex; align-items: center; gap: 7px; font-weight: inherit; }
+.xmap__label b { display: flex; align-items: center; gap: 8px; font-weight: 500; }
 .xmap__label b::before { content: ""; width: 6px; height: 6px; background: var(--c, var(--fg)); flex: none; }
 .xmap__label--ul b, .xmap__label--dl b { justify-content: flex-end; }
-.xmap__label span { color: var(--muted); letter-spacing: 0.06em; }
+.xmap__label span { color: var(--muted); }
 .xmap__label--ur { transform: translate(16px, calc(-100% - 8px)); }
 .xmap__label--dr { transform: translate(16px, 10px); }
 .xmap__label--ul { transform: translate(calc(-100% - 16px), calc(-100% - 8px)); text-align: right; }
@@ -584,43 +599,46 @@ body { overflow-x: clip; }
 }
 .bio__facts div { padding: 14px 0; flex: 1; align-items: center; }
 .bio__facts div:last-child { border-bottom: 0; }
+.bio__facts dt { font-family: var(--font-body); font-size: 0.8125rem; letter-spacing: 0; text-transform: none; }
 
 /* key numbers: four cards */
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
 .stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 26px; background: color-mix(in srgb, var(--surface) 82%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--radius); }
 .stat__num { margin-bottom: 14px; font-family: var(--font-display); font-size: clamp(2.5rem, 4.4vw, 3.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
 .stat__what { font-size: var(--fs-base); color: var(--fg); }
-.stat__src { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; line-height: 1.5; color: var(--muted); }
+.stat__src { font-family: var(--font-body); font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
 
 /* domains: packed bubbles drawn as pixel dots, labels in HTML on top */
 /* domains: a chip on a board. Board and package run full width; the package matches the content column */
-.chip { position: relative; width: 100vw; max-width: none; margin: 0 calc(50% - 50vw); }
+.chip { position: relative; width: var(--page-w, 100%); max-width: none; margin: 0 calc((100% - var(--page-w, 100%)) / 2); }
 .chip canvas { position: absolute; top: 0; left: 0; display: block; image-rendering: pixelated; }
 .die-label { position: absolute; display: grid; gap: 5px; align-content: start; pointer-events: none; }
-.die-name { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; line-height: 1.12; color: #f1efea; text-wrap: balance; }
-.die-count { font-family: var(--font-mono); font-size: 0.8125rem; letter-spacing: 0.02em; color: #c9c6bf; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.die-name { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; line-height: 1.12; color: var(--on-panel); text-wrap: balance; }
+.die-count { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--on-panel-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .die-label.is-code { gap: 2px; }
-.die-code { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; color: #f1efea; }
+.die-code { font-family: var(--font-body); font-weight: 600; font-size: 0.75rem; color: var(--on-panel); }
 .die-legend { position: absolute; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 24px; font-size: var(--fs-sm); }
 .die-legend div { display: flex; gap: 10px; align-items: baseline; }
-.die-legend dt { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; color: var(--fg); min-width: 3.5em; }
+.die-legend dt { font-family: var(--font-body); font-weight: 600; font-size: var(--fs-xs); color: var(--fg); min-width: 3.5em; }
 .die-legend dd { margin: 0; color: var(--muted); }
 /* domains as a heat map: LED panels drawn by pixelfx, labels set large on top */
 .heat { position: relative; margin: 0; display: grid; gap: 24px; }
 .heat canvas { display: block; image-rendering: pixelated; }
-.heat-label { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35em; padding: 10px; text-align: center; pointer-events: none; opacity: 0; transition: opacity 400ms ease; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
-.heat-label.is-on { opacity: 1; }
-.heat-name { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.03em; line-height: 1.02; color: #fff; text-wrap: balance; }
-.heat-count { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0.4em 0.6em; font-family: var(--font-mono); color: rgba(255, 255, 255, 0.9); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.heat-count em { font-style: normal; font-size: 0.72em; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2em 0.5em; border: 1px solid rgba(255, 255, 255, 0.55); }
-.heat-share { margin-top: 0.6em; font-family: var(--font-mono); letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.75); white-space: nowrap; }
+.heat-label { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35em; padding: 10px; text-align: center; pointer-events: none; transition: opacity 400ms ease; text-shadow: 0 1px 0 var(--panel-shade); }
+.js .heat-label { opacity: 0; }
+.js .heat-label.is-on { opacity: 1; }
+.heat-name { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.03em; line-height: 1.02; color: var(--on-panel); text-wrap: balance; }
+.heat-count { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0.4em 0.6em; font-family: var(--font-mono); color: var(--on-panel-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.heat-count em { font-style: normal; font-family: var(--font-body); font-weight: 500; font-size: max(0.75rem, 0.72em); padding: 0.15em 0.6em 0.2em; border: 1px solid var(--on-panel-line); }
+.heat-share { margin-top: 0.6em; font-family: var(--font-mono); color: var(--on-panel-3); white-space: nowrap; }
 .heat-label.is-code { gap: 2px; padding: 6px; }
-.heat-label.is-code .heat-name { font-family: var(--font-mono); font-size: 0.8125rem; letter-spacing: 0.06em; }
+.heat-label.is-code .heat-name { font-family: var(--font-body); font-weight: 600; font-size: 0.8125rem; letter-spacing: 0; }
 .heat-label.is-code .heat-count { font-size: 0.75rem; }
-.heat-tip { position: absolute; z-index: 2; display: grid; gap: 4px; padding: 9px 12px 10px; background: #111214; border: 1px solid var(--line); box-shadow: inset 3px 0 0 var(--c, var(--fg)); pointer-events: none; opacity: 0; transform: translateY(4px); transition: opacity 140ms ease, transform 140ms ease; white-space: nowrap; }
+.heat-tip { position: absolute; z-index: 2; display: grid; gap: 4px; padding: 9px 12px 10px; background: var(--tip-bg); border: 1px solid var(--line); box-shadow: inset 4px 0 0 var(--c, var(--fg)); pointer-events: none; transform: translateY(4px); transition: opacity 140ms ease, transform 140ms ease; white-space: nowrap; }
+.js .heat-tip { opacity: 0; }
 .heat-tip.is-on { opacity: 1; transform: none; }
 .heat-tip b { font-weight: 500; font-size: var(--fs-sm); color: var(--fg); }
-.heat-tip span { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); }
+.heat-tip span { font-family: var(--font-body); font-size: 0.8125rem; color: var(--muted); }
 /* domains as a pixel grid: one tile per project, then a legend */
 .waffle { position: relative; margin: 0; display: grid; gap: 32px; }
 .waffle canvas { display: block; image-rendering: pixelated; }
@@ -628,10 +646,10 @@ body { overflow-x: clip; }
 .waffle-legend div { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
 .waffle-legend dt { display: flex; align-items: center; gap: 12px; font-size: var(--fs-base); color: var(--fg); min-width: 0; white-space: nowrap; }
 .waffle-legend dt i { flex: none; width: 12px; height: 12px; background: var(--s); box-shadow: inset 2px 2px 0 var(--e); }
-.waffle-legend dd em { font-style: normal; margin-right: 10px; font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.waffle-legend dd em { font-style: normal; margin-right: 12px; font-family: var(--font-body); font-size: 0.8125rem; color: var(--muted); }
 .heat-legend { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 24px; font-size: var(--fs-sm); }
 .heat-legend div { display: flex; gap: 10px; align-items: baseline; }
-.heat-legend dt { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.08em; color: var(--fg); min-width: 4.5em; }
+.heat-legend dt { display: flex; align-items: center; gap: 8px; font-family: var(--font-body); font-weight: 600; font-size: var(--fs-xs); color: var(--fg); min-width: 4.5em; }
 .heat-legend dt i { width: 8px; height: 8px; }
 .heat-legend dd { margin: 0; color: var(--muted); }
 .waffle-legend dd { margin: 0; white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--fg); font-variant-numeric: tabular-nums; }
@@ -642,21 +660,20 @@ body { overflow-x: clip; }
 .vgraph { margin: 0; min-width: 0; --vg-label: 27rem; --vg-dur: 5rem; --vg-gap: 32px; }
 .vg-head, .vg-row { display: grid; grid-template-columns: minmax(0, var(--vg-label)) minmax(0, 1fr) var(--vg-dur); column-gap: var(--vg-gap); align-items: center; }
 .vg-head { padding: 18px 0 14px; border-bottom: 1px solid var(--line); }
-.vg-head .label { font-size: 0.6875rem; }
+#view-about .vg-head .label { font-family: var(--font-body); font-size: 0.8125rem; letter-spacing: 0; text-transform: none; }
 .vg-head .label:last-child { text-align: right; }
 .vgraph__axis { position: relative; height: 1em; font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1; }
-.vgraph__axis span { position: absolute; top: 0; color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+.vgraph__axis span { position: absolute; top: 0; color: var(--muted); font-variant-numeric: tabular-nums; }
 .vgraph__axis span.is-now { color: var(--fg); }
 .vg-row { padding: 20px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
 .vg-row:last-child { border-bottom: 0; }
 .vg-row__label { display: grid; gap: 8px; min-width: 0; }
 .vg-row__domain { font-family: var(--font-display); font-size: 1.25rem; font-weight: 500; letter-spacing: -0.015em; line-height: 1.1; color: var(--fg); }
-.vg-row__co { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
-.vg-row__co i { font-style: normal; margin: 0 0.7em; color: var(--taupe-400); opacity: 0.5; }
+.vg-row__co { font-family: var(--font-body); font-size: 0.875rem; color: var(--muted); line-height: 1.4; }
 .vg-row__co span { white-space: nowrap; } /* wrap only at the divider */
 .vg-row svg { display: block; width: 100%; height: auto; overflow: visible; }
 .vg-row__dur { font-family: var(--font-mono); font-size: 0.875rem; color: var(--fg); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.vg-row__dur.is-project { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.vg-row__dur.is-project { font-family: var(--font-body); font-size: 0.8125rem; color: var(--muted); }
 .vg-off { fill: var(--ink-600); }
 .vg-yr { fill: var(--taupe-400); opacity: 0.45; }
 .vg-on { fill: var(--ash-300); }
@@ -666,7 +683,10 @@ body { overflow-x: clip; }
 /* closing link */
 .about-cta { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 16px 32px; margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--line); }
 .about-cta p { margin: 0; font-size: var(--fs-xl); font-weight: 300; color: var(--muted); }
-.about-cta a { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg); text-decoration: none; display: inline-flex; align-items: baseline; }
+.about-cta a { font-family: var(--font-body); font-size: var(--fs-base); font-weight: 500; color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; display: inline-flex; align-items: baseline; transition: color 140ms ease, text-decoration-color 140ms ease; }
+.about-cta a:hover { text-decoration-color: currentColor; }
+.about-cta a:active { color: var(--muted); }
+.about-cta a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; transition: none; }
 .about-cta a::after { content: ""; width: 8px; height: 2px; margin-left: 4px; background: currentColor; animation: bit-blink 1.06s steps(1, end) infinite; }
 
 @media (max-width: 1100px) {
@@ -738,6 +758,11 @@ body { overflow-x: clip; }
 <script>
   // Show the loading screen from the first paint (skipped for reduced motion).
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('is-intro');
+  // Scripted states (hidden-until-ready labels) hang off .js, so the page reads with scripting off.
+  document.documentElement.classList.add('js');
+  // Full-bleed blocks use the window width without the scrollbar (100vw would include it and scroll sideways).
+  const setPageW = () => document.documentElement.style.setProperty('--page-w', document.documentElement.clientWidth + 'px');
+  setPageW(); addEventListener('resize', setPageW); addEventListener('DOMContentLoaded', setPageW);
 </script>
 <script src="portrait.js"></script>
 <script>
@@ -809,10 +834,10 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       <!-- 2 · Numbers. Users: sum of the published figures only (Digikala, AbanTether, Gala); other products add to the "+" -->
       <section class="about-stats" aria-label="In numbers">
         <div class="stats" data-reveal>
-          <div class="stat"><span class="stat__num">5.7M+</span><span class="stat__what">users reached</span><span class="stat__src">Digikala 1.9M · AbanTether 2.5M · Gala 1.3M</span></div>
+          <div class="stat"><span class="stat__num">5.7M+</span><span class="stat__what">users reached</span><span class="stat__src">Digikala 1.9M, AbanTether 2.5M, Gala 1.3M</span></div>
           <div class="stat"><span class="stat__num">94</span><span class="stat__what">products</span><span class="stat__src">across 7 roles and 3 partnerships</span></div>
-          <div class="stat"><span class="stat__num">14</span><span class="stat__what">product domains</span><span class="stat__src">Web3 · crypto · commerce · SaaS · media · more</span></div>
-          <div class="stat"><span class="stat__num">6</span><span class="stat__what">countries</span><span class="stat__src">Iran · UAE · Germany · Portugal · USA · Armenia</span></div>
+          <div class="stat"><span class="stat__num">14</span><span class="stat__what">product domains</span><span class="stat__src">Web3, crypto, commerce, SaaS, media and more</span></div>
+          <div class="stat"><span class="stat__num">6</span><span class="stat__what">countries</span><span class="stat__src">Iran, UAE, Germany, Portugal, USA, Armenia</span></div>
         </div>
       </section>
 
@@ -846,7 +871,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
           <dl class="facts bio__facts">
             <div><dt>Based in</dt><dd>Tehran, Iran</dd></div>
             <div><dt>Works</dt><dd>On-site &amp; remote</dd></div>
-            <div><dt>Focus</dt><dd>Product · UX · Design systems</dd></div>
+            <div><dt>Focus</dt><dd>Product, UX, design systems</dd></div>
             <div><dt>Recognition</dt><dd>GEMA × WISE 2025</dd></div>
           </dl>
         </div>
@@ -1912,7 +1937,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     }
     const row = document.createElement('div');
     row.className = 'vg-row';
-    row.innerHTML = `<span class="vg-row__label"><span class="vg-row__domain">${x.co}</span><span class="vg-row__co"><span>${x.role}</span>${x.d ? `<i aria-hidden="true">·</i><wbr><span>${x.d}</span>` : ''}</span></span>`;
+    row.innerHTML = `<span class="vg-row__label"><span class="vg-row__domain">${x.co}</span><span class="vg-row__co"><span>${x.role}${x.d ? ',' : ''}</span>${x.d ? ` <wbr><span>${x.d}</span>` : ''}</span></span>`;
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${N} 1`);
     svg.setAttribute('aria-hidden', 'true');
@@ -2081,7 +2106,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
         lab.style.left = (b.x * PX + inset) + 'px';
         lab.style.top = (b.y * PX + inset - 1) + 'px';
         lab.style.maxWidth = (wc - 20) + 'px';
-        const count = wc < 160 ? `${b.m}${b.live ? ' · live' : ''}` : `${b.m} project${b.m === 1 ? '' : 's'}${b.live ? ' · live' : ''}`;
+        const count = wc < 160 ? `${b.m}${b.live ? ', live' : ''}` : `${b.m} project${b.m === 1 ? '' : 's'}${b.live ? ', live' : ''}`;
         lab.innerHTML = fits
           ? `<span class="die-name" style="font-size:${fs.toFixed(1)}px">${b.d}</span><span class="die-count">${count}</span>`
           : `<span class="die-code">${b.code}</span>` + (hc >= 46 ? `<span class="die-count">${b.m}</span>` : '');
@@ -2092,7 +2117,7 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
       if (legend.length) {
         const ul = document.createElement('dl');
         ul.className = 'die-legend';
-        ul.innerHTML = legend.map((b) => `<div><dt>${b.code}</dt><dd>${b.d} · ${b.m}</dd></div>`).join('');
+        ul.innerHTML = legend.map((b) => `<div><dt>${b.code}</dt><dd>${b.d}: ${b.m}</dd></div>`).join('');
         chipEl.append(ul);
         chipEl.style.height = FH * PX + ul.offsetHeight + 16 + 'px';
         ul.style.top = FH * PX + 12 + 'px';
@@ -2438,12 +2463,12 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
         if (wc >= 96 && hc >= 64) {
           lab.innerHTML = `<span class="heat-name" style="font-size:${fs.toFixed(1)}px">${it.d}</span>` +
             `<span class="heat-count" style="font-size:${Math.max(12, fs * 0.36).toFixed(1)}px">${unit}${it.current ? '<em>current</em>' : ''}</span>` +
-            (hc >= 150 ? `<span class="heat-share" style="font-size:${Math.max(11, fs * 0.26).toFixed(1)}px">Share · ${share}</span>` : '');
+            (hc >= 150 ? `<span class="heat-share" style="font-size:${Math.max(11, fs * 0.26).toFixed(1)}px">${share} share</span>` : '');
         } else {
           lab.classList.add('is-code');
           lab.innerHTML = `<span class="heat-name">${it.code}</span>` + (hc >= 52 ? `<span class="heat-count">${it.m}</span>` : '');
           b.small = true;
-          b.tip = `<b>${it.d}</b><span>${unit} · ${share}</span>`;
+          b.tip = `<b>${it.d}</b><span>${unit}, ${share} share</span>`;
         }
         heatEl.append(lab);
         b.lab = lab;
@@ -2580,7 +2605,8 @@ var PFX=(()=>{var S=Object.defineProperty;var ot=Object.getOwnPropertyDescriptor
     else { onScreen = true; revealAt = 0; kick(); }
     draw();
     let bt;
-    addEventListener('resize', () => { clearTimeout(bt); bt = setTimeout(draw, 120); });
+    // a narrower window relays the panels at once (a canvas left at the old width would push past the screen); wider ones settle first
+    addEventListener('resize', () => { clearTimeout(bt); if (heatEl.clientWidth < FW * PX) draw(); else bt = setTimeout(draw, 120); });
     addEventListener('viewchange', (e) => { if (e.detail.id === 'about') requestAnimationFrame(() => { draw(); kick(); }); });
     (document.fonts?.ready || Promise.resolve()).then(draw);
   }
