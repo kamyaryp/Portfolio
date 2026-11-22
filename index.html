@@ -848,7 +848,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
         <div class="card-panel" data-reveal>
           <figure class="vgraph" id="vgraph" aria-label="Timeline of roles, one square per quarter, from late 2017 to now.">
             <div class="vg-head" aria-hidden="true">
-              <span class="label">Role</span>
+              <span class="label">Experiences</span>
               <div class="vgraph__axis" id="vgraph-axis"></div>
               <span class="label">Time</span>
             </div>
@@ -1916,11 +1916,9 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
     { co: 'Djoid', role: 'Product Designer', d: 'AI & music tech', s: '2023-04', e: '2024-06' },
     { co: 'AbanTether', role: 'Senior Product Designer', d: 'Fintech & crypto', s: '2023-02', e: '2024-05' },
     { co: 'Gala', role: 'Product Designer', d: 'Web3 & DeFi', s: '2022-02', e: '2023-02' },
+    { co: 'Trakdesk', role: 'Product Designer', d: 'SaaS & CRM', s: '2021-03', e: '2022-02' },
     { co: 'Imen Aria', role: 'UI/UX Designer', d: 'SaaS, cloud & networks', s: '2020-01', e: '2022-02' },
-    { co: 'Kidcare', role: 'Product Designer', d: 'Edtech & childcare', s: '2020-01', e: '2020-06' },        // 6 months, early in Imen Aria
-    { co: 'EasyBimeh', role: 'UI/UX Designer', d: 'Insurtech CRM', s: '2017-10', e: '2020-01' },
-    { co: 'Trakdesk', role: 'Product Designer', d: 'SaaS & CRM', s: '2021-03', e: '2022-02' },       // 1 year, Imen Aria's last year
-    { co: 'Fill Studio', role: 'Product Designer', d: 'E-commerce', s: '2026-05', e: '2026-08' }    // 4 months, alongside Digikala
+    { co: 'EasyBimeh', role: 'UI/UX Designer', d: 'Insurtech CRM', s: '2017-10', e: '2020-01' }
   ];
   const dur = (m) => { const y = Math.floor(m / 12), r = m % 12; return (y ? y + 'y' : '') + (y && r ? ' ' : '') + (r ? r + 'm' : ''); };
   const SQ = 0.66; // filled square, as a share of one quarter's width
