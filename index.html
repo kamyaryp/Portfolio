@@ -627,7 +627,7 @@ body { overflow-x: clip; }
 .heat-label { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35em; padding: 10px; text-align: center; pointer-events: none; transition: opacity 400ms ease; text-shadow: 0 1px 0 var(--panel-shade); }
 .js .heat-label { opacity: 0; }
 .js .heat-label.is-on { opacity: 1; }
-.heat-name { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.03em; line-height: 1.02; color: var(--on-panel); text-wrap: balance; }
+.heat-name { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em; line-height: 1.04; text-transform: uppercase; color: var(--on-panel); text-wrap: balance; }
 .heat-count { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0.4em 0.6em; font-family: var(--font-mono); color: var(--on-panel-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .heat-count em { font-style: normal; font-family: var(--font-body); font-weight: 500; font-size: max(0.75rem, 0.72em); padding: 0.15em 0.6em 0.2em; border: 1px solid var(--on-panel-line); }
 .heat-share { margin-top: 0.6em; font-family: var(--font-mono); color: var(--on-panel-3); white-space: nowrap; }
@@ -865,7 +865,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
 
       <!-- 4 · Domains: a chip floor plan, one block per product domain, area = projects -->
       <section class="about-block" aria-label="Product domains">
-        <figure class="chip" id="bubbles" data-reveal aria-label="Product domains as panels, each sized by its share of products: Q-commerce and e-commerce 35.1%, Web3, crypto and DeFi 34%, design assets, brand and campaign sites 6.4% each, SaaS, CRM and cloud 5.3%, media and streaming 3.2%, insurtech and gaming 2.1% each, and 1.1% each for AI and music tech, travel, government, edtech and childcare, and beauty and self-care."></figure>
+        <figure class="chip" id="bubbles" data-reveal aria-label="Product domains as panels, each sized by its share of products: commerce platforms 35.1%, crypto and Web3 platforms 34%, UI kits and assets, and campaign landing pages 6.4% each, SaaS, CRM and cloud 5.3%, media and VOD 3.2%, insurtech and game UI 2.1% each, and 1.1% each for AI music tech, travel booking, GovTech, edtech and beauty booking."></figure>
       </section>
 
       <!-- 5 · Bio -->
@@ -2396,22 +2396,22 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
   const heatEl = document.getElementById('bubbles');
   if (heatEl && F && DOMAINS_VIEW === 'heat') {
     heatEl.className = 'heat';
-    // one flat colour per domain, each built into a pixelfx-style ramp (dark to white-hot). Q-commerce takes Digikala's red,
-    // Web3 & crypto AbanTether's blue; the rest are set at the same weight and kept clear of those two hues
+    // one flat colour per domain, each built into a pixelfx-style ramp (dark to white-hot). commerce takes Digikala's red,
+    // crypto & Web3 AbanTether's blue; the rest are vivid at the same weight and kept clear of those two hues
     const items = [
-      { d: 'Q-commerce & e-commerce', code: 'QCM', m: 33, base: '#ED1B34', current: true },
-      { d: 'Web3, crypto & DeFi', code: 'WEB3', m: 32, base: '#2E46DE' },
-      { d: 'Design assets', code: 'AST', m: 6, base: '#D98A0E', current: true },
-      { d: 'Brand & campaign sites', code: 'BRD', m: 6, base: '#1E9A58' },
-      { d: 'SaaS, CRM & cloud', code: 'SAAS', m: 5, base: '#0E95A3' },
-      { d: 'Media & streaming', code: 'MED', m: 3, base: '#8A3FD6' },
-      { d: 'Insurtech', code: 'INS', m: 2, base: '#7D8B1F' },
-      { d: 'Gaming', code: 'GME', m: 2, base: '#D2551E' },
-      { d: 'AI & music tech', code: 'AI', m: 1, base: '#5D4FB0' },
-      { d: 'Travel', code: 'TRV', m: 1, base: '#2C7F96' },
-      { d: 'Government', code: 'GOV', m: 1, base: '#6E6C66' },
-      { d: 'Edtech & childcare', code: 'EDU', m: 1, base: '#7F6439' },
-      { d: 'Beauty & self-care', code: 'BTY', m: 1, base: '#B2468C' }
+      { d: 'Commerce platforms', code: 'COM', m: 33, base: '#ED1B34', current: true },
+      { d: 'Crypto & Web3 platforms', code: 'WEB3', m: 32, base: '#2E46DE' },
+      { d: 'UI kits & assets', code: 'KIT', m: 6, base: '#E8960C', current: true },
+      { d: 'Campaign landing pages', code: 'LP', m: 6, base: '#14A858' },
+      { d: 'SaaS, CRM & cloud', code: 'SAAS', m: 5, base: '#00ADC0' },
+      { d: 'Media & VOD', code: 'VOD', m: 3, base: '#9A4DF5' },
+      { d: 'Insurtech', code: 'INS', m: 2, base: '#8DB616' },
+      { d: 'Game UI', code: 'GAME', m: 2, base: '#FF6A1F' },
+      { d: 'AI music tech', code: 'AI', m: 1, base: '#6B63F2' },
+      { d: 'Travel booking', code: 'TRV', m: 1, base: '#2AA6E8' },
+      { d: 'GovTech', code: 'GOV', m: 1, base: '#A8A296' },
+      { d: 'Edtech', code: 'EDU', m: 1, base: '#E3B91B' },
+      { d: 'Beauty booking', code: 'BTY', m: 1, base: '#E04BB8' }
     ];
     const hx = (h) => [1, 3, 5].map((k) => parseInt(h.slice(k, k + 2), 16));
     const toHex = (c) => '#' + c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
@@ -2503,7 +2503,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       const seen = new Set();
       nodes = [];
       for (const w of wires) for (const q of [w.pts[0], w.pts[w.pts.length - 1]]) { const key = q[0] + ',' + q[1]; if (!seen.has(key)) { seen.add(key); nodes.push({ x: q[0], y: q[1], hit: -9, ramp: w.owner.ramp }); } }
-      for (const b of blocks) { b.traces = []; b.nx = Math.ceil((b.w - 2) / 2); b.ny = Math.ceil((b.h - 2) / 2); b.maxTraces = Math.min(12, 2 + Math.round(b.nx * b.ny / 900)); b.nextSpark = 0; }
+      for (const b of blocks) { b.traces = []; b.nx = Math.ceil((b.w - 2) / 2); b.ny = Math.ceil((b.h - 2) / 2); b.maxTraces = Math.min(12, Math.max(1, Math.round(b.nx * b.ny / 650))); b.nextSpark = 0; }
       // keep the flicker off the text: each label's text box, in art pixels
       const cr = heatEl.getBoundingClientRect();
       for (const b of blocks) {
@@ -2594,7 +2594,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
           const ex = side === 0 || side === 2 ? b.x + 1 + u * (b.w - 3) : side === 1 ? b.x : b.x + b.w - 1;
           const ey = side === 1 || side === 3 ? b.y + 1 + u * (b.h - 3) : side === 0 ? b.y : b.y + b.h - 1;
           b.traces.push(trace(b, ex, ey, t));
-          b.nextSpark = t + ((b.current ? 0.35 : 0.6) + hash(k, 6) * 1.2) * Math.max(0.4, 4 / b.maxTraces);
+          b.nextSpark = t + ((b.current ? 0.35 : 0.6) + hash(k, 6) * 1.2) * Math.max(0.4, 4 / b.maxTraces) * (b.maxTraces < 2 ? 2.2 : 1);   // small panels stay calm
         }
         for (let y = b.y + 1; y < b.y + b.h - 1; y += 2) for (let x = b.x + 1; x < b.x + b.w - 1; x += 2) {
           const k = x * 7919 + y;
