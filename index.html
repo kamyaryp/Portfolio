@@ -844,7 +844,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
         <div class="stats" data-reveal>
           <div class="stat"><span class="stat__num">5.7M+</span><span class="stat__what">users reached</span><span class="stat__src">Digikala 1.9M, AbanTether 2.5M, Gala 1.3M</span></div>
           <div class="stat"><span class="stat__num">94</span><span class="stat__what">products</span><span class="stat__src">across 7 roles and 3 partnerships</span></div>
-          <div class="stat"><span class="stat__num">14</span><span class="stat__what">product domains</span><span class="stat__src">Web3, crypto, commerce, SaaS, media and more</span></div>
+          <div class="stat"><span class="stat__num">13</span><span class="stat__what">product domains</span><span class="stat__src">Web3, crypto, commerce, SaaS, media and more</span></div>
           <div class="stat"><span class="stat__num">6</span><span class="stat__what">countries</span><span class="stat__src">Iran, UAE, Germany, Portugal, USA, Armenia</span></div>
         </div>
       </section>
@@ -865,7 +865,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
 
       <!-- 4 · Domains: a chip floor plan, one block per product domain, area = projects -->
       <section class="about-block" aria-label="Product domains">
-        <figure class="chip" id="bubbles" data-reveal aria-label="Product domains as blocks on a chip, each sized by its number of projects: Q-commerce and e-commerce 33, Web3, NFT and DeFi 26, crypto exchange 6, design assets 6, brand and campaign sites 6, SaaS, CRM and cloud 5, media and streaming 3, insurtech 2, gaming 2, and one each for AI and music tech, travel, government, edtech and childcare, and beauty and self-care."></figure>
+        <figure class="chip" id="bubbles" data-reveal aria-label="Product domains as panels, each sized by its share of products: Q-commerce and e-commerce 35.1%, Web3, crypto and DeFi 34%, design assets, brand and campaign sites 6.4% each, SaaS, CRM and cloud 5.3%, media and streaming 3.2%, insurtech and gaming 2.1% each, and 1.1% each for AI and music tech, travel, government, edtech and childcare, and beauty and self-care."></figure>
       </section>
 
       <!-- 5 · Bio -->
@@ -2396,23 +2396,29 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
   const heatEl = document.getElementById('bubbles');
   if (heatEl && F && DOMAINS_VIEW === 'heat') {
     heatEl.className = 'heat';
-    // pixelfx ramps, the same family as the map's cities
+    // one flat colour per domain, each built into a pixelfx-style ramp (dark to white-hot). Q-commerce takes Digikala's red,
+    // Web3 & crypto AbanTether's blue; the rest are set at the same weight and kept clear of those two hues
     const items = [
-      { d: 'Q-commerce & e-commerce', code: 'QCM', m: 33, pal: 'ember', current: true },
-      { d: 'Web3, NFT & DeFi', code: 'WEB3', m: 26, pal: 'cyber' },
-      { d: 'Crypto exchange', code: 'CEX', m: 6, pal: 'heal' },
-      { d: 'Design assets', code: 'AST', m: 6, pal: 'volt', current: true },
-      { d: 'Brand & campaign sites', code: 'BRD', m: 6, pal: 'poison' },
-      { d: 'SaaS, CRM & cloud', code: 'SAAS', m: 5, pal: 'electric' },
-      { d: 'Media & streaming', code: 'MED', m: 3, pal: 'arcane' },
-      { d: 'Insurtech', code: 'INS', m: 2, pal: 'gold' },
-      { d: 'Gaming', code: 'GME', m: 2, pal: 'blood' },
-      { d: 'AI & music tech', code: 'AI', m: 1, pal: 'shadow' },
-      { d: 'Travel', code: 'TRV', m: 1, pal: 'ice' },
-      { d: 'Government', code: 'GOV', m: 1, pal: 'metal' },
-      { d: 'Edtech & childcare', code: 'EDU', m: 1, pal: 'earth' },
-      { d: 'Beauty & self-care', code: 'BTY', m: 1, pal: 'neon' }
+      { d: 'Q-commerce & e-commerce', code: 'QCM', m: 33, base: '#ED1B34', current: true },
+      { d: 'Web3, crypto & DeFi', code: 'WEB3', m: 32, base: '#2E46DE' },
+      { d: 'Design assets', code: 'AST', m: 6, base: '#D98A0E', current: true },
+      { d: 'Brand & campaign sites', code: 'BRD', m: 6, base: '#1E9A58' },
+      { d: 'SaaS, CRM & cloud', code: 'SAAS', m: 5, base: '#0E95A3' },
+      { d: 'Media & streaming', code: 'MED', m: 3, base: '#8A3FD6' },
+      { d: 'Insurtech', code: 'INS', m: 2, base: '#7D8B1F' },
+      { d: 'Gaming', code: 'GME', m: 2, base: '#D2551E' },
+      { d: 'AI & music tech', code: 'AI', m: 1, base: '#5D4FB0' },
+      { d: 'Travel', code: 'TRV', m: 1, base: '#2C7F96' },
+      { d: 'Government', code: 'GOV', m: 1, base: '#6E6C66' },
+      { d: 'Edtech & childcare', code: 'EDU', m: 1, base: '#7F6439' },
+      { d: 'Beauty & self-care', code: 'BTY', m: 1, base: '#B2468C' }
     ];
+    const hx = (h) => [1, 3, 5].map((k) => parseInt(h.slice(k, k + 2), 16));
+    const toHex = (c) => '#' + c.map((v) => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+    const tint = (c, to, k) => c.map((v, n) => v + (to[n] - v) * k);
+    const rampOf = (base) => { const c = hx(base), K = [0, 0, 0], W = [255, 255, 255];
+      return [tint(c, K, 0.85), tint(c, K, 0.62), tint(c, K, 0.12), c, tint(c, W, 0.3), tint(c, W, 0.55), tint(c, W, 0.8), W].map(toHex); };
+    for (const it of items) it.hexes = rampOf(it.base);
     const TOTAL = items.reduce((a, b) => a + b.m, 0);
     const PX = 2;                                   // one art pixel = 2 CSS px; LEDs sit on every other art pixel
     const hash = (x, y) => { let h = (x * 374761393 + y * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -2460,7 +2466,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       blocks = rects.map((r, i) => {
         const it = items[i];
         const x0 = Math.round(r.x), y0 = Math.round(r.y), x1 = Math.round(r.x + r.w) - 2, y1 = Math.round(r.y + r.h) - 2; // 2 art px seams: the bus
-        const ramp = F.PAL[it.pal].map(F.hex);
+        const ramp = it.hexes.map(F.hex);
         const b = { ...it, i, x: x0, y: y0, w: x1 - x0, h: y1 - y0, ramp, led: F.mix(ramp[2], ramp[3], 0.45), off: hash(i, 3) * 9, rate: 0.6 + hash(i, 5) * 0.9 };
         // the label: name and share, set large like a market heat map and scaled to the panel
         const wc = b.w * PX, hc = b.h * PX;
@@ -2497,7 +2503,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       const seen = new Set();
       nodes = [];
       for (const w of wires) for (const q of [w.pts[0], w.pts[w.pts.length - 1]]) { const key = q[0] + ',' + q[1]; if (!seen.has(key)) { seen.add(key); nodes.push({ x: q[0], y: q[1], hit: -9, ramp: w.owner.ramp }); } }
-      for (const b of blocks) { b.traces = []; b.nx = Math.ceil((b.w - 2) / 2); b.ny = Math.ceil((b.h - 2) / 2); b.maxTraces = Math.min(5, 1 + Math.round(b.nx * b.ny / 2500)); b.nextSpark = 0; }
+      for (const b of blocks) { b.traces = []; b.nx = Math.ceil((b.w - 2) / 2); b.ny = Math.ceil((b.h - 2) / 2); b.maxTraces = Math.min(12, 2 + Math.round(b.nx * b.ny / 900)); b.nextSpark = 0; }
       // keep the flicker off the text: each label's text box, in art pixels
       const cr = heatEl.getBoundingClientRect();
       for (const b of blocks) {
@@ -2513,28 +2519,32 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
     const BUS = F.hex('#1d1e21'), NODE = F.hex('#2b2d31'), SPEED = 95;   // packet speed in art px per second
     // a circuit trace: from where the packet landed, a signal runs into the panel along the LED grid in straight runs
     // with right-angle turns, like a track on a board, and ends on a via that flashes
-    const TRACE_SPEED = 30, TAIL = 14;                                   // LEDs per second, lit LEDs behind the head
+    const TRACE_SPEED = 26, TAIL = 20, LINGER = 2.4;                    // LEDs per second, lit LEDs behind the head, seconds a track stays faintly lit
     const trace = (b, ex, ey, t0) => {
       let lx = Math.max(0, Math.min(b.nx - 1, Math.round((ex - b.x - 1) / 2))), ly = Math.max(0, Math.min(b.ny - 1, Math.round((ey - b.y - 1) / 2)));
-      const seed = Math.floor(t0 * 997) + b.i * 131;
-      let dx = 0, dy = 1;                                              // in from the top edge, or from the left
-      if (ey > b.y + 1 && ex <= b.x + 1) { dx = 1; dy = 0; }
-      const pts = [[lx, ly]], total = Math.min(Math.round((b.nx + b.ny) * 0.9), 30 + Math.floor(hash(seed, 1) * 50));
-      let run = 0, seg = 4 + Math.floor(hash(seed, 2) * Math.max(4, Math.min(b.nx, b.ny) * 0.4)), turns = 0;
-      const cx = b.nx / 2, cy = b.ny / 2;
-      const ok = (x, y) => x >= 0 && y >= 0 && x < b.nx && y < b.ny;
-      while (pts.length < total) {
+      const seed = Math.floor(t0 * 997) + b.i * 131 + lx * 7 + ly * 13;
+      // in from whichever edge it starts on
+      let dx = 0, dy = 1;
+      if (ly >= b.ny - 1) { dx = 0; dy = -1; } else if (lx <= 0 && ly > 0) { dx = 1; dy = 0; } else if (lx >= b.nx - 1 && ly > 0) { dx = -1; dy = 0; }
+      const short = Math.min(b.nx, b.ny);
+      const pts = [[lx, ly]], total = Math.min(Math.round((b.nx + b.ny) * 1.4), 40 + Math.floor(hash(seed, 1) * 90));
+      let run = 0, seg = 2 + Math.floor(hash(seed, 2) * Math.max(4, short * 0.6)), turns = 0;
+      const cx = b.nx / 2, cy = b.ny / 2, seen = new Set([lx + ',' + ly]);
+      const ok = (x, y) => x >= 0 && y >= 0 && x < b.nx && y < b.ny && !seen.has(x + ',' + y);
+      while (pts.length < total && turns < 22) {
         if (run >= seg || !ok(lx + dx, ly + dy)) {
-          // turn left or right, mostly towards the middle of the panel so the track keeps working inward
+          // turn left or right: a little more often towards the middle, so tracks wander but keep working inward
           const left = [dy, -dx], right = [-dy, dx], score = ([qx, qy]) => (cx - lx) * qx + (cy - ly) * qy;
-          const inward = score(left) >= score(right) ? [left, right] : [right, left], pick = hash(seed, 10 + turns) < 0.7 ? inward : [inward[1], inward[0]];
+          const inward = score(left) >= score(right) ? [left, right] : [right, left], pick = hash(seed, 10 + turns) < 0.58 ? inward : [inward[1], inward[0]];
           const nd = pick.find(([qx, qy]) => ok(lx + qx, ly + qy));
           if (!nd) break;
-          [dx, dy] = nd; run = 0; seg = 3 + Math.floor(hash(seed, 20 + turns) * Math.max(4, Math.min(b.nx, b.ny) * 0.45)); turns++;
+          [dx, dy] = nd; run = 0; turns++;
+          const r = hash(seed, 20 + turns);                                // run lengths: mostly short jogs, now and then a long straight
+          seg = r < 0.55 ? 2 + Math.floor(r * 8) : 4 + Math.floor(hash(seed, 40 + turns) * Math.max(6, short * 0.7));
         }
         lx += dx; ly += dy; run++;
+        seen.add(lx + ',' + ly);
         pts.push([lx, ly]);
-        if (turns > 9) break;
       }
       return { pts: pts.map(([x, y]) => [b.x + 1 + x * 2, b.y + 1 + y * 2]), t0 };
     };
@@ -2578,11 +2588,13 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
         p.rect(b.x, b.y, b.w, b.h, boot > 0 ? r[2] : r[0]);
         const slot = Math.floor(t * b.rate * (b.current ? 1.6 : 1));
         const m = b.mask;
-        b.traces = b.traces.filter((q) => (t - q.t0) * TRACE_SPEED < q.pts.length + TAIL + 12);
+        b.traces = b.traces.filter((q) => (t - q.t0) * TRACE_SPEED < q.pts.length + TAIL + LINGER * TRACE_SPEED + 12);
         if (live && t > b.nextSpark && b.traces.length < b.maxTraces && b.nx > 3 && b.ny > 3) {   // the panel's own activity: a trace from a random point on its top or left edge
-          const k = Math.floor(t * 13) + b.i * 71, top = hash(k, 3) > 0.5;
-          b.traces.push(trace(b, top ? b.x + 1 + hash(k, 4) * (b.w - 2) : b.x, top ? b.y : b.y + 1 + hash(k, 5) * (b.h - 2), t));
-          b.nextSpark = t + (b.current ? 1.2 : 2.2) + hash(k, 6) * 2.5;
+          const k = Math.floor(t * 13) + b.i * 71, side = Math.floor(hash(k, 3) * 4), u = hash(k, 4);   // any of the four edges
+          const ex = side === 0 || side === 2 ? b.x + 1 + u * (b.w - 3) : side === 1 ? b.x : b.x + b.w - 1;
+          const ey = side === 1 || side === 3 ? b.y + 1 + u * (b.h - 3) : side === 0 ? b.y : b.y + b.h - 1;
+          b.traces.push(trace(b, ex, ey, t));
+          b.nextSpark = t + ((b.current ? 0.35 : 0.6) + hash(k, 6) * 1.2) * Math.max(0.4, 4 / b.maxTraces);
         }
         for (let y = b.y + 1; y < b.y + b.h - 1; y += 2) for (let x = b.x + 1; x < b.x + b.w - 1; x += 2) {
           const k = x * 7919 + y;
@@ -2600,12 +2612,18 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
         const free = (x, y) => !(x > m.x0 && x < m.x1 && y > m.y0 && y < m.y1);
         for (const q of b.traces) {
           const head = Math.floor((t - q.t0) * TRACE_SPEED), n = q.pts.length;
+          for (let i = Math.max(0, head - TAIL - Math.ceil(LINGER * TRACE_SPEED)); i < Math.min(n, head - TAIL + 1); i++) {   // the track stays faintly lit, then dithers away
+            const a = 1 - (head - TAIL - i) / (LINGER * TRACE_SPEED), [x, y] = q.pts[i];
+            if (a <= 0) continue;
+            if (free(x, y)) p.put(x, y, r[4], a * 0.85);
+            if (i > 0) { const [px, py] = q.pts[i - 1], mx = (x + px) / 2, my = (y + py) / 2; if (free(mx, my)) p.put(mx, my, r[4], a * 0.85); }
+          }
           for (let j = TAIL - 1; j >= 0; j--) {
             const i = head - j;
             if (i < 0 || i >= n) continue;
-            const [x, y] = q.pts[i], c = j < 1 ? r[6] : j < 3 ? r[5] : j < 7 ? r[4] : r[3];
+            const [x, y] = q.pts[i], c = j < 1 ? r[6] : j < 4 ? r[5] : r[4];
             if (free(x, y)) p.put(x, y, c, 1);
-            if (i > 0) { const [px, py] = q.pts[i - 1], mx = (x + px) / 2, my = (y + py) / 2; if (free(mx, my)) p.put(mx, my, j < 3 ? r[5] : j < 7 ? r[4] : r[3], 1); }
+            if (i > 0) { const [px, py] = q.pts[i - 1], mx = (x + px) / 2, my = (y + py) / 2; if (free(mx, my)) p.put(mx, my, j < 4 ? r[5] : r[4], 1); }
           }
           const after = head - (n - 1);
           if (after >= 0 && after < 12) {                                  // the via: a square pad that pulses and cools
@@ -2627,7 +2645,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       const b = blocks.find((q) => q.small && x >= q.x && x < q.x + q.w && y >= q.y && y < q.y + q.h);
       if (!b) { tip.classList.remove('is-on'); return; }
       tip.innerHTML = b.tip;
-      tip.style.setProperty('--c', F.PAL[b.pal][4]);
+      tip.style.setProperty('--c', b.hexes[4]);
       const tw = tip.offsetWidth, th = tip.offsetHeight;
       tip.style.left = Math.max(0, Math.min(cr.width - tw, e.clientX - cr.left - tw / 2)) + 'px';
       tip.style.top = Math.max(0, e.clientY - cr.top - th - 14) + 'px';
