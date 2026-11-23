@@ -1605,7 +1605,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
 /* About: pixel map (0.25° per land dot, equirectangular, 130°W–70°E, 70°N–8°N), full width under the top bar.
    Land is a static dot grid on one canvas; routes, packets, markers and their glow are a live pixelfx frame
    (half-degree art pixels, a color buffer plus an additive light buffer) on a second canvas.
-   Each city has its own palette ramp (pixelfx PAL), and the countries worked with are tinted with it. */
+   Each city has its own palette ramp (pixelfx PAL); the countries worked with stay in the theme's neutrals. */
 (() => {
   const fig = document.getElementById('xmap');
   const inner = document.getElementById('xmap-inner');
@@ -1683,7 +1683,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
   // neutrals from the site's own tokens (warm near-greys around --ink-800 / --ink-700 / --ink-600):
   // shadowed coast, two body tones, lit coast
   const LAND = ['#1b1b1a', '#232322', '#292928', '#3a3a38'].map(hex);
-  // countries worked with: a lighter warm grey, carrying only a breath of their city's colour
+  // countries worked with: a lighter warm grey from the same neutrals (no hue)
   const WORK = ['#2a2a28', '#333331', '#3c3b38', '#52514c'].map(hex);
   const SEA = '#1f1f1e';
   // land and worked masks (for coast lighting)
@@ -1750,7 +1750,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       }
     };
     runs(landRuns, LAND);
-    for (const wk of worked) runs(wk.runs, WORK.map((n) => mix(n, wk.ramp[4], 0.06)));
+    for (const wk of worked) runs(wk.runs, WORK);   // the theme's neutral, no city hue
   };
 
   // ---- live layer: a pixelfx frame on the same quarter-degree grid as the land dots ----
@@ -1819,8 +1819,7 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
           p.dot(x, y, j < 2 ? rt.ramp[7] : at(rt.ramp, 0.92 - j * 0.045), j < 5 ? 1 : 1 - j * 0.05);
         }
         const [x, y] = rt.pts[Math.min(n - 1, head)];
-        p.rect(x - 1, y - 1, 2, 2, rt.ramp[7]);          // a 2×2 head reads at this size
-        p.glow(x, y, 11, rt.ramp[5], 0.5);
+        p.rect(x - 1, y - 1, 2, 2, rt.ramp[7]);          // a 2×2 head reads at this size; the light alone, no glow
       } else {
         const a = (tt - travel) / 1.6, [x, y] = P(rt.k);
         p.ring(x, y, 7 + a * 16, 1, rt.ramp[5], (1 - a) * 0.9);
