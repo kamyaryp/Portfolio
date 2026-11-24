@@ -605,7 +605,7 @@ body { overflow-x: clip; }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
 .stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 26px; background: color-mix(in srgb, var(--surface) 82%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--radius); }
 .stat__num { margin-bottom: 14px; font-family: var(--font-display); font-size: clamp(2.5rem, 4.4vw, 3.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
-.stat__what, .stat__src { text-transform: uppercase; text-wrap: balance; }
+.stat__what, .stat__src { text-wrap: balance; }
 .stat__what { font-size: var(--fs-base); color: var(--fg); }
 .stat__src { font-family: var(--font-body); font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
 
@@ -843,10 +843,10 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       <!-- 2 · Numbers -->
       <section class="about-stats" aria-label="In numbers">
         <div class="stats" data-reveal>
-          <div class="stat"><span class="stat__num">68M+</span><span class="stat__what">Users reached</span><span class="stat__src">People who use products I helped design.</span></div>
-          <div class="stat"><span class="stat__num">100+</span><span class="stat__what">Products designed</span><span class="stat__src">Across 7 roles and 3 design partnerships.</span></div>
-          <div class="stat"><span class="stat__num">14</span><span class="stat__what">Product domains</span><span class="stat__src">From online groceries to crypto wallets.</span></div>
-          <div class="stat"><span class="stat__num">6</span><span class="stat__what">Countries represented</span><span class="stat__src">My teams worked together on-site and remotely.</span></div>
+          <div class="stat"><span class="stat__num">68M+</span><span class="stat__what">Users Reached</span><span class="stat__src">People who use products I helped design.</span></div>
+          <div class="stat"><span class="stat__num">100+</span><span class="stat__what">Products Designed</span><span class="stat__src">Across 7 roles and 3 design partnerships.</span></div>
+          <div class="stat"><span class="stat__num">14</span><span class="stat__what">Product Domains</span><span class="stat__src">From online groceries to crypto wallets.</span></div>
+          <div class="stat"><span class="stat__num">6</span><span class="stat__what">Countries Represented</span><span class="stat__src">My teams worked together on-site and remotely.</span></div>
         </div>
       </section>
 
