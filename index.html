@@ -601,13 +601,45 @@ body { overflow-x: clip; }
 .bio__facts div:last-child { border-bottom: 0; }
 .bio__facts dt { font-family: var(--font-body); font-size: 0.8125rem; letter-spacing: 0; text-transform: none; }
 
-/* key numbers: four cards */
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
-.stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 26px; background: color-mix(in srgb, var(--surface) 82%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--radius); }
-.stat__num { margin-bottom: 14px; font-family: var(--font-display); font-size: clamp(2.5rem, 4.4vw, 3.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
-.stat__what, .stat__src { text-wrap: balance; }
-.stat__what { font-size: var(--fs-base); color: var(--fg); }
-.stat__src { font-family: var(--font-body); font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
+/* About stats: the experience tile leads, with four supporting metrics. */
+.stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.4vw, 20px);
+}
+.stat {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  padding: clamp(14px, 2vw, 24px);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.stat--experience {
+  grid-row: span 2;
+  grid-template-rows: 1fr auto auto;
+  padding: clamp(20px, 3vw, 40px);
+  background: var(--surface-2);
+}
+.stat__num {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(2.125rem, 3.4vw, 3rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.stat--experience .stat__num {
+  margin-bottom: clamp(16px, 2.4vw, 32px);
+  font-size: clamp(3.5rem, 7vw, 6rem);
+}
+.stat__what { font-size: var(--fs-base); line-height: 1.3; color: var(--fg); text-wrap: balance; }
+.stat--experience .stat__what { font-size: var(--fs-lg); }
+.stat__src { font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
 
 /* domains: packed bubbles drawn as pixel dots, labels in HTML on top */
 /* domains: a chip on a board. Board and package run full width; the package matches the content column */
@@ -700,6 +732,7 @@ body { overflow-x: clip; }
 @media (max-width: 900px) {
   .bio__lead, .bio__text, .bio__facts { grid-column: 1 / -1; grid-row: auto; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat--experience { grid-column: 1 / -1; grid-row: auto; }
   .about-block { padding-top: 80px; }
   .card-panel { padding: 4px 18px 6px; }
   .vg-row { grid-template-columns: minmax(0, 1fr) 4.5rem; row-gap: 14px; }
@@ -843,6 +876,11 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       <!-- 2 · Numbers -->
       <section class="about-stats" aria-label="In numbers">
         <div class="stats" data-reveal>
+          <div class="stat stat--experience">
+            <span class="stat__num">8+</span>
+            <span class="stat__what">Years of Experience</span>
+            <span class="stat__src">Designing digital products since 2017.</span>
+          </div>
           <div class="stat"><span class="stat__num">68M+</span><span class="stat__what">Users Reached</span><span class="stat__src">People who use products I helped design.</span></div>
           <div class="stat"><span class="stat__num">100+</span><span class="stat__what">Products Designed</span><span class="stat__src">Across 7 roles and 3 design partnerships.</span></div>
           <div class="stat"><span class="stat__num">14</span><span class="stat__what">Product Domains</span><span class="stat__src">From online groceries to crypto wallets.</span></div>
