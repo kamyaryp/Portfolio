@@ -19,7 +19,7 @@ img { max-width: 100%; }
 :root {
   color-scheme: dark;
 
-  /* Palette: near-neutral warm greys, minimal saturation, no gloss or gradients */
+  /* Palette: near-neutral warm greys with minimal saturation */
   --ink-900: #141413;   /* page background */
   --ink-800: #1A1A19;   /* surface / cards */
   --ink-700: #222221;   /* raised surface, hover */
@@ -575,7 +575,32 @@ body { overflow-x: clip; }
 .about-stats { margin-top: 0; position: relative; z-index: 1; } /* script crops the map: Berlin 32px under the bar; these cards sit 48px under Atlanta, over the map's tail */
 .about-table { margin-top: var(--gutter); position: relative; z-index: 1; }
 .about-block { padding-top: 112px; }
-.card-panel { background: color-mix(in srgb, var(--surface) 86%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 32px 8px; }
+.card-panel { padding: 6px 32px 8px; }
+
+/* Shared material for the About stat cards, timeline and profile. */
+.view--about :is(.stat, .card-panel, .bio__facts) {
+  --muted: #b9bac2;
+  background-color: var(--about-panel-solid, var(--surface));
+  border: 1px solid rgb(223 232 255 / 16%);
+  border-radius: 16px;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .view--about :is(.stat, .card-panel, .bio__facts) {
+    background-color: rgb(28 30 35 / 64%);
+    background-image:
+      linear-gradient(155deg, rgb(238 245 255 / 12%), transparent 56%),
+      radial-gradient(ellipse at 0 0, var(--about-panel-reflection, rgb(177 195 224 / 9%)), transparent 76%);
+    -webkit-backdrop-filter: blur(16px) saturate(125%);
+    backdrop-filter: blur(16px) saturate(125%);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .view--about :is(.stat, .card-panel, .bio__facts) {
+    background: var(--about-panel-solid, var(--surface));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
 
 /* ---------- About page: bio and numbers ---------- */
 /* two columns that start on the same line: the story on the left, a compact profile card on the right */
@@ -588,9 +613,6 @@ body { overflow-x: clip; }
 .bio__facts {
   grid-column: 4;
   grid-row: 1 / span 2;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
   padding: 4px 22px;
   /* the card runs the full height of the story beside it, rows spread evenly */
   align-self: stretch;
@@ -605,7 +627,7 @@ body { overflow-x: clip; }
 .stats {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr));
-  gap: clamp(12px, 1.4vw, 20px);
+  gap: clamp(8px, 1vw, 12px);
 }
 .stat {
   display: grid;
@@ -613,15 +635,13 @@ body { overflow-x: clip; }
   gap: 4px;
   min-width: 0;
   padding: clamp(14px, 2vw, 24px);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  border: 1px solid var(--line);
-  border-radius: 12px;
 }
 .stat--experience {
   grid-row: span 2;
   grid-template-rows: 1fr auto auto;
   padding: clamp(20px, 3vw, 40px);
-  background: var(--surface-2);
+  --about-panel-solid: var(--surface-2);
+  --about-panel-reflection: rgb(155 176 235 / 22%);
 }
 .stat__num {
   margin-bottom: 8px;
