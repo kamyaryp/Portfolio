@@ -19,7 +19,7 @@ img { max-width: 100%; }
 :root {
   color-scheme: dark;
 
-  /* Palette: near-neutral warm greys with minimal saturation */
+  /* Palette: near-neutral warm greys, minimal saturation, no gloss or gradients */
   --ink-900: #141413;   /* page background */
   --ink-800: #1A1A19;   /* surface / cards */
   --ink-700: #222221;   /* raised surface, hover */
@@ -572,78 +572,10 @@ body { overflow-x: clip; }
 
 /* About sections under the map */
 .view.view--about { padding-top: 0; } /* beats the narrow-screen .view padding too */
-.about-stats { margin-top: 0; position: relative; z-index: 1; } /* the map script tucks the stats over the map's lower edge */
+.about-stats { margin-top: 0; position: relative; z-index: 1; } /* script crops the map: Berlin 32px under the bar; these cards sit 48px under Atlanta, over the map's tail */
 .about-table { margin-top: var(--gutter); position: relative; z-index: 1; }
 .about-block { padding-top: 112px; }
-.card-panel { padding: 6px 32px 8px; }
-
-/* Quiet surfaces for content, clear glass where the stats overlap the map. */
-.view--about :is(.stat, .card-panel, .bio__facts) {
-  --muted: #b7b9bb;
-  background-color: var(--surface);
-  border: 1px solid rgb(255 255 255 / 13%);
-  border-radius: 16px;
-}
-.view--about .stat {
-  position: relative;
-  border-radius: 22px;
-}
-.view--about .stat--experience {
-  background-color: var(--surface-2);
-  border-radius: 26px;
-}
-
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  @media (not (prefers-reduced-transparency: reduce)) and (not (prefers-contrast: more)) and (not (forced-colors: active)) {
-    /* One field of reflected color, drawn from the city routes above the cards. */
-    .about-stats::before {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      inset: -48px calc((100% - var(--page-w, 100%)) / 2) -28px;
-      background:
-        radial-gradient(ellipse 45% 65% at 14% 34%, rgb(37 122 120 / 36%), transparent 76%),
-        radial-gradient(ellipse 48% 69% at 59% 56%, rgb(61 77 151 / 33%), transparent 73%),
-        radial-gradient(ellipse 42% 69% at 94% 31%, rgb(147 91 47 / 29%), transparent 72%);
-      -webkit-mask-image: linear-gradient(transparent, #000 23%, #000 75%, transparent);
-      mask-image: linear-gradient(transparent, #000 23%, #000 75%, transparent);
-      pointer-events: none;
-    }
-    .view--about .stat {
-      background:
-        linear-gradient(165deg, rgb(255 255 255 / 6%), transparent 47%, rgb(0 0 0 / 17%)),
-        rgb(15 17 19 / var(--glass-opacity, 39%));
-      border-color: rgb(255 255 255 / 12%);
-      -webkit-backdrop-filter: blur(5px) saturate(122%);
-      backdrop-filter: blur(5px) saturate(122%);
-      box-shadow: inset 0 0 0 1px rgb(0 0 0 / 37%);
-    }
-    .view--about .stat--experience { --glass-opacity: 30%; }
-  }
-}
-
-@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
-  @media (not (prefers-reduced-transparency: reduce)) and (not (prefers-contrast: more)) and (not (forced-colors: active)) {
-    .stat::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background:
-        radial-gradient(circle 112px at var(--glass-x, 50%) var(--glass-y, 50%), var(--glass-gleam, transparent), transparent),
-        linear-gradient(152deg, rgb(230 253 255 / 62%), rgb(255 255 255 / 3%) 27% 58%, rgb(203 220 255 / 36%) 100%);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-    }
-    @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-      .stat:hover { --glass-gleam: rgb(241 250 255 / 42%); }
-    }
-  }
-}
+.card-panel { background: color-mix(in srgb, var(--surface) 86%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 32px 8px; }
 
 /* ---------- About page: bio and numbers ---------- */
 /* two columns that start on the same line: the story on the left, a compact profile card on the right */
@@ -656,6 +588,9 @@ body { overflow-x: clip; }
 .bio__facts {
   grid-column: 4;
   grid-row: 1 / span 2;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
   padding: 4px 22px;
   /* the card runs the full height of the story beside it, rows spread evenly */
   align-self: stretch;
@@ -666,41 +601,13 @@ body { overflow-x: clip; }
 .bio__facts div:last-child { border-bottom: 0; }
 .bio__facts dt { font-family: var(--font-body); font-size: 0.8125rem; letter-spacing: 0; text-transform: none; }
 
-/* About stats: the experience tile leads, with four supporting metrics. */
-.stats {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr));
-  gap: clamp(6px, 0.7vw, 10px);
-}
-.stat {
-  display: grid;
-  align-content: start;
-  gap: 4px;
-  min-width: 0;
-  padding: clamp(14px, 2vw, 24px);
-}
-.stat--experience {
-  grid-row: span 2;
-  grid-template-rows: 1fr auto auto;
-  padding: clamp(20px, 3vw, 40px);
-}
-.stat__num {
-  margin-bottom: 8px;
-  font-family: var(--font-display);
-  font-size: clamp(2.125rem, 3.4vw, 3rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: var(--fg);
-  font-variant-numeric: tabular-nums;
-}
-.stat--experience .stat__num {
-  margin-bottom: clamp(16px, 2.4vw, 32px);
-  font-size: clamp(3.5rem, 7vw, 6rem);
-}
-.stat__what { font-size: var(--fs-base); line-height: 1.3; color: var(--fg); text-wrap: balance; }
-.stat--experience .stat__what { font-size: var(--fs-lg); }
-.stat__src { font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
+/* key numbers: four cards */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
+.stat { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 24px 24px 26px; background: color-mix(in srgb, var(--surface) 82%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--radius); }
+.stat__num { margin-bottom: 14px; font-family: var(--font-display); font-size: clamp(2.5rem, 4.4vw, 3.5rem); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+.stat__what, .stat__src { text-wrap: balance; }
+.stat__what { font-size: var(--fs-base); color: var(--fg); }
+.stat__src { font-family: var(--font-body); font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
 
 /* domains: packed bubbles drawn as pixel dots, labels in HTML on top */
 /* domains: a chip on a board. Board and package run full width; the package matches the content column */
@@ -793,7 +700,6 @@ body { overflow-x: clip; }
 @media (max-width: 900px) {
   .bio__lead, .bio__text, .bio__facts { grid-column: 1 / -1; grid-row: auto; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .stat--experience { grid-column: 1 / -1; grid-row: auto; }
   .about-block { padding-top: 80px; }
   .card-panel { padding: 4px 18px 6px; }
   .vg-row { grid-template-columns: minmax(0, 1fr) 4.5rem; row-gap: 14px; }
@@ -937,11 +843,6 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
       <!-- 2 · Numbers -->
       <section class="about-stats" aria-label="In numbers">
         <div class="stats" data-reveal>
-          <div class="stat stat--experience">
-            <span class="stat__num">8+</span>
-            <span class="stat__what">Years of Experience</span>
-            <span class="stat__src">Designing digital products since 2017.</span>
-          </div>
           <div class="stat"><span class="stat__num">68M+</span><span class="stat__what">Users Reached</span><span class="stat__src">People who use products I helped design.</span></div>
           <div class="stat"><span class="stat__num">100+</span><span class="stat__what">Products Designed</span><span class="stat__src">Across 7 roles and 3 design partnerships.</span></div>
           <div class="stat"><span class="stat__num">14</span><span class="stat__what">Product Domains</span><span class="stat__src">From online groceries to crypto wallets.</span></div>
@@ -1803,8 +1704,8 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
     const size = Math.max(1, Math.round(cs * 0.7));
     const off = Math.max(0, Math.floor((cs - size) / 2));
     const cssCell = w / MAP.cols;
-    // Crop cleanly under the bar. Keep the terrain visible through the top of the cards,
-    // then dither the dots down to the page colour without thinning the raster.
+    // top: a clean cut under the top bar. bottom: full strength down to the cards, then every dot steps
+    // darker towards the page colour (5 hard steps, dithered between neighbours), no overlay, no thinning
     const r0 = crop.top / cssCell, rs = (crop.fadeFrom || MAP.rows * cssCell) / cssCell, r1 = MAP.rows;
     const show = new Uint8Array(MAP.rows), dark = new Float32Array(MAP.rows);
     for (let r = 0; r < MAP.rows; r++) {
@@ -1969,10 +1870,9 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
     const labels = [...inner.querySelectorAll('.xmap__label')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
     const top = Math.max(0, box('berlin', ir, full).top - 32);
     const lowest = labels.length ? Math.max(...labels.map((r) => r.bottom - ir.top)) : 0;
-    const mapGap = Math.min(36, w * 0.064);
-    const cards = Math.min(full, Math.max(box('atlanta', ir, full).bottom + mapGap, lowest + 12));
-    const fadeFrom = cards + Math.min(64, (full - cards) * 0.28);
-    crop = { top, bottom: full, fadeFrom };
+    // where the cards start: 48px under Atlanta's label (other labels just stay clear)
+    const cards = Math.min(full, Math.max(box('atlanta', ir, full).bottom + 48, lowest + 12));
+    crop = { top, bottom: full, fadeFrom: cards };
     // arcs may bend up to just under the visible top edge (in half-degree art pixels)
     buildRoutes((top / w) * FW + 3);
     inner.style.transform = `translateY(${-top}px)`;
@@ -2002,19 +1902,6 @@ for (const k in PFX.PAL) if (PFX.PAL[k].length < 8) PFX.PAL[k].push('#ffffff');
   fit();
 })();
 
-
-/* The glass rim catches a small highlight near a desktop pointer. */
-(() => {
-  const glassPointer = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) and (not (prefers-reduced-transparency: reduce)) and (not (prefers-contrast: more)) and (not (forced-colors: active))');
-  document.querySelector('.about-stats')?.addEventListener('pointermove', (event) => {
-    if (!glassPointer.matches || event.pointerType !== 'mouse') return;
-    const card = event.target.closest('.stat');
-    if (!card) return;
-    const { left, top } = card.getBoundingClientRect();
-    card.style.setProperty('--glass-x', `${event.clientX - left}px`);
-    card.style.setProperty('--glass-y', `${event.clientY - top}px`);
-  });
-})();
 
 /* Experience timeline: one row per role (company, then role · focus), one pixel per quarter from Q4 2017 to now */
 (() => {
